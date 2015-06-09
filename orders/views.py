@@ -6,7 +6,7 @@ from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.contrib import messages
 from django.shortcuts import render, HttpResponseRedirect
-from django.http import HttpResponseBadRequest
+from django.http import HttpResponseBadRequest, JsonResponse
 from orders.forms import OrderRatingForm
 
 # Create your views here.
@@ -113,8 +113,8 @@ def rate_order(request):
             if form.is_valid():
                 form.save()
                 messages.success(request, "Tu comentario ha sido enviado. Gracias!")
-                return HttpResponseRedirect(reverse("user_profile"))
-                # return HttpResponse('Success')
+                # return HttpResponseRedirect(reverse("user_profile"))
+                return JsonResponse({'message': 'Success', })
             if form.errors:
                 json_data = json.dumps(form.errors)
                 return HttpResponseBadRequest(json_data, content_type='application/json')

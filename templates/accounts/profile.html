@@ -11,60 +11,7 @@
 
 <div class="row profile">
     <div class="col-md-3">
-        <div class="profile-sidebar">
-            <!-- SIDEBAR USERPIC -->
-                {% if user.userprofile.avatar %}
-                    <img class='img-responsive img-thumbnail' src="{{ user.userprofile.avatar.url }}" />
-                {% else %}
-                    <img class='img-responsive img-thumbnail' src="{% static 'img/placeholder.svg' %}" />
-                {% endif %}
-
-            <!-- END SIDEBAR USERPIC -->
-            <!-- SIDEBAR USER TITLE -->
-            <div class="profile-usertitle">
-                <div class="profile-usertitle-name">
-                    <h4>@{{ user.username }}</h4>
-                </div>
-            </div>
-            <!-- END SIDEBAR USER TITLE -->
-            <!-- SIDEBAR BUTTONS -->
-            <div class="profile-userbuttons">
-                <a class="btn btn-info btn-responsive" href="{% url 'edit_user_profile' %}"> Editar
-                    <span class="glyphicon glyphicon-edit"></span>
-                </a>
-            </div>
-            <!-- END SIDEBAR BUTTONS -->
-            <!-- SIDEBAR MENU -->
-            <div class="profile-usermenu">
-                <ul class="nav">
-                    <li class="active">
-                        <a href="#profile" data-toggle="tab">
-                            <i class="glyphicon glyphicon-home"></i>
-                            Resumen
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#settings" data-toggle="tab">
-                            <i class="glyphicon glyphicon-user"></i>
-                            Configuracion de la cuenta
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#orders" data-toggle="tab">
-                            <i class="glyphicon glyphicon-list-alt"></i>
-                            Pedidos
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#help" data-toggle="tab">
-                            <i class="glyphicon glyphicon-flag"></i>
-                            Ayuda
-                        </a>
-                    </li>
-                </ul>
-            </div>
-            <!-- END MENU -->
-        </div>
+        {% include 'accounts/profile-navbar.html' %}
     </div>
     <div class="col-md-9">
         <div class="profile-content">
@@ -218,7 +165,7 @@
 {% block profile-scripts %}
     <script src="{% static 'js/profile.js' %}"></script>
     <script>
-    var order_id = ""
+
         $('#rateOrderModal').on('show.bs.modal', function (event) {
             var button = $(event.relatedTarget) // Button that triggered the modal
             var user = button.data('user') // Extract info from data-* attributes
@@ -237,72 +184,35 @@
         })
 
         $("#sendRateOrderForm").click(function(e){
-              e.preventDefault()
-              var mForm = $("#rateOrderForm").serialize()
-             $.ajax({
-                  type: "POST",
-                  url: "{% url 'ajax_rate_order' %}",
-                  data: mForm,
+            e.preventDefault()
+            var mForm = $("#rateOrderForm").serialize()
+            $.ajax({
+                type: "POST",
+                url: "{% url 'ajax_rate_order' %}",
+                data: mForm,
 
-                  success: function(data){
-                      //console.log(data)
-                      $("#rateOrderModalMessage").html("<p>" + data + "</p>")
-                      $("#rateOrderModal").modal("hide");
-                  },
-                  error: function(data){
-                     console.log(data)
-                     console.log(data.responseJSON)
-                      var obj = data.responseJSON
-                      // console.log(obj)
-                      // console.log(obj.email)
-                      if (obj.rate) {
-                          $("#rateOrderModalMessage").html("<p class='alert alert-top-message'>" + obj.rate + "</p>")
-                      }
-                      else {
-                          $("#rateOrderModalMessage").html("<p class='alert alert-top-message'>" + obj.rate + "</p>")
-                      }
+                success: function(data){
+                    //console.log(data)
+                    $("#rateOrderModalMessage").html("<p>" + data.message + "</p>")
+                    $("#rateOrderModal").modal("hide");
+                    location.reload()
+                },
+                error: function(data){
+                    console.log(data)
+                    console.log(data.responseJSON)
+                    var obj = data.responseJSON
+                    // console.log(obj)
+                    // console.log(obj.email)
+                    if (obj.comment) {
+                        $("#rateOrderModalMessage").html("<p class='alert alert-top-message'>" + obj.comment + "</p>")
+                    }
+                    else {
+                        $("#rateOrderModalMessage").html("<p class='alert alert-top-message'>" + obj.rate + "</p>")
+                    }
 
-                  },
-               });
+                },
             });
-
-        var $star_rating = $('.star-rating .fa');
-        var rating_text = "";
-
-        var SetRatingStar = function() {
-            return $star_rating.each(function() {
-                if (parseInt($star_rating.siblings('input.rating-value').val()) >= parseInt($(this).data('rating'))) {
-                    return $(this).removeClass('fa-star-o').addClass('fa-star');
-                } else {
-                    return $(this).removeClass('fa-star').addClass('fa-star-o');
-                }
-            });
-        };
-
-        $star_rating.on('click', function() {
-            $star_rating.siblings('input.rating-value').val($(this).data('rating'));
-            switch($(this).data('rating')) {
-                case 1:
-                    rating_text = "Muy Mal";
-                    break;
-                case 2:
-                    rating_text = "Mal";
-                    break;
-                case 3:
-                    rating_text = "Normal";
-                    break;
-                case 4:
-                    rating_text = "Muy Bueno!";
-                    break;
-                case 5:
-                    rating_text = "Excelente!";
-                    break;
-            }
-            $('#ratingLabel').text(rating_text);
-
-            return SetRatingStar();
         });
 
-        SetRatingStar();
     </script>
 {% endblock %}
