@@ -1,0 +1,46 @@
+<div class="modal fade" id="rateOrderModal" tabindex="-1" role="dialog" aria-labelledby="rateOrderModalLabel" aria-hidden="true">
+    <form method="POST" action="{% url 'ajax_rate_order' %}" id="rateOrderForm" class="form" role="form">
+        {% csrf_token %}
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="commentsModalLabel">Nuevo comentario</h4>
+                    <h5 class="modal-title" id="order-label" name="order-id">#</h5>
+                    <input type="hidden" name="order" id="order-id" value="">
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <!-- <input class='form-control' type='text' placeholder='Enter Email' /> -->
+                            <p id='rateOrderModalMessage'></p>
+
+                        <label for="recipient-name" class="control-label">De:</label>
+                        <input type="text" class="form-control" id="recipient-name" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="message-text" class="control-label">Comentario:</label>
+                        <textarea class="form-control" id="message-text" name="comment" maxlength="120"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="star-rate" class="control-label">Evalúanos:</label>
+                        <div class="star-rating" id="star-rate">
+                            <span class="fa fa-star-o fa-2x" data-rating="1"></span>
+                            <span class="fa fa-star-o fa-2x" data-rating="2"></span>
+                            <span class="fa fa-star-o fa-2x" data-rating="3"></span>
+                            <span class="fa fa-star-o fa-2x" data-rating="4"></span>
+                            <span class="fa fa-star-o fa-2x" data-rating="5"></span>
+                            <input type="hidden" name="rate" class="rating-value" value="0">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label" id="ratingLabel"></label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <input type="submit" id='sendRateOrderForm' class="btn btn-primary" value="Enviar">
+                </div>
+            </div>
+        </div>
+    </form>
+</div>

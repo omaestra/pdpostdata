@@ -1,0 +1,308 @@
+{% extends "base.html" %}
+
+{% load staticfiles %}
+
+{% block profile-styles %}
+    <link rel='stylesheet' href='{% static "css/profile.css" %}' />
+    <link rel='stylesheet' href='{% static "css/font-awesome.min.css" %}' />
+{% endblock %}
+
+{% block content %}
+
+<div class="row profile">
+    <div class="col-md-3">
+        <div class="profile-sidebar">
+            <!-- SIDEBAR USERPIC -->
+                {% if user.userprofile.avatar %}
+                    <img class='img-responsive img-thumbnail' src="{{ user.userprofile.avatar.url }}" />
+                {% else %}
+                    <img class='img-responsive img-thumbnail' src="{% static 'img/placeholder.svg' %}" />
+                {% endif %}
+
+            <!-- END SIDEBAR USERPIC -->
+            <!-- SIDEBAR USER TITLE -->
+            <div class="profile-usertitle">
+                <div class="profile-usertitle-name">
+                    <h4>@{{ user.username }}</h4>
+                </div>
+            </div>
+            <!-- END SIDEBAR USER TITLE -->
+            <!-- SIDEBAR BUTTONS -->
+            <div class="profile-userbuttons">
+                <a class="btn btn-info btn-responsive" href="{% url 'edit_user_profile' %}"> Editar
+                    <span class="glyphicon glyphicon-edit"></span>
+                </a>
+            </div>
+            <!-- END SIDEBAR BUTTONS -->
+            <!-- SIDEBAR MENU -->
+            <div class="profile-usermenu">
+                <ul class="nav">
+                    <li class="active">
+                        <a href="#profile" data-toggle="tab">
+                            <i class="glyphicon glyphicon-home"></i>
+                            Resumen
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#settings" data-toggle="tab">
+                            <i class="glyphicon glyphicon-user"></i>
+                            Configuracion de la cuenta
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#orders" data-toggle="tab">
+                            <i class="glyphicon glyphicon-list-alt"></i>
+                            Pedidos
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#help" data-toggle="tab">
+                            <i class="glyphicon glyphicon-flag"></i>
+                            Ayuda
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <!-- END MENU -->
+        </div>
+    </div>
+    <div class="col-md-9">
+        <div class="profile-content">
+            <div class="tab-content">
+                <div class="tab-pane active" id="profile">
+                    <div class="panel panel-primary">
+                        <div class="panel-heading">Informacion personal</div>
+                        <table class="table table-hover">
+                            <thead>
+                              <tr>
+                                <th>Nombre</th>
+                                <th>Apellido</th>
+                                <th>Username</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr>
+                                <td>{{ user.first_name }}</td>
+                                <td>{{ user.last_name }}</td>
+                                <td>{{ user.username }}</td>
+                              </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="panel panel-primary">
+                        <div class="panel-heading">Direccion de envio</div>
+
+                        <table class="table table-hover">
+                            <thead>
+                            <tr>
+                                <th>Direccion</th>
+                                <th>Telefono</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for useraddress in user.useraddress_set.all %}
+                                <tr>
+                                    <td>{{ useraddress.get_address }}</td>
+                                    <td>{{ useraddress.phone }}</td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="tab-pane" id="settings">
+                    <div class="panel panel-primary">
+                        <div class="panel-heading">Configuracion de la cuenta</div>
+                        {% if profile_form and user_form %}
+                            <form method="POST" action="{% url 'edit_user_profile' %}" enctype="multipart/form-data" class="form-horizontal" role="form">
+                                {% csrf_token %}
+                                <table class="table table-hover">
+                                    {{ profile_form }}
+                                    {{ user_form }}
+                                </table>
+                                <div class="form-group">
+                                    <div class="col-lg-offset-2 col-lg-10">
+                                        <input class="btn btn-primary btn-responsive" type="submit" value="Aceptar">
+                                        <a href="{% url 'user_profile' %}" class="btn btn-danger btn-responsive">Cancelar</a>
+                                    </div>
+                                </div>
+                            </form>
+                        {% else %}
+                            <table class="table table-hover">
+                                <thead>
+                                  <tr>
+                                    <th>Nombre</th>
+                                    <th>Apellido</th>
+                                    <th>Username</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  <tr>
+                                    <td>{{ user.first_name }}</td>
+                                    <td>{{ user.last_name }}</td>
+                                    <td>{{ user.username }}</td>
+                                  </tr>
+                                </tbody>
+                            </table>
+                            <div class="profile-userbuttons">
+                                <a class="btn btn-info btn-responsive" href="{% url 'edit_user_profile' %}"> Editar
+                                    <span class="glyphicon glyphicon-edit"></span>
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="tab-pane" id="orders">
+                    <div class="panel panel-primary">
+                        <div class="panel-heading">Pedidos</div>
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Estatus</th>
+                                    <th>Total</th>
+                                    <th>Fecha creacion</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            {% for order in user.order_set.all %}
+                                <tr>
+                                    <td>
+                                        <a href="#order" data-toggle="tab">{{ order.order_id }}</a>
+                                    </td>
+                                    <td>{{ order.status }}</td>
+                                    <td>{{ order.final_total }}</td>
+                                    <td>{{ order.timestamp }}</td>
+                                    <td>
+                                        {% if not order.orderrating %}
+                                        <a href="#" data-toggle="modal" data-target="#rateOrderModal"
+                                           data-order_number="{{ order.order_id }}" data-user="@{{ user.username }}"
+                                                data-order_id="{{ order.id }}">
+                                            Que tal estuvo?
+                                            <span class="glyphicon glyphicon-comment"></span>
+                                        </a>
+                                        {% else %}
+                                            Comentario enviado!
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="tab-pane" id="help">
+                    <div class="panel panel-primary">
+                        <div class="panel-heading">Ayuda</div>
+                    </div>
+                </div>
+                <div class="tab-pane" id="order">
+                    <div class="panel panel-primary">
+                        <div class="panel-heading">Pedido #
+                            <a href="#orders" data-toggle="tab" style="color: #FFF;">Volver</a>
+                        </div>
+                        <table class="table table-hover">
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+    {% include 'accounts/order_rate_modal.html' %}
+
+{% endblock %}
+
+{% block profile-scripts %}
+    <script src="{% static 'js/profile.js' %}"></script>
+    <script>
+    var order_id = ""
+        $('#rateOrderModal').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget) // Button that triggered the modal
+            var user = button.data('user') // Extract info from data-* attributes
+            var order_number = button.data('order_number') //Extract info from data-* attributes
+            var order_id = button.data('order_id') //Extract info from data-* attributes
+
+            // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
+            // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
+
+            var modal = $(this)
+            modal.find('#rateOrderModalLabel').text('Danos tu opinion ' + user + '!')
+            modal.find('.modal-header #order-label').text('Pedido Nro. #' + order_number)
+            modal.find('.modal-body #recipient-name').val(user)
+            modal.find('.modal-body #message-text').val("")
+            modal.find('.modal-header #order-id').val(order_id)
+        })
+
+        $("#sendRateOrderForm").click(function(e){
+              e.preventDefault()
+              var mForm = $("#rateOrderForm").serialize()
+             $.ajax({
+                  type: "POST",
+                  url: "{% url 'ajax_rate_order' %}",
+                  data: mForm,
+
+                  success: function(data){
+                      //console.log(data)
+                      $("#rateOrderModalMessage").html("<p>" + data + "</p>")
+                      $("#rateOrderModal").modal("hide");
+                  },
+                  error: function(data){
+                     console.log(data)
+                     console.log(data.responseJSON)
+                      var obj = data.responseJSON
+                      // console.log(obj)
+                      // console.log(obj.email)
+                      if (obj.rate) {
+                          $("#rateOrderModalMessage").html("<p class='alert alert-top-message'>" + obj.rate + "</p>")
+                      }
+                      else {
+                          $("#rateOrderModalMessage").html("<p class='alert alert-top-message'>" + obj.rate + "</p>")
+                      }
+
+                  },
+               });
+            });
+
+        var $star_rating = $('.star-rating .fa');
+        var rating_text = "";
+
+        var SetRatingStar = function() {
+            return $star_rating.each(function() {
+                if (parseInt($star_rating.siblings('input.rating-value').val()) >= parseInt($(this).data('rating'))) {
+                    return $(this).removeClass('fa-star-o').addClass('fa-star');
+                } else {
+                    return $(this).removeClass('fa-star').addClass('fa-star-o');
+                }
+            });
+        };
+
+        $star_rating.on('click', function() {
+            $star_rating.siblings('input.rating-value').val($(this).data('rating'));
+            switch($(this).data('rating')) {
+                case 1:
+                    rating_text = "Muy Mal";
+                    break;
+                case 2:
+                    rating_text = "Mal";
+                    break;
+                case 3:
+                    rating_text = "Normal";
+                    break;
+                case 4:
+                    rating_text = "Muy Bueno!";
+                    break;
+                case 5:
+                    rating_text = "Excelente!";
+                    break;
+            }
+            $('#ratingLabel').text(rating_text);
+
+            return SetRatingStar();
+        });
+
+        SetRatingStar();
+    </script>
+{% endblock %}

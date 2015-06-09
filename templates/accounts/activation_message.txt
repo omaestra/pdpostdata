@@ -1,0 +1,9 @@
+Estimado usuario {{ user }},
+
+Por favor, active su cuenta haciendo clic en el siguiente enlace:
+
+{{ activation_url }}
+
+Gracias!
+
+-PD

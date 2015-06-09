@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class='container'>
+
+{% if empty %}
+
+<h1 style='text-align:center;'>{{ empty_message }}</h1>
+
+{% else %}
+<div class="table-responsive">
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>Producto</th>
+                <th class="text-center">Cantidad</th>
+                <th class="text-center">Precio</th>
+                <th class="text-center">Fotos</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for item in cart.cartitem_set.all %}
+            <tr>
+                <td class="col-sm-8 col-md-6">
+                    <h5><a href="#">{{ item.product }}</a></h5>
+                </td>
+                <td  style="text-align: center">
+                    <input type="number" class="form-control" id="qty" value="{{ item.quantity }}">
+                </td>
+                <td class="col-sm-3 col-md-2 text-center"><h5>Bs.F {{ item.product.price }}</h5></td>
+                <td class="col-sm-1 col-md-1 text-center"><h5>{{ item.photo_set.count }}</h5></td>
+                <td class="col-sm-1 col-md-1">
+                    <a href='{% url "remove_from_cart" item.id %}'>
+                        <button class="btn btn-danger">Eliminar <span class="glyphicon glyphicon-remove"></span> </button>
+                    </a>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td><h4>Total</h4></td>
+                <td class="text-right"><h4><strong>Bs.F {{ cart.total }}</strong></h4></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td class="col-sm-1 col-md-1 text-center">
+                    <a class="btn btn-default btn-responsive" href="{% url 'products' %}">
+                        <span class="glyphicon glyphicon-shopping-cart"></span> Continuar comprando
+                    </a>
+                </td>
+                <td class="col-sm-1 col-md-1 text-center">
+                    <a class="btn btn-success btn-responsive" href="{% url 'checkout' %}"> Checkout
+                        <span class="glyphicon glyphicon-play"></span>
+                    </a>
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+    </div>
+
+<!--<div class="table-responsive">
+    <table class='table'>
+        <thead>
+            <th>Producto</th>
+            <th>Precio</th>
+            <th>Cantidad</th>
+            <th>Fotos</th>
+            <th></th>
+        </thead>
+        {% for item in cart.cartitem_set.all %}
+        <tbody>
+        <tr>
+            <td class="col-sm-8 col-md-6">{{ item.product }} {% if item.variations.all %}<ul>{% for subitem in item.variations.all %}<li>{{ subitem.category|capfirst}} : {{ subitem.title|capfirst }}{% endfor %}</li><ul> {% endif %}</td>
+            <td>Bs.F {{ item.product.price }}</td>
+            <td>{{ item.quantity }}</td>
+            <td>{{ item.photo_set.count }}</td>
+            <td class="text-right">
+                <a class="btn btn-danger btn-responsive" href="{% url 'remove_from_cart' item.id %}">
+                <span class="glyphicon glyphicon-remove"></span>
+                </a>
+            </td>
+        </tr>
+
+        {% endfor %}
+    </tbody>
+        <tfoot>
+        <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td><h4>Total</h4></td>
+            <td><h4>Bs.F {{ cart.total }}</h4></td>
+        </tr>
+        </tfoot>
+
+    </table>
+    </div>
+
+    <a class="btn btn-default btn-responsive" href="{% url 'products' %}">
+        <span class="glyphicon glyphicon-shopping-cart"></span> Continuar comprando
+    </a>
+    <a class="btn btn-success btn-responsive" href="{% url 'checkout' %}">
+        <span class="glyphicon glyphicon-play"></span> Checkout
+    </a> -->
+
+{% endif %}
+</div>
+
+{% endblock %}

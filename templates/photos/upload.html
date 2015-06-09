@@ -1,0 +1,235 @@
+{% extends "base.html" %}
+
+{% load staticfiles %}
+
+{% block dropzonejs-styles %}
+    <link rel="stylesheet" href="{% static 'css/dropzone.css' %}">
+    <link rel="stylesheet" href="{% static 'css/pdpostdata.css' %}">
+{% endblock %}
+
+{% block dropzonejs-uploader %}
+   <!-- <form action="{% url 'make' product.slug %}" method="post" enctype="multipart/form-data">{% csrf_token %}
+        {{ form.as_p }}
+        <input name="file" type="file" multiple/>
+        <input type="submit" class="btn btn-primary">
+    </form>
+    <span id='image-count'>0</span> / {{ product.image_total }}
+
+    <button id="submit-all" class="btn btn-primary">Cargar archivos</button>-->
+
+    <div class="panel panel-info">
+        <div class="panel-heading">Cargar imagenes</div>
+        <div class="panel-body">
+            <form action="{% url 'make' product.slug %}" method="post" enctype="multipart/form-data" class="form-inline" role="form">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="file">Elige tus imagenes:</label>
+                    <input type="file" id="upload-image" name="file" multiple="multiple"/>
+                </div>
+
+                <input type="submit" class="btn btn-primary" value="Cargar fotos">
+            </form>
+        </div>
+    </div>
+
+    <div id="thumbnail"></div>
+
+
+
+     <!--<div id="dropzone">
+        <form action="{% url 'make' product.slug %}" class="dropzone" id="myDropzone" method='POST' enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="dz-message">
+                <span class="note">Demo</span>
+            </div>
+            <div class="fallback">
+                <input name="file" type="file" multiple />
+            </div>
+        </form>
+    </div>-->
+{% endblock %}
+
+{% block content %}
+    {% for photo in photos %}
+    <div class="row">
+        <div class="col-sm-1 col-md-3">
+            <div class="thumbnail">
+                <a href="{{ photo.image_field.url }}">
+                    <img class="img-responsive" id="{{ photo.id }}" data-dz-thumbnail alt="{{ photo.name }}" src="{{ photo.image_field.url }}" />
+                </a>
+            </div>
+            <div class="caption">
+                <h3>Thumbnail label</h3>
+                <p>Some sample text. Some sample text.</p>
+                <p>
+                    <a href="#" class="btn btn-primary" role="button">Editar</a>
+                    <a href="#" class="btn btn-default" role="button">Eliminar</a>
+                </p>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+    <div id="dropzone-previews">
+    </div>
+    <!-- your popup hidden content -->
+    <div id="popover_content_wrapper" style="display: none">This is your div content</div>
+        <div class="modal fade" id="imagemodal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog" data-dismiss="modal">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                        <img src="" class="imagepreview" >
+                    </div>
+                    <div class="modal-footer">
+                        <div class="col-xs-12">
+                            <p class="text-left">1. line of description<br>2. line of description <br>3. line of description</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+{% endblock %}
+
+{% block dropzonejs-scripts %}
+    <script src="{% static 'js/dropzone.js' %}"></script>
+    <script type="text/javascript">
+
+        var image_count = 0;
+
+        $('input[type="file"]').change(function () {
+            image_count = $(this)[0].files.length
+            $("#image-count").html(image_count);
+        });
+
+        jQuery(function($){
+            var fileDiv = document.getElementById("upload");
+            var fileInput = document.getElementById("upload-image");
+            console.log(fileInput);
+            fileInput.addEventListener("change",function(e){
+              var files = this.files
+              showThumbnail(files)
+            },false)
+
+            fileDiv.addEventListener("click",function(e){
+              $(fileInput).show().focus().click().hide();
+              e.preventDefault();
+            },false)
+
+            fileDiv.addEventListener("dragenter",function(e){
+              e.stopPropagation();
+              e.preventDefault();
+            },false);
+
+            fileDiv.addEventListener("dragover",function(e){
+              e.stopPropagation();
+              e.preventDefault();
+            },false);
+
+            fileDiv.addEventListener("drop",function(e){
+              e.stopPropagation();
+              e.preventDefault();
+
+              var dt = e.dataTransfer;
+              var files = dt.files;
+
+              showThumbnail(files)
+            },false);
+
+            function showThumbnail(files){
+              for(var i=0;i<files.length;i++){
+                var file = files[i]
+                var imageType = /image.*/
+                if(!file.type.match(imageType)){
+                  console.log("Not an Image");
+                  continue;
+                }
+
+                var image = document.createElement("img");
+                // image.classList.add("")
+                var thumbnail = document.getElementById("thumbnail");
+                image.file = file;
+                thumbnail.appendChild(image)
+
+                var reader = new FileReader()
+                reader.onload = (function(aImg){
+                  return function(e){
+                    aImg.src = e.target.result;
+                  };
+                }(image))
+                var ret = reader.readAsDataURL(file);
+                var canvas = document.createElement("canvas");
+                ctx = canvas.getContext("2d");
+                image.onload= function(){
+                  ctx.drawImage(image,100,100)
+                }
+              }
+            }
+        });
+
+        Dropzone.options.myDropzone = {
+            //paramName: "image_field", // el nombre de nuestro input
+            autoProcessQueue : false,
+            parallelUploads: {{ product.image_total }},
+            removeLinks: true,
+            acceptedFiles: "image/*",
+            createImageThumbnails: true,
+            maxFiles: {{ product.image_total }},
+            minFiles: {{ product.image_total }},
+
+            init: function() {
+                var submitButton = document.querySelector("#submit-all")
+                var myDropzone = this;
+
+                submitButton.addEventListener("click", function() {
+                    //if (image_count == {{ product.image_total }}) {
+                        myDropzone.processQueue(); // Tell Dropzone to process all queued files.
+                    //}
+                    //else {
+                    //    alert("FHF");
+                    //}
+                });
+
+                this.on("success", function(file, responseText) {
+                    // evento lanzado al terminar de subir las imágenes en cola
+                    console.log(responseText);
+                    //var mydropzone = this;
+                    //mydropzone.emit("thumbnail", file, responseText.files[0].url);
+                    //file.previewElement.querySelector("img").src = responseText.files[0].url;
+                    $('#dropzone-previews').append('<div class="row"><div class="col-sm-1 col-md-3"><div class="thumbnail"><a><img class="img-responsive" id="' + responseText.files[0].name + '" data-dz-thumbnail alt="' +responseText.files[0].name+ '" src="' + responseText.files[0].url + '"alt=""/></a> </div> <div class="caption"> <h3>Thumbnail label</h3> <p>Some sample text. Some sample text.</p> <p> <a href="#" class="btn btn-primary" role="button"> Button </a> <a href="#" class="btn btn-default" role="button">Button </a> </p> </div> </div> </div>');
+                    // pop up #example1, #example2, #example3 with same content
+                    $('#'+responseText.files[0].name).popover({
+                        html: true,
+                        trigger: 'click focus',
+                        container: '#dropzone-previews',
+                        placement: 'bottom',
+                        animation: true,
+                        content: function () {
+                            return '<div><a href="' + responseText.files[0].url + '">Editar</a></div>';
+                        },
+                    });
+                });
+
+                this.on("complete", function() {
+                  //this.removeAllFiles();
+                });
+
+                this.on("addedfile", function(file) {
+                    
+                    file.previewElement.addEventListener("click", function() {
+                        //myDropzone.removeFile(file);
+                        $('.imagepreview').attr('src', $(this).find('img').attr('src'));
+			            $('#imagemodal').modal('show');
+                    });
+
+                    image_count++
+                    $("#image-count").html(image_count);
+                    var fileCount = myDropzone.files.length;
+                });
+
+                this.on("maxfilesexceeded", function(file){
+
+                });
+            }
+        };
+    </script>
+{% endblock %}
