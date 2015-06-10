@@ -25,7 +25,7 @@ $( document ).ready(function() {
     );
 });
 
-/* Rate quality of one order using Font-Awesome fonts */
+/* Rate quality of one order using Font-Awesome */
 var $star_rating = $('.star-rating .fa');
         var rating_text = "";
 

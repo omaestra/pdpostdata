@@ -21,6 +21,12 @@ from django.conf.urls.static import static
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
 
+    url(r'^accounts/password_change/$', 'django.contrib.auth.views.password_change',
+        {'post_change_redirect': '/accounts/password_change/done/'},
+        name="password_change"),
+    url(r'^accounts/password_change/done/$',
+        'django.contrib.auth.views.password_change_done'),
+
     url(r'^$', 'products.views.home', name='home'),
     url(r'^s/$', 'products.views.search', name='search'),
     url(r'^products/$', 'products.views.all', name='products'),
@@ -33,6 +39,7 @@ urlpatterns = [
     url(r'^checkout/$', 'orders.views.checkout', name='checkout'),
     url(r'^orders/$', 'orders.views.orders', name='user_orders'),
     url(r'^ajax/rate_order/$', 'orders.views.rate_order', name='ajax_rate_order'),
+    url(r'^orders/(?P<order_id>[\w-]+)/$', 'orders.views.order_details', name='order_details'),
 
     url(r'^ajax/dismiss_marketing_message/$', 'marketing.views.dismiss_marketing_message',
         name='dismiss_marketing_message'),
@@ -45,7 +52,6 @@ urlpatterns = [
     url(r'^accounts/address/add/$', 'accounts.views.add_user_address', name='add_user_address'),
     url(r'^accounts/activate/(?P<activation_key>\w+)/$', 'accounts.views.activation_view', name='activation_view'),
     url(r'^accounts/profile/$', 'accounts.views.user_profile', name='user_profile'),
-    url(r'^accounts/profile/edit/$', 'accounts.views.edit_user_profile', name='edit_user_profile'),
 
     url(r'^photos/upload/$', 'photos.views.upload', name='upload'),
     url(r'^make/(?P<slug>[\w-]+)/$', 'photos.views.make', name='make'),

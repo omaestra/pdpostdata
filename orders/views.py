@@ -121,3 +121,11 @@ def rate_order(request):
 
     else:
         raise Http404
+
+
+def order_details(request, order_id=None):
+    order = Order.objects.get(order_id=order_id)
+    context = {'order': order, }
+    template = "orders/order_details.html"
+
+    return render(request, template, context)

@@ -11,23 +11,22 @@
           <a class="navbar-brand" href="{% url 'home' %}">Postdata</a>
         </div>
         <div class="navbar-collapse collapse">
-
-          <form class="navbar-form navbar-left" role="search" action='/s/'>
-            <div class="form-group">
-          <input type="text" class="form-control" name='q' placeholder="Buscar producto">
-            </div>
-          <button type="submit" class="btn btn-default">Buscar</button>
-          </form>
-          <ul class="nav navbar-nav navbar-right">
-          <li><a href="{% url 'products' %}">Productos</a></li>
-            <li><a href="{% url 'cart' %}"><span class="glyphicon glyphicon-shopping-cart"></span> <span class="badge">{% if not request.session.items_total %} 0 {% else %} {{ request.session.items_total }} {% endif%}</span></a></li>
-            {% if user.is_authenticated %}
-            <li><a href="{% url 'user_profile' %}">{{ user.username }}</a></li>
-            <li><a href="{% url 'auth_logout' %}">Cerrar sesion</a></li>
-            {% else %}
-            <li><a href="{% url 'auth_login' %}">Iniciar sesion</a></li>
-            {% endif %}
-          </ul>
+            <form class="navbar-form navbar-left" role="search" action='/s/'>
+                <div class="form-group">
+                    <input type="text" class="form-control" name='q' placeholder="Buscar producto">
+                </div>
+                <button type="submit" class="btn btn-default">Buscar</button>
+            </form>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="{% url 'products' %}">Productos</a></li>
+                <li><a href="{% url 'cart' %}"><span class="glyphicon glyphicon-shopping-cart"></span> <span class="badge">{% if not request.session.items_total %} 0 {% else %} {{ request.session.items_total }} {% endif%}</span></a></li>
+                {% if user.is_authenticated %}
+                    <li><a href="{% url 'user_profile' %}">{{ user.username }}</a></li>
+                    <li><a href="{% url 'auth_logout' %}">Cerrar sesion</a></li>
+                {% else %}
+                    <li><a href="{% url 'auth_login' %}?next={{ request.get_full_path|urlencode }}">Iniciar sesion</a></li>
+                {% endif %}
+            </ul>
         </div><!--/.nav-collapse -->
       </div>
     </div>

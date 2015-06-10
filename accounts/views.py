@@ -7,6 +7,7 @@ import random
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from django.shortcuts import render, HttpResponseRedirect, Http404
+from django.http import HttpResponseBadRequest
 from django.contrib.auth import logout, login, authenticate
 from django.contrib import messages
 from django.core.urlresolvers import reverse
@@ -17,28 +18,10 @@ from .models import EmailConfirmed, UserDefaultAddress, UserProfile
 # Create your views here.
 @login_required
 def user_profile(request):
-    try:
-        user_id = request.session['user_id']
-        user = settings.AUTH_USER_MODEL.User.objects.get(id=user_id)
-
-    except:
-        user_id = None
-
-    if user_id:
-
-        context = {"user": user, }
-    else:
-        empty_message = "Tu Perfil esta vacio, por favor registrate."
-        context = {"empty": True, "empty_message": empty_message}
-
-    template = "accounts/profile.html"
-    return render(request, template, context)
-
-@login_required
-def edit_user_profile(request):
-    profile = UserProfile.objects.get(user=request.user)
-
     if request.POST:
+
+        profile = request.user.userprofile
+
         profile_form = UserProfileForm(request.POST, request.FILES, instance=profile)
         user_form = UserForm(request.POST, instance=request.user)
         if profile_form.is_valid() and user_form.is_valid():
@@ -50,14 +33,25 @@ def edit_user_profile(request):
 
             return HttpResponseRedirect(reverse('user_profile'))
     else:
+
+        try:
+            profile = request.user.userprofile
+
+        except:
+            empty_message = "Tu Perfil esta vacio, por favor registrate."
+            context = {'empty': True, 'empty_message': empty_message, }
+            return HttpResponseBadRequest(reverse('user_profile'))
+
+        profile = request.user.userprofile
+
         profile_form = UserProfileForm(instance=profile)
         user_form = UserForm(instance=request.user)
 
-        context = {'profile_form': profile_form, 'user_form': user_form, }
+        context = {'user': request.user, 'user_form': user_form, 'profile_form': profile_form, }
+
         template = "accounts/profile.html"
 
         return render(request, template, context)
-
 
 def logout_view(request):
     print "logging out"
@@ -71,19 +65,33 @@ def logout_view(request):
 
 
 def login_view(request):
-    form = LoginForm(request.POST or None)
+    login_form = LoginForm(request.POST or None)
     btn = "Iniciar sesion"
-    if form.is_valid():
-        username = form.cleaned_data['username']
-        password = form.cleaned_data['password']
+
+    if login_form.is_valid():
+        redirect_to = request.REQUEST.get('next', '')
+        username = login_form.cleaned_data['username']
+        password = login_form.cleaned_data['password']
         user = authenticate(username=username, password=password)
-        login(request, user)
-        messages.success(request, "Iniciaste sesion exitosamente. Bienvenido!")
-        return HttpResponseRedirect("/")
+        if user:
+            # Is the account active? It could have been disabled.
+            if user.is_active:
+                # If the account is valid and active, we can log the user in.
+                # We'll send the user back to the homepage.
+                login(request, user)
+            else:
+                # An inactive account was used - no logging in!
+                messages.error(request, "Tu cuenta esta inactiva")
+                return HttpResponseRedirect('%s' % (reverse("home")))
+
+            messages.success(request, "Iniciaste sesion exitosamente. Bienvenido!")
+
+            return HttpResponseRedirect(redirect_to)
+
     context = {
-        "form": form,
+        "login_form": login_form,
         "submit_btn": btn,
-        "class_name": form.__class__.__name__
+        "class_name": login_form.__class__.__name__
     }
     return render(request, "form.html", context)
 
