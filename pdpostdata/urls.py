@@ -52,6 +52,7 @@ urlpatterns = [
     url(r'^accounts/address/add/$', 'accounts.views.add_user_address', name='add_user_address'),
     url(r'^accounts/activate/(?P<activation_key>\w+)/$', 'accounts.views.activation_view', name='activation_view'),
     url(r'^accounts/profile/$', 'accounts.views.user_profile', name='user_profile'),
+    url(r'^address/delete/(?P<address_id>\d+)/$', 'accounts.views.delete_user_address', name='delete_user_address'),
 
     url(r'^photos/upload/$', 'photos.views.upload', name='upload'),
     url(r'^make/(?P<slug>[\w-]+)/$', 'photos.views.make', name='make'),

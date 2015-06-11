@@ -13,7 +13,7 @@ from django.contrib import messages
 from django.core.urlresolvers import reverse
 
 from .forms import LoginForm, RegistrationForm, UserAddressForm, UserProfileForm, UserForm
-from .models import EmailConfirmed, UserDefaultAddress, UserProfile
+from .models import EmailConfirmed, UserDefaultAddress, UserProfile, UserAddress
 
 # Create your views here.
 @login_required
@@ -24,8 +24,8 @@ def user_profile(request):
 
         profile_form = UserProfileForm(request.POST, request.FILES, instance=profile)
         user_form = UserForm(request.POST, instance=request.user)
-        if profile_form.is_valid() and user_form.is_valid():
 
+        if profile_form.is_valid() and user_form.is_valid():
             profile_form.save()
             user_form.save()
 
@@ -46,12 +46,15 @@ def user_profile(request):
 
         profile_form = UserProfileForm(instance=profile)
         user_form = UserForm(instance=request.user)
+        address_form = UserAddressForm()
 
-        context = {'user': request.user, 'user_form': user_form, 'profile_form': profile_form, }
+        context = {'user': request.user, 'user_form': user_form, 'profile_form': profile_form,
+                   'address_form': address_form, }
 
         template = "accounts/profile.html"
 
         return render(request, template, context)
+
 
 def logout_view(request):
     print "logging out"
@@ -162,25 +165,44 @@ def add_user_address(request):
         next_page = request.GET.get("next")
     except:
         next_page = None
-    form = UserAddressForm(request.POST or None)
+
+    address_form = UserAddressForm(request.POST or None)
     if request.method == "POST":
-        if form.is_valid():
-            new_address = form.save(commit=False)
+        if address_form.is_valid():
+            new_address = address_form.save(commit=False)
             new_address.user = request.user
+            phone_number = address_form.cleaned_data['phone_number']
+            new_address.phone = phone_number
             new_address.save()
-            is_default = form.cleaned_data["default"]
+
+            messages.success(request, "Direccion de envio agregada con exito!")
+
+            is_default = address_form.cleaned_data["default"]
             if is_default:
                 default_address, created = UserDefaultAddress.objects.get_or_create(user=request.user)
                 default_address.shipping = new_address
                 default_address.save()
 
-            if next_page is not None:
-                return HttpResponseRedirect(reverse(str(next_page)))
+                messages.success(request, "Direccion de facturacion agregada con exito!")
+
+            # if next_page is not None:
+            return HttpResponseRedirect(reverse('user_profile'))
 
     submit_btn = "Guardar Direccion"
     form_title = "Agregar Nueva Direccion"
-    return render(request, "form.html",
-                  {"form": form,
+    return render(request, "accounts/profile.html",
+                  {"address_form": address_form,
                    "submit_btn": submit_btn,
                    "form_title": form_title,
                    })
+
+def delete_user_address(request, address_id):
+
+    address = UserAddress.objects.get(id=address_id)
+    address.delete()
+    # cartitem.carts = None
+    # cartitem.save()
+
+    messages.success(request, "Direccion eliminada con exito!")
+
+    return HttpResponseRedirect(reverse("user_profile"))
