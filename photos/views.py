@@ -9,6 +9,22 @@ from products.models import Product
 
 # Create your views here.
 
+from django.views.generic.edit import FormView
+
+from photos.forms import UploadForm
+from photos.models import Photo
+
+
+class UploadView(FormView):
+    template_name = 'photos/upload2.html'
+    form_class = UploadForm
+    success_url = '/upload2/'
+
+    def form_valid(self, form):
+        for each in form.cleaned_data['attachments']:
+            Photo.objects.create(image_field=each)
+        return super(UploadView, self).form_valid(form)
+
 
 def upload(request):
     if request.method == 'POST':

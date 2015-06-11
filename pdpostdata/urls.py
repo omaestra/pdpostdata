@@ -17,6 +17,8 @@ from django.conf.urls import include, url
 from django.contrib import admin
 from django.conf import settings
 from django.conf.urls.static import static
+from photos.views import UploadView
+
 
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
@@ -56,6 +58,7 @@ urlpatterns = [
 
     url(r'^photos/upload/$', 'photos.views.upload', name='upload'),
     url(r'^make/(?P<slug>[\w-]+)/$', 'photos.views.make', name='make'),
+    url(r'^upload2/$', UploadView.as_view(), name='upload2'),
 
     url(r'^dashboard/$', 'dashboards.views.dashboard', name='dashboard'),
 ]

@@ -18,9 +18,9 @@ from .models import EmailConfirmed, UserDefaultAddress, UserProfile, UserAddress
 # Create your views here.
 @login_required
 def user_profile(request):
-    if request.POST:
+    profile = request.user.userprofile
 
-        profile = request.user.userprofile
+    if request.POST:
 
         profile_form = UserProfileForm(request.POST, request.FILES, instance=profile)
         user_form = UserForm(request.POST, instance=request.user)
@@ -41,8 +41,6 @@ def user_profile(request):
             empty_message = "Tu Perfil esta vacio, por favor registrate."
             context = {'empty': True, 'empty_message': empty_message, }
             return HttpResponseBadRequest(reverse('user_profile'))
-
-        profile = request.user.userprofile
 
         profile_form = UserProfileForm(instance=profile)
         user_form = UserForm(instance=request.user)
@@ -206,3 +204,4 @@ def delete_user_address(request, address_id):
     messages.success(request, "Direccion eliminada con exito!")
 
     return HttpResponseRedirect(reverse("user_profile"))
+

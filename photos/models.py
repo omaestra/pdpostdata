@@ -24,7 +24,7 @@ def get_image_path(instance, filename):
 class Photo(models.Model):
     id = models.CharField(max_length=36, primary_key=True, default=make_uuid)
     image_field = models.ImageField(upload_to=get_image_path)
-    cart_item = models.ForeignKey(CartItem)
+    cart_item = models.ForeignKey(CartItem, null=True, blank=True)
     updated = models.DateTimeField(auto_now_add=False, auto_now=True)
     created = models.DateTimeField(auto_now_add=True, auto_now=False)
 
