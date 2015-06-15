@@ -71,12 +71,22 @@ def make(request, slug):
         product = Product.objects.get(slug=slug)
     except Product.DoesNotExist:
         pass
+
+    try:
+        cart_item_id = request.session['cart_item_id']
     except:
-        pass
+        # new_cart_item = CartItem()
+        cart_item = CartItem.objects.create(cart=cart, product=product)
+        # new_cart.save()
+        request.session['cart_item_id'] = cart_item.id
+        cart_item_id = new_cart.id
+
+    cart_item = CartItem.objects.get(id=cart_item_id)
+
+    request.session['cart_item_id'] = cart_item.id
 
     uploaded_images = []  # product variation
     if request.method == "POST":
-        cart_item = CartItem.objects.create(cart=cart, product=product)
         try:
             response = {'files': []}
             for photo in request.FILES.getlist('file'):
@@ -101,16 +111,16 @@ def make(request, slug):
         if len(uploaded_images) > 0:
             cart_item.photo_set.add(*uploaded_images)
 
-        #cart_item.save()
+        # cart_item.save()
         # success message
         context = {
             'product': product,
             'photos': uploaded_images,
         }
 
-        #return render(request, "photos/upload.html", context)
-        #return JsonResponse(response)
-        return HttpResponseRedirect(reverse('cart'))
+        return render(request, "photos/upload.html", context)
+        # return JsonResponse(response)
+        # return HttpResponseRedirect(reverse('cart'))
     # error message
     form = PhotoForm()
     context = {
