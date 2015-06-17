@@ -1,5 +1,66 @@
-<form action="" method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <input type="submit" value="Send" />
-</form>
+{% extends "base.html" %}
+
+{% load staticfiles %}
+
+{% block dropzonejs-styles %}
+    <link rel="stylesheet" href="{% static 'css/dropzone.css' %}">
+    <link rel="stylesheet" href="{% static 'css/pdpostdata.css' %}">
+{% endblock %}
+
+{% block dropzonejs-uploader %}
+
+    <form id="uploadForm" action="{% url 'upload2' %}" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input type="submit" id="sendUploadForm" value="Send" />
+    </form>
+
+{% endblock %}
+
+{% block content %}
+    {% for photo in photos %}
+    <div class="row">
+        <div class="col-sm-1 col-md-3">
+            <div class="thumbnail">
+                <a href="{{ photo.image_field.url }}">
+                    <img class="img-responsive" id="{{ photo.id }}" data-dz-thumbnail alt="{{ photo.name }}" src="{{ photo.image_field.url }}" />
+                </a>
+            </div>
+            <div class="caption">
+                <h3>Thumbnail label</h3>
+                <p>Some sample text. Some sample text.</p>
+                <p>
+                    <a href="#" class="btn btn-primary" role="button">Editar</a>
+                    <a href="#" class="btn btn-default" role="button">Eliminar</a>
+                </p>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+    <div id="dropzone-previews">
+    </div>
+    <!-- your popup hidden content -->
+    <div id="popover_content_wrapper" style="display: none">This is your div content</div>
+        <div class="modal fade" id="imagemodal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog" data-dismiss="modal">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                        <img src="" class="imagepreview" >
+                    </div>
+                    <div class="modal-footer">
+                        <div class="col-xs-12">
+                            <p class="text-left">1. line of description<br>2. line of description <br>3. line of description</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+{% endblock %}
+
+{% block dropzonejs-scripts %}
+    <script type="text/javascript">
+
+
+    </script>
+{% endblock %}

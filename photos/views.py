@@ -1,7 +1,9 @@
 from django.http import JsonResponse
 
-from django.shortcuts import render, HttpResponseRedirect
+from django.shortcuts import render, HttpResponseRedirect, HttpResponse
 from django.core.urlresolvers import reverse
+from django.http import QueryDict
+
 from .forms import PhotoForm
 from .models import Photo
 from carts.models import Cart, CartItem
@@ -11,19 +13,44 @@ from products.models import Product
 
 from django.views.generic.edit import FormView
 
-from photos.forms import UploadForm
 from photos.models import Photo
 
+class MultiAttachmentMixin(object):
 
-class UploadView(FormView):
-    template_name = 'photos/upload2.html'
-    form_class = UploadForm
-    success_url = '/upload2/'
+    def post(self, request, *args, **kwargs):
+        # Ajax POST for file uploads
+        if request.POST:
+            custom_post = QueryDict('temp_hash=%s' % request.POST.get('temp_hash'))
+            file_form = PhotoForm(request.POST, request.FILES)
+            if file_form.is_valid():
+                # file_form.save()
+                # return HttpResponse('{"status":"success"}', content_type='application/json')
+                return JsonResponse({'status': 'success', })
+            # return HttpResponse('{"status":"error: %s"}' % file_form.errors, content_type='application/json')
+            return JsonResponse({'status': file_form.errors, })
+
+        return super(MultiAttachmentMixin, self).post(request, *args, **kwargs)
 
     def form_valid(self, form):
-        for each in form.cleaned_data['attachments']:
-            Photo.objects.create(image_field=each)
-        return super(UploadView, self).form_valid(form)
+        print("FJKHJH")
+        # I load these uploaded files into django-filer objects.
+        files = Photo.objects.filter(temp_hash=self.request.POST.get('temp_hash'))
+        # folder = Folder.objects.get(name='Customer Service')
+        for f in files:
+            new_file = Photo(image_field=f)
+            # Save the image using the model's ImageField settings
+            new_file.save()
+            # Attach the new Filer files to the original form object.
+            self.object.attachments.add(new_file)
+        files.delete()
+
+        return super(MultiAttachmentMixin, self).form_valid(form)
+
+
+class UploadView(MultiAttachmentMixin, FormView):
+    template_name = 'photos/upload2.html'
+    form_class = PhotoForm
+    success_url = '/upload2/'
 
 
 def upload(request):
@@ -58,41 +85,18 @@ def make(request, slug):
     request.session.set_expiry(120000)
 
     try:
-        the_id = request.session['cart_id']
-    except:
-        new_cart = Cart()
-        new_cart.save()
-        request.session['cart_id'] = new_cart.id
-        the_id = new_cart.id
-
-    cart = Cart.objects.get(id=the_id)
-
-    try:
         product = Product.objects.get(slug=slug)
     except Product.DoesNotExist:
         pass
-
-    try:
-        cart_item_id = request.session['cart_item_id']
-    except:
-        # new_cart_item = CartItem()
-        cart_item = CartItem.objects.create(cart=cart, product=product)
-        # new_cart.save()
-        request.session['cart_item_id'] = cart_item.id
-        cart_item_id = new_cart.id
-
-    cart_item = CartItem.objects.get(id=cart_item_id)
-
-    request.session['cart_item_id'] = cart_item.id
 
     uploaded_images = []  # product variation
     if request.method == "POST":
         try:
             response = {'files': []}
-            for photo in request.FILES.getlist('file'):
+            for photo in request.FILES.getlist('photos'):
                 # Create a new entry in our database
                 new_image = Photo(image_field=photo)
-                new_image.cart_item = cart_item
+                # new_image.cart_item = cart_item
                 # Save the image using the model's ImageField settings
                 new_image.save()
                 # Save output for return as JSON
@@ -121,6 +125,7 @@ def make(request, slug):
         return render(request, "photos/upload.html", context)
         # return JsonResponse(response)
         # return HttpResponseRedirect(reverse('cart'))
+
     # error message
     form = PhotoForm()
     context = {

@@ -9,10 +9,10 @@
 
 {% block dropzonejs-uploader %}
 
-    <form action="" method="post" enctype="multipart/form-data">
+    <form id="uploadForm" action="{% url 'upload2' %}" method="post" enctype="multipart/form-data">
         {% csrf_token %}
         {{ form.as_p }}
-        <input type="submit" value="Send" />
+        <input type="submit" id="sendUploadForm" value="Send" />
     </form>
 
    <!-- <form action="{% url 'make' product.slug %}" method="post" enctype="multipart/form-data">{% csrf_token %}
@@ -100,6 +100,52 @@
 {% block dropzonejs-scripts %}
     <script src="{% static 'js/dropzone.js' %}"></script>
     <script type="text/javascript">
+
+        $("#sendUploadForm").click(function(e){
+            e.preventDefault()
+            var mForm = $("#uploadForm").serialize()
+            $.ajax({
+                type: 'POST',
+                url: '{% url 'upload2' %}',
+                data: mForm,
+                cache: false,
+                processData: false,
+                contentType: false,
+                success: function(data) {
+                    alert('success');
+                },
+                error: function(data) {
+                    alert("error");
+                }
+            });
+        });
+
+        var frm = $('#uploadForm');
+        frm.submit(function () {
+            $.ajax({
+                type: frm.attr('method'),
+                url: frm.attr('action'),
+                data: frm.serialize(),
+                cache: false,
+                processData: false,
+                contentType: false,
+                success: function(data) {
+                    alert('success');
+                },
+                error: function(data) {
+                    alert("error");
+                }
+            });
+            return false;
+        });
+
+        // Submit post on submit
+        $('#uploadForm').on('submit', function(event){
+            alert("fmwjkn")
+            event.preventDefault();
+            console.log("form submitted!")  // sanity check
+            upload();
+        });
 
         var image_count = 0;
 
