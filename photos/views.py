@@ -22,12 +22,27 @@ class MultiAttachmentMixin(object):
         if request.POST:
             custom_post = QueryDict('temp_hash=%s' % request.POST.get('temp_hash'))
             file_form = PhotoForm(request.POST, request.FILES)
+            print(request.FILES)
             if file_form.is_valid():
                 # file_form.save()
+                response = {'files': []}
+                # Create a new entry in our database
+                new_image = Photo(image_field=request.FILES['image_field'],
+                                  temp_hash=request.POST.get('temp_hash'))
+                # Save the image using the model's ImageField settings
+                new_image.save()
+                response['files'].append({
+                    'name': '%s' % new_image.id,
+                    'size': '%d' % request.FILES.__sizeof__(),
+                    'url': '%s' % new_image.image_field.url,
+                    'thumbnailUrl': '%s' % new_image.image_field.url,
+                    'deleteUrl': '\/image\/delete\/%s' % new_image.id,
+                    "deleteType": 'DELETE'
+                })
                 # return HttpResponse('{"status":"success"}', content_type='application/json')
-                return JsonResponse({'status': 'success', })
+                return JsonResponse({'response': response, })
             # return HttpResponse('{"status":"error: %s"}' % file_form.errors, content_type='application/json')
-            return JsonResponse({'status': file_form.errors, })
+            return JsonResponse({'response': file_form.errors, })
 
         return super(MultiAttachmentMixin, self).post(request, *args, **kwargs)
 
