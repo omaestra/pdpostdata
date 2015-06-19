@@ -1,0 +1,42 @@
+{% extends 'accounts/profile-base.html' %}
+
+{% block orders %}
+    <div class="panel panel-primary">
+        <div class="panel-heading">Mis Pedidos</div>
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Estatus</th>
+                    <th>Total</th>
+                    <th>Fecha creacion</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for order in user.order_set.all %}
+                <tr>
+                    <td>
+                        <a href="{% url 'order_details' order.order_id %}">{{ order.order_id }}</a>
+                    </td>
+                    <td>{{ order.status }}</td>
+                    <td>{{ order.final_total }}</td>
+                    <td>{{ order.timestamp }}</td>
+                    <td>
+                        {% if not order.orderrating %}
+                        <a href="#" data-toggle="modal" data-target="#rateOrderModal"
+                           data-order_number="{{ order.order_id }}" data-user="@{{ user.username }}"
+                                data-order_id="{{ order.id }}">
+                            Que tal estuvo?
+                            <span class="glyphicon glyphicon-comment"></span>
+                        </a>
+                        {% else %}
+                            Comentario enviado! =)
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

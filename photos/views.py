@@ -24,6 +24,7 @@ class MultiAttachmentMixin(object):
             file_form = PhotoForm(request.POST, request.FILES)
             print(request.POST)
             print(request.FILES)
+
             if file_form.is_valid():
                 # file_form.save()
                 response = {'photos': []}
