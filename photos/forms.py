@@ -15,7 +15,7 @@ class PhotoForm(forms.ModelForm):
 
     class Meta:
         model = Photo
-        fields = ['image_field', 'temp_hash', ]
+        fields = ['temp_hash', ]
 
     def __init__(self, *args, **kwargs):
         super(PhotoForm, self).__init__(*args, **kwargs)

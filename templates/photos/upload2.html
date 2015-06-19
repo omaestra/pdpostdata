@@ -8,16 +8,45 @@
 {% endblock %}
 
 {% block dropzonejs-uploader %}
+    {{ product.slug }}
+    {{ product.image_total }}
 
-    <form id="uploadForm" action="{% url 'upload2' %}" method="post" enctype="multipart/form-data">
+    <div id="dropzone">
+        <form action="{% url 'upload2' product.slug %}" class="dropzone" id="myDropzone" method='POST' enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <div class="dz-message">
+                <span class="note">Carga tus fotos haciendo clic aqui o arrastrandolas a la zona de carga.</span>
+            </div>
+            <div class="fallback">
+                <input name="file" type="file" multiple />
+            </div>
+        </form>
+    </div>
+
+    <!--<form id="uploadForm" action="{% url 'upload2' product.slug %}" method="post" enctype="multipart/form-data">
         {% csrf_token %}
         {{ form.as_p }}
         <input type="submit" id="sendUploadForm" value="Send" />
-    </form>
+    </form>-->
+
+        <!-- The global file processing state -->
+        <span class="fileupload-process">
+            <div id="total-progress" class="progress progress-striped active" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                <div class="progress-bar progress-bar-success" style="width:0%;" data-dz-uploadprogress=""></div>
+            </div>
+        </span>
 
 {% endblock %}
 
 {% block content %}
+
+    <div class="row">
+        <form class='form' method='POST' action='{% url "add_to_cart" product.slug %}'> {% csrf_token %}
+			<input class='btn btn-default btn-block' type='submit' value='Agregar al carrito'/>
+        </form>
+    </div>
+
     {% for photo in photos %}
     <div class="row">
         <div class="col-sm-1 col-md-3">
@@ -59,36 +88,127 @@
 {% endblock %}
 
 {% block dropzonejs-scripts %}
+    <script src="{% static 'js/dropzone.js' %}"></script>
     <script type="text/javascript">
-        // AJAX for posting
-        function create_post() {
-            console.log("create post is working!") // sanity check
-            $.ajax({
-                url : "{% url 'upload2' %}", // the endpoint
-                type : "post", // http method
-                data : { form : $('#uploadForm').serialize() }, // data sent with the post request
 
-                // handle a successful response
-                success : function(json) {
-                    console.log(json); // log the returned json to the console
-                    console.log("success"); // another sanity check
-                },
+        $(document).ready(function (e) {
+            $('#uploadForm').on('submit',(function(e) {
+                e.preventDefault();
+                var formData = new FormData(this);
 
-                // handle a non-successful response
-                error : function(xhr,errmsg,err) {
-                    $('#dropzone-previews').html("<div class='alert-box alert radius' data-alert>Oops! We have encountered an error: "+errmsg+
-                        " <a href='#' class='close'>&times;</a></div>"); // add the error to the dom
-                    console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
-                }
+                $.ajax({
+                    type:'POST',
+                    url: $(this).attr('action'),
+                    data:formData,
+                    cache:false,
+                    contentType: false,
+                    processData: false,
+                    success:function(data){
+                        console.log("success");
+                        console.log("fjkdwhfjwhf"+ data);
+                        for (var i =0; i< data.photos.length; i++) {
+                            $('#dropzone-previews').append('<div class="col-lg-2 col-md-1 col-xs-1 thumb"><a class="thumbnail" href="#"> <img class="img-responsive" src="' + data.photos[i].url + '" alt=""> </a> </div>');
+                            //$('#dropzone-previews').append('<div class="col-sm-1 col-md-3"><div class="thumbnail"><a><img class="img-responsive" id="' + data.photos[i].name + '" data-dz-thumbnail alt="' + data.photos[i].name+ '" src="' + data.photos[i].url + '"alt=""/></a> </div> <div class="caption"> <h3>Thumbnail label</h3> <p>Some sample text. Some sample text.</p> <p> <a href="#" class="btn btn-primary" role="button"> Button </a> <a href="#" class="btn btn-default" role="button">Button </a> </p> </div> </div>');
+                        }
+
+
+                    },
+                    error: function(data){
+                        console.log("error");
+                        console.log(data);
+                    },
+
+                    xhr: function()
+                    {
+                        //$('.progress-bar').css("display",'block');
+                        //$('#percent').text('0%');
+                        var xhr = new window.XMLHttpRequest();
+                        //Upload progress
+                        xhr.upload.addEventListener("progress", function(e){
+                        if (e.lengthComputable) {
+                            var percentComplete = e.loaded / e.total;
+                            //Do something with upload progress
+                            console.log(percentComplete)
+                            $('.progress-bar').css('width', (percentComplete)*100+'%');
+                            $('#percent').text(Math.floor((percentComplete)*100)+'%');
+                        }
+                    }, false);
+                    return xhr;
+                    }
+                });
+            }));
+
+            $("#id_photos").on("change", function() {
+                $("#uploadForm").submit();
             });
-        };
-
-        // Submit post on submit
-        $('#uploadForm').on('submit', function(event){
-            event.preventDefault();
-            console.log("form submitted!")  // sanity check
-            create_post();
         });
+
+        Dropzone.options.myDropzone = {
+            url: "{% url 'upload2' product.slug %}", // Set the url
+            parallelUploads: 5,
+            paramName: "photos", // Name of our input file tag
+            removeLinks: true,
+            acceptedFiles: "image/*",
+            createImageThumbnails: true,
+            maxFiles: 20,
+            minFiles: 0,
+
+            init: function() {
+                var myDropzone = this;
+
+                this.on("success", function(file, responseText) {
+                    // evento lanzado al terminar de subir las imágenes en cola
+                    console.log(responseText);
+                    //var mydropzone = this;
+                    //mydropzone.emit("thumbnail", file, responseText.files[0].url);
+                    //file.previewElement.querySelector("img").src = responseText.files[0].url;
+                    $('#dropzone-previews').append('<div class="col-sm-1 col-md-3"><div class="thumbnail"><a><img class="img-responsive" id="' + responseText.photos[0].name + '" data-dz-thumbnail alt="' +responseText.photos[0].name+ '" src="' + responseText.photos[0].url + '"alt=""/></a> </div> <div class="caption"> <h3>Thumbnail label</h3> <p>Some sample text. Some sample text.</p> <p> <a href="#" class="btn btn-primary" role="button"> Button </a> <a href="#" class="btn btn-default" role="button">Button </a> </p> </div> </div>');
+                    // pop up #example1, #example2, #example3 with same content
+                    $('#'+responseText.photos[0].name).popover({
+                        html: true,
+                        trigger: 'click focus',
+                        container: '#dropzone-previews',
+                        placement: 'bottom',
+                        animation: true,
+                        content: function () {
+                            return '<div><a href="' + responseText.photos[0].url + '">Editar</a></div>';
+                        },
+                    });
+                });
+
+                this.on("complete", function() {
+                  //this.removeAllFiles();
+                });
+
+                this.on("addedfile", function(file) {
+
+                    //image_count++
+                    //$("#image-count").html(image_count);
+
+                    //var fileCount = myDropzone.files.length;
+                });
+
+                this.on("maxfilesexceeded", function(file){
+
+                });
+
+                // Update the total progress bar
+                this.on("totaluploadprogress", function(progress) {
+                  document.querySelector("#total-progress .progress-bar").style.width = progress + "%";
+                });
+
+                this.on("sending", function(file) {
+                  // Show the total progress bar when upload starts
+                  document.querySelector("#total-progress").style.opacity = "1";
+                  // And disable the start button
+                });
+
+                // Hide the total progress bar when nothing's uploading anymore
+                this.on("queuecomplete", function(progress) {
+                  document.querySelector("#total-progress").style.opacity = "0";
+                });
+            }
+        };
 
     </script>
 {% endblock %}

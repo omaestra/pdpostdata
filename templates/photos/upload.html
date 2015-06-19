@@ -8,8 +8,9 @@
 {% endblock %}
 
 {% block dropzonejs-uploader %}
+    {{ product.image_total }}
 
-    <form id="uploadForm" action="{% url 'upload2' %}" method="post" enctype="multipart/form-data">
+    <form id="uploadForm" action="{% url 'upload2' product.slug %}" method="post" enctype="multipart/form-data">
         {% csrf_token %}
         {{ form.as_p }}
         <input type="submit" id="sendUploadForm" value="Send" />
@@ -101,50 +102,38 @@
     <script src="{% static 'js/dropzone.js' %}"></script>
     <script type="text/javascript">
 
-        $("#sendUploadForm").click(function(e){
-            e.preventDefault()
-            var mForm = $("#uploadForm").serialize()
-            $.ajax({
-                type: 'POST',
-                url: '{% url 'upload2' %}',
-                data: mForm,
-                cache: false,
-                processData: false,
-                contentType: false,
-                success: function(data) {
-                    alert('success');
-                },
-                error: function(data) {
-                    alert("error");
-                }
-            });
-        });
+        $(document).ready(function (e) {
+            $('#uploadForm').on('submit',(function(e) {
+                e.preventDefault();
+                var formData = new FormData(this);
 
-        var frm = $('#uploadForm');
-        frm.submit(function () {
-            $.ajax({
-                type: frm.attr('method'),
-                url: frm.attr('action'),
-                data: frm.serialize(),
-                cache: false,
-                processData: false,
-                contentType: false,
-                success: function(data) {
-                    alert('success');
-                },
-                error: function(data) {
-                    alert("error");
-                }
-            });
-            return false;
-        });
+                $.ajax({
+                    type:'POST',
+                    url: $(this).attr('action'),
+                    data:formData,
+                    cache:false,
+                    contentType: false,
+                    processData: false,
+                    success:function(data){
+                        console.log("success");
+                        console.log("fjkdwhfjwhf"+ data);
+                        for (var i =0; i< data.photos.length; i++) {
+                            $('#dropzone-previews').append('<div class="col-lg-2 col-md-1 col-xs-1 thumb"><a class="thumbnail" href="#"> <img class="img-responsive" src="' + data.photos[i].url + '" alt=""> </a> </div>');
+                            //$('#dropzone-previews').append('<div class="col-sm-1 col-md-3"><div class="thumbnail"><a><img class="img-responsive" id="' + data.photos[i].name + '" data-dz-thumbnail alt="' + data.photos[i].name+ '" src="' + data.photos[i].url + '"alt=""/></a> </div> <div class="caption"> <h3>Thumbnail label</h3> <p>Some sample text. Some sample text.</p> <p> <a href="#" class="btn btn-primary" role="button"> Button </a> <a href="#" class="btn btn-default" role="button">Button </a> </p> </div> </div>');
+                        }
 
-        // Submit post on submit
-        $('#uploadForm').on('submit', function(event){
-            alert("fmwjkn")
-            event.preventDefault();
-            console.log("form submitted!")  // sanity check
-            upload();
+
+                    },
+                    error: function(data){
+                        console.log("error");
+                        console.log(data);
+                    }
+                });
+            }));
+
+            $("#id_photos").on("change", function() {
+                $("#uploadForm").submit();
+            });
         });
 
         var image_count = 0;

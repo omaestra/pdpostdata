@@ -58,7 +58,7 @@ urlpatterns = [
 
     url(r'^photos/upload/$', 'photos.views.upload', name='upload'),
     url(r'^make/(?P<slug>[\w-]+)/$', 'photos.views.make', name='make'),
-    url(r'^upload2/$', UploadView.as_view(), name='upload2'),
+    url(r'^upload2/(?P<slug>[\w-]+)/$', UploadView.as_view(), name='upload2'),
 
     url(r'^dashboard/$', 'dashboards.views.dashboard', name='dashboard'),
 ]
