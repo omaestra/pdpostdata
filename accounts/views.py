@@ -171,6 +171,7 @@ def add_user_address(request):
             new_address.user = request.user
             phone_number = address_form.cleaned_data['phone_number']
             new_address.phone = phone_number
+            new_address.billing = True
             new_address.save()
 
             messages.success(request, "Direccion de envio agregada con exito!")
@@ -179,6 +180,7 @@ def add_user_address(request):
             if is_default:
                 default_address, created = UserDefaultAddress.objects.get_or_create(user=request.user)
                 default_address.shipping = new_address
+                default_address.billing = new_address
                 default_address.save()
 
                 messages.success(request, "Direccion de facturacion agregada con exito!")

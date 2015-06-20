@@ -5,6 +5,7 @@ from django.contrib import messages
 
 from products.models import Product, Variation
 from .models import Cart, CartItem
+from photos.models import Photo
 
 
 def view(request):
@@ -82,7 +83,10 @@ def add_to_cart(request, slug):
                 product_var.append(v)
             except:
                 pass
+
+        photos = Photo.objects.filter(temp_hash=request.POST.get('temp_hash'))
         cart_item = CartItem.objects.create(cart=cart, product=product)
+        cart_item.photo_set = photos
         if len(product_var) > 0:
             cart_item.variations.add(*product_var)
         cart_item.quantity = qty

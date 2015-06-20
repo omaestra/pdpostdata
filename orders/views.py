@@ -87,7 +87,7 @@ def checkout(request):
             shipping_address_instance = None
 
         #if charge["captured"]:
-        new_order.status = "Finished"
+        # new_order.status = "Finished"
         new_order.shipping_address = shipping_address_instance
         new_order.billing_addresses = billing_address_instance
         new_order.save()

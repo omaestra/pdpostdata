@@ -61,6 +61,7 @@ urlpatterns = [
     url(r'^upload2/(?P<slug>[\w-]+)/$', UploadView.as_view(), name='upload2'),
 
     url(r'^dashboard/$', 'dashboards.views.dashboard', name='dashboard'),
+    url(r'^dashboard/orders/$', 'dashboards.views.orders', name='dashboard_orders'),
 ]
 
 if settings.DEBUG:
