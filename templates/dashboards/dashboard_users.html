@@ -4,19 +4,19 @@
     <div class="row">
 
             <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-              <h1 class="page-header">Dashboard / Pedidos</h1>
+              <h1 class="page-header">Dashboard / Usuarios</h1>
                 <h4>Conectado como @{{ user.username }}</h4>
               <div class="row">
                     <div class="col-lg-3 col-md-6">
-                        <div class="panel panel-yellow">
-                            <div class="panel-heading" data-toggle="tooltip" data-placement="top" title="Cantidad de Pedidos pendientes">
+                        <div class="panel panel-green">
+                            <div class="panel-heading" data-toggle="tooltip" data-placement="top" title="Cantidad de Usuarios registrados en los ultimos 30 dias">
                                 <div class="row">
                                     <div class="col-xs-3">
-                                        <i class="fa fa-shopping-cart fa-5x"></i>
+                                        <i class="fa fa-users fa-5x"></i>
                                     </div>
                                     <div class="col-xs-9 text-right">
-                                        <div class="huge">{{ pending_orders.count }}</div>
-                                        <div>Nuevos Pedidos!</div>
+                                        <div class="huge">{{ new_users.count }}</div>
+                                        <div>Nuevos Usuarios!</div>
                                     </div>
                                 </div>
                             </div>
@@ -36,7 +36,7 @@
                     <div class="col-lg-8">
                         <div class="panel panel-default">
                             <div class="panel-heading">
-                                <i class="fa fa-shopping-cart fa-fw"></i> Pedidos
+                                <i class="fa fa-shopping-cart fa-fw"></i> Usuarios
                                 <div class="pull-right">
                                     <div class="btn-group">
                                         <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">
@@ -62,77 +62,26 @@
                                 <table class="table table-hover" style="color: #000;">
                                     <thead>
                                         <tr>
-                                            <th>#</th>
-                                            <th>Estatus</th>
-                                            <th>Total</th>
-                                            <th>Fecha creacion</th>
-                                            <th>Carrito</th>
-                                            <th></th>
+                                            <th>Username</th>
+                                            <th>Nombre</th>
+                                            <th>Apellido</th>
+                                            <th>E-mail</th>
+                                            <th>Fecha de registro</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {% for order in pending_orders %}
+                                        {% for new_user in new_users %}
                                             <tr>
                                                 <td>
                                                     <a class="btn btn-primary btn-xs" role="button" data-toggle="collapse"
-                                                       href="#{{ order.order_id }}" aria-expanded="false"
-                                                       aria-controls="collapseExample">{{ order.order_id }}
+                                                       href="#{{ new_user.username }}" aria-expanded="false"
+                                                       aria-controls="collapseExample">{{ new_user.username }}
                                                     </a>
                                                 </td>
-                                                <td>
-                                                    <form method="POST" id="order_status_form">{% csrf_token %}
-                                                        <select name="status" class="btn btn-default dropdown" onchange="this.form.submit()">
-                                                            <option value="{{ order.status }}" selected>{{ order.status }}</option>
-                                                            {% for choice in order_status_choices %}
-                                                                <option value="{{ choice.0 }}">{{ choice.1 }}</option>
-                                                            {% endfor %}
-                                                        </select>
-                                                        <input type="hidden" value="{{ order.order_id }}" name="order_id">
-                                                    </form>
-                                                </td>
-                                                <td>Bs.F {{ order.final_total }}</td>
-                                                <td>{{ order.timestamp }}</td>
-                                                <td>
-                                                    <span class="badge">{{ order.cart.cartitem_set.count }}</span>
-                                                </td>
-                                                <td>
-                                                    <a href="{% url 'send_zipfile' order.order_id %}">
-                                                        <span class="fa fa-download fa-fw"></span>
-                                                    </a>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td colspan="6" class="hiddenRow">
-                                                    <div class="collapse" id="{{ order.order_id }}">
-                                                        <table class="table table-hover"style="color: #000;">
-                                                            <thead>
-                                                                <tr>
-                                                                    <th>Producto</th>
-                                                                    <th>Cantidad</th>
-                                                                    <th>Total</th>
-                                                                    <th>Notas</th>
-                                                                    <th>Imagenes</th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody>
-                                                                {% for item in order.cart.cartitem_set.all %}
-                                                                    <tr>
-                                                                        <td>{{ item.product.title }}</td>
-                                                                        <td>{{ item.quantity }}</td>
-                                                                        <td>Bs.F {{ item.line_total }}</td>
-                                                                        <td>{{ item.notes }}</td>
-                                                                        <td>
-                                                                            <span class="badge blu">
-                                                                                {{ item.photo_set.count }} / {{ item.product.image_total }}
-                                                                            </span>
-                                                                        </td>
-
-                                                                    </tr>
-                                                                {% endfor %}
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
-                                                </td>
+                                                <td>{{ new_user.first_name }}</td>
+                                                <td>{{ new_user.last_name }}</td>
+                                                <td>{{ new_user.email }}</td>
+                                                <td>{{ new_user.date_joined }}</td>
                                             </tr>
                                         {% endfor %}
                                     </tbody>

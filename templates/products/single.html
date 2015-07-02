@@ -67,7 +67,9 @@
 		  {{ product.description|linebreaks }}
 		</div>
         <div class='col-sm-12'>
-		  <a href="{% url 'make' product.slug %}">Elegir</a>
+            <a class="btn btn-primary btn-responsive" href="{% url 'make' product.slug %}"> Elegir
+                <span class="glyphicon glyphicon-check"></span>
+            </a>
 		</div>
 	</div>
 </div>

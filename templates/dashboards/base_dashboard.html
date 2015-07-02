@@ -75,7 +75,7 @@
             <li class="active"><a href="{% url 'dashboard' %}" class="active"><i class="fa fa-dashboard fa-fw"></i> Dashboard</a></li>
             <li><a href="#"><i class="fa fa-bar-chart fa-fw"></i> Reportes</a></li>
             <li><a href="{% url 'dashboard_orders' %}"><i class="fa fa-shopping-cart fa-fw"></i> Pedidos</a></li>
-            <li><a href="#"><i class="fa fa-users fa-fw"></i> Usuarios</a></li>
+            <li><a href="{% url 'dashboard_users' %}"><i class="fa fa-users fa-fw"></i> Usuarios</a></li>
           </ul>
           <ul class="nav nav-sidebar">
             <li><a href="">Nav item</a></li>
@@ -89,6 +89,19 @@
             <li><a href="">One more nav</a></li>
             <li><a href="">Another nav item</a></li>
           </ul>
+        </div>
+
+        <div id="messages-container" class="container pull-right">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class='alert {% if "success" in message.tags %}alert-success{% elif "warning" in message.tags%}alert-warning{% elif "error" in message.tags %}alert-danger{% endif %} alert-dismissible' role='alert'>
+                        <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+
+                        {% if "safe" in message.tags %}{{ message|safe }}{% else %}{{ message }}{% endif %}
+
+                    </div>
+                {% endfor %}
+            {% endif %}
         </div>
 
         {% block content %}

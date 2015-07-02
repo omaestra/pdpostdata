@@ -18,7 +18,9 @@
             <div class="tab-content">
                 <div class="tab-pane active" id="profile">
                     <div class="panel panel-primary">
-                        <div class="panel-heading">Informacion personal</div>
+                        <div class="panel-heading">
+                            Informacion personal
+                        </div>
                         <table class="table table-hover">
                             <thead>
                               <tr>
@@ -113,43 +115,87 @@
                 </div>
                 <div class="tab-pane" id="orders">
                     <div class="panel panel-primary">
-                        <div class="panel-heading">Pedidos</div>
-                        <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th>#</th>
-                                    <th>Estatus</th>
-                                    <th>Total</th>
-                                    <th>Fecha creacion</th>
-                                    <th></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                            {% for order in user.order_set.all %}
-                                <tr>
-                                    <td>
-                                        <a href="#order" data-toggle="tab">{{ order.order_id }}</a>
-                                    </td>
-                                    <td>{{ order.status }}</td>
-                                    <td>{{ order.final_total }}</td>
-                                    <td>{{ order.timestamp }}</td>
-                                    <td>
-                                        {% if not order.orderrating %}
-                                        <a href="#" data-toggle="modal" data-target="#rateOrderModal"
-                                           data-order_number="{{ order.order_id }}" data-user="@{{ user.username }}"
-                                                data-order_id="{{ order.id }}">
-                                            Que tal estuvo?
-                                            <span class="glyphicon glyphicon-comment"></span>
-                                        </a>
-                                        {% else %}
-                                            Comentario enviado!
-                                        {% endif %}
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
+                            <div class="panel-heading">Mis Pedidos</div>
+                            <!-- /.panel-heading -->
+                            <div class="panel-body">
+                                <table class="table table-hover" style="color: #000;">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Estatus</th>
+                                            <th>Total</th>
+                                            <th>Fecha creacion</th>
+                                            <th>Productos</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for order in user.order_set.all %}
+                                            <tr>
+                                                <td>
+                                                    <a class="btn btn-primary btn-xs" role="button" data-toggle="collapse"
+                                                       href="#{{ order.order_id }}" aria-expanded="false"
+                                                       aria-controls="collapseExample">{{ order.order_id }}
+                                                    </a>
+                                                </td>
+                                                <td>{{ order.status }}</td>
+                                                <td>Bs.F {{ order.final_total }}</td>
+                                                <td>{{ order.timestamp }}</td>
+                                                <td>
+                                                    <span class="badge">{{ order.cart.cartitem_set.count }}</span>
+                                                </td>
+                                                {% if not order.orderrating %}
+                                                    <td><a href="" data-toggle="modal" data-target="#rateOrderModal"
+                                                            data-order_number="{{ order.order_id }}"
+                                                            data-user="{{ user.username }}"
+                                                            data-order_id="{{ order.id }}">Que tal estuvo?
+                                                        </a>
+                                                    </td>
+                                                {% endif %}
+                                            </tr>
+                                            <tr>
+                                                <td colspan="6" class="hiddenRow">
+                                                    <div class="collapse" id="{{ order.order_id }}">
+                                                        <table class="table table-hover"style="color: #000;">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>Producto</th>
+                                                                    <th>Cantidad</th>
+                                                                    <th>Total</th>
+                                                                    <th>Notas</th>
+                                                                    <th>Imagenes</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                {% for item in order.cart.cartitem_set.all %}
+                                                                    <tr>
+                                                                        <td>{{ item.product.title }}</td>
+                                                                        <td>{{ item.quantity }}</td>
+                                                                        <td>Bs.F {{ item.line_total }}</td>
+                                                                        <td>{{ item.notes }}</td>
+                                                                        <td>
+                                                                            <span class="badge">
+                                                                                {{ item.photo_set.count }} / {{ item.product.image_total }}
+                                                                            </span>
+                                                                        </td>
+
+                                                                    </tr>
+                                                                {% endfor %}
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <!-- /.panel-body -->
+                            <div class="panel-footer">
+                                <i class="glyphicon glyphicon-info-sign"></i>
+                                Puedes hacer clic en el numero del pedido para ver el detalle del mismo.
+                            </div>
+                        </div>
                 </div>
                 <div class="tab-pane" id="help">
                     <div class="panel panel-primary">

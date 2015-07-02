@@ -70,7 +70,7 @@ def login_view(request):
     btn = "Iniciar sesion"
 
     if login_form.is_valid():
-        redirect_to = request.REQUEST.get('next', '')
+        redirect_to = request.GET.get('next', '')
         username = login_form.cleaned_data['username']
         password = login_form.cleaned_data['password']
         user = authenticate(username=username, password=password)
@@ -120,7 +120,7 @@ def registration_view(request):
         return HttpResponseRedirect("/")
 
     context = {
-        "form": form,
+        "registration_form": form,
         "submit_btn": btn,
         "class_name": form.__class__.__name__
     }

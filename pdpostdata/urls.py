@@ -57,11 +57,14 @@ urlpatterns = [
     url(r'^address/delete/(?P<address_id>\d+)/$', 'accounts.views.delete_user_address', name='delete_user_address'),
 
     url(r'^photos/upload/$', 'photos.views.upload', name='upload'),
-    url(r'^make/(?P<slug>[\w-]+)/$', 'photos.views.make', name='make'),
-    url(r'^upload2/(?P<slug>[\w-]+)/$', UploadView.as_view(), name='upload2'),
+    url(r'^upload2/(?P<slug>[\w-]+)/$', 'photos.views.make', name='upload2'),
+    url(r'^make/(?P<slug>[\w-]+)/$', UploadView.as_view(), name='make'),
+    url(r'^sort/$', 'photos.views.sort_photos', name='sort_photos'),
 
     url(r'^dashboard/$', 'dashboards.views.dashboard', name='dashboard'),
     url(r'^dashboard/orders/$', 'dashboards.views.orders', name='dashboard_orders'),
+    url(r'^dashboard/orders/(?P<order_id>[\w-]+)/download/$', 'dashboards.views.send_zipfile', name='send_zipfile'),
+    url(r'^dashboard/users/$', 'dashboards.views.users', name='dashboard_users'),
 ]
 
 if settings.DEBUG:

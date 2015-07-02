@@ -85,7 +85,7 @@ def add_to_cart(request, slug):
                 pass
 
         photos = Photo.objects.filter(temp_hash=request.POST.get('temp_hash'))
-        cart_item = CartItem.objects.create(cart=cart, product=product)
+        cart_item = CartItem.objects.create(cart=cart, product=product )
         cart_item.photo_set = photos
         if len(product_var) > 0:
             cart_item.variations.add(*product_var)

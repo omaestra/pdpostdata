@@ -51,7 +51,6 @@ class MultiAttachmentMixin(object):
         return super(MultiAttachmentMixin, self).post(request, *args, **kwargs)
 
     def form_valid(self, form):
-        print("FJKHJH")
         # I load these uploaded files into django-filer objects.
         files = Photo.objects.filter(temp_hash=self.request.POST.get('temp_hash'))
         # folder = Folder.objects.get(name='Customer Service')
@@ -75,6 +74,12 @@ class UploadView(MultiAttachmentMixin, FormView):
     template_name = 'photos/upload2.html'
     form_class = PhotoForm
     success_url = '/upload2/'
+
+
+def sort_photos(request):
+    photo_list = Photo.objects.all()[:20]
+    context = {'photo_list': photo_list, }
+    return render(request, 'photos/sortable.html', context)
 
 
 def upload(request):
