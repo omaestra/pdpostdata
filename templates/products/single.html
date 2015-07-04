@@ -5,73 +5,74 @@
 </div>
 
 {% block content %}
+<div class="container-fluid">
+    <div class='row'>
+        <div class='col-sm-4'>
+        {% for img in images %}
 
-<div class='row'>
-	<div class='col-sm-4'>
-	{% for img in images %}
-
-		{% if img.featured %}
-		<div class="col-xs-12">
-		  <img class='img-responsive' src="/media/{{ img.image }}" />
-		  <hr/>
-		</div>
-		{% endif %}
-	{% endfor %}
-	{% for img in images %}
-		{% if not img.featured %}
-		<div class="col-xs-6">
-	    <a href="/media/{{ img.image }}" class="thumbnail">
-	      <img class='img-responsive' src="/media/{{ img.image }}">
-	    </a>
-	  	</div>
-		{% endif %}					 
-	{% endfor %}
-	</div>
-	<div class='col-sm-8'>
-		<div class='col-sm-8 pull-left'>
-			 <h1>{{ product.title }}</h1>
-		 </div>
-		 <div class='col-sm-4 pull-right'>
-		  <form class='form' method='POST' action='{% url "add_to_cart" product.slug %}'> {% csrf_token %}
-			<input class='btn btn-default btn-block' type='submit' value='Agregar al carrito'/>
-			<input  class="form-control"  name='qty' type='number' value='1'/>
-			 	
-			{% if product.variation_set.all %}
-			{% if product.variation_set.sizes %}
-			<select class='form-control' name='size'>
-			{% for item in product.variation_set.sizes %}
-				<option value='{{ item.title|lower }}'>{{ item.title|capfirst }}</option>
-				{% endfor %}
-			</select>
-			{% endif %}
-
-			 {% if product.variation_set.colors %}
-			<select class='form-control' name='color'>
-			{% for item in product.variation_set.colors %}
-				<option value='{{ item.title|lower }}'>{{ item.title|capfirst }}</option>
-			{% endfor %}
-			</select>
-			{% endif %}
-			{% endif %}
-
-		  </form>
-	 	</div>
-	 	<div class='col-sm-12'>
-			 <hr/>
-
-			 Precio: {{ product.price }} <br/>
-			 Envio: Por calcular.
-			 <hr/>
-	 	</div>
-		<div class='col-sm-12'>
-		  {{ product.description|linebreaks }}
-		</div>
-        <div class='col-sm-12'>
-            <a class="btn btn-primary btn-responsive" href="{% url 'make' product.slug %}"> Elegir
-                <span class="glyphicon glyphicon-check"></span>
+            {% if img.featured %}
+            <div class="col-xs-12">
+              <img class='img-responsive' src="/media/{{ img.image }}" />
+              <hr/>
+            </div>
+            {% endif %}
+        {% endfor %}
+        {% for img in images %}
+            {% if not img.featured %}
+            <div class="col-xs-6">
+            <a href="/media/{{ img.image }}" class="thumbnail">
+              <img class='img-responsive' src="/media/{{ img.image }}">
             </a>
-		</div>
-	</div>
-</div>
+            </div>
+            {% endif %}
+        {% endfor %}
+        </div>
+        <div class='col-sm-8'>
+            <div class='col-sm-8 pull-left'>
+                 <h1>{{ product.title }}</h1>
+             </div>
+             <div class='col-sm-4 pull-right'>
+              <form class='form' method='POST' action='{% url "add_to_cart" product.slug %}'> {% csrf_token %}
+                <input class='btn btn-default btn-block' type='submit' value='Agregar al carrito'/>
+                <input  class="form-control"  name='qty' type='number' value='1'/>
+
+                {% if product.variation_set.all %}
+                {% if product.variation_set.sizes %}
+                <select class='form-control' name='size'>
+                {% for item in product.variation_set.sizes %}
+                    <option value='{{ item.title|lower }}'>{{ item.title|capfirst }}</option>
+                    {% endfor %}
+                </select>
+                {% endif %}
+
+                 {% if product.variation_set.colors %}
+                <select class='form-control' name='color'>
+                {% for item in product.variation_set.colors %}
+                    <option value='{{ item.title|lower }}'>{{ item.title|capfirst }}</option>
+                {% endfor %}
+                </select>
+                {% endif %}
+                {% endif %}
+
+              </form>
+            </div>
+            <div class='col-sm-12'>
+                 <hr/>
+
+                 Precio: {{ product.price }} <br/>
+                 Envio: Por calcular.
+                 <hr/>
+            </div>
+            <div class='col-sm-12'>
+              {{ product.description|linebreaks }}
+            </div>
+            <div class='col-sm-12'>
+                <a class="btn btn-primary btn-responsive" href="{% url 'make' product.slug %}"> Elegir
+                    <span class="glyphicon glyphicon-check"></span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div> <!-- /container -->
 
 {% endblock %}

@@ -4,7 +4,8 @@
 <head>
 	<meta charset="utf-8">
 	<title>Ordena tus imagenes!</title>
-	<link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:300' rel='stylesheet' type='text/css'>
+	<!--<link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:300' rel='stylesheet' type='text/css'>-->
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet" type="text/css">
 	<style>
 	header, section {
 		display: block;
@@ -18,7 +19,6 @@
 	}
 	section {
 		margin: auto;
-		width: 800px;
 	}
 	a, a:link, a:visited {
 		color: #ff3399;
@@ -30,7 +30,7 @@
 	.sortable {
 		margin: auto;
 		padding: 0;
-		width: 700px;
+		/*width: 700px;*/
 		-webkit-touch-callout: none;
 		-webkit-user-select: none;
 		-khtml-user-select: none;
@@ -53,7 +53,7 @@
 		list-style: none;
 		border-radius: 4px;
 		margin: 5px;
-		padding: 5px;
+		padding: 0px;
 		height: 22px;
 	}
 	li:hover {
@@ -69,8 +69,8 @@
 	.grid li {
 		line-height: 80px;
 		float: left;
-		width: 100px;
-		height: 100px;
+		width: 160px;
+		height: 160px;
 		text-align: center;
 	}
 	.funcs li {
@@ -205,9 +205,16 @@
 	<section>
 		<h2>Nombre del producto</h2>
 		<ul class="sortable grid" style="border: 1px solid;">
-            {% for photo in photo_list %}
-			<li id="{{ photo.id }}"><img draggable="false" src="{{ photo.image_field.url }}" width="100" height="100"/></li>
-            {% endfor %}
+        {% for group in photo_list %}
+            <div class="col-md-2" style="background-color: #5b80b2; margin: 25px;">
+                {% for photo in group %}
+			        <li id="{{ photo.id }}">
+                        <img class="thumbnail" draggable="false" src="{{ photo.image_field.url }}" width="150" height="150"/>
+                    </li>
+                {% endfor %}
+            <span style="border: 1px solid; ;text-align: center">PDStrips</span>
+            </div>
+        {% endfor %}
 		</ul>
 	</section>
     <section>
@@ -218,24 +225,25 @@
 	<script src="{% static 'js/zepto.dragswap.js' %}"></script>
 	<script>
 	$(function() {
-        
+
         $('.sortable_exclude_dynamic').dragswap({
             element : 'li',
 			dropAnimation: true,
             exclude : ['.correct', '.empty']
-		});  
-		
+		});
+
         $('.sortable_exclude_dynamic').append(
             '<li id="item1">Item 1</li>'
 			+'<li id="item2">Item 2</li>'
 			+'<li id="item3" class="correct">Item 3</li>'
-            +'<li id="item4">Item 4</li>'                                  
+            +'<li id="item4">Item 4</li>'
 			+'<li id="item5" class="empty"></li>'
 			+'<li id="item6" class="correct">Item 6</li>'
 			+'<li id="item7" class="correct">Item 7</li>');
-        
+
         $('.sortable').dragswap({
             element : 'li',
+            connectWith: '.sortable',
 			dropAnimation: true,
             overClass: 'over', // class when element goes over another element
             moveClass: 'moving', // class when element is moving

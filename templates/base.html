@@ -6,20 +6,39 @@
       <meta name="viewport" content="width=device-width, initial-scale=1">
       <meta name="description" content="">
       <meta name="author" content="">
-      <link rel="icon" href="../../favicon.ico">
+      <link rel="icon" href="../../media/images/favicons.ico/favicon.ico">
+      <link rel="apple-touch-icon" sizes="57x57" href="../../media/images/favicons.ico/apple-icon-57x57.png">
+      <link rel="apple-touch-icon" sizes="60x60" href="../../media/images/favicons.ico/apple-icon-60x60.png">
+      <link rel="apple-touch-icon" sizes="72x72" href="../../media/images/favicons.ico/apple-icon-72x72.png">
+      <link rel="apple-touch-icon" sizes="76x76" href="../../media/images/favicons.ico/apple-icon-76x76.png">
+      <link rel="apple-touch-icon" sizes="114x114" href="../../media/images/favicons.ico/apple-icon-114x114.png">
+      <link rel="apple-touch-icon" sizes="120x120" href="../../media/images/favicons.ico/apple-icon-120x120.png">
+      <link rel="apple-touch-icon" sizes="144x144" href="../../media/images/favicons.ico/apple-icon-144x144.png">
+      <link rel="apple-touch-icon" sizes="152x152" href="../../media/images/favicons.ico/apple-icon-152x152.png">
+      <link rel="apple-touch-icon" sizes="180x180" href="../../media/images/favicons.ico/apple-icon-180x180.png">
+      <link rel="icon" type="image/png" sizes="192x192"  href="../../media/images/favicons.ico/android-icon-192x192.png">
+      <link rel="icon" type="image/png" sizes="32x32" href="../../media/images/favicons.ico/favicon-32x32.png">
+      <link rel="icon" type="image/png" sizes="96x96" href="../../media/images/favicons.ico/favicon-96x96.png">
+      <link rel="icon" type="image/png" sizes="16x16" href="../../media/images/favicons.ico/favicon-16x16.png">
+      <link rel="manifest" href="../../media/images/favicons.ico/manifest.json">
+      <meta name="msapplication-TileColor" content="#ffffff">
+      <meta name="msapplication-TileImage" content="../../media/images/favicons.ico/ms-icon-144x144.png">
+      <meta name="theme-color" content="#ffffff">
 
       <title>{% block head_title %}{% endblock %}Postdata</title>
 
       {% load staticfiles %}
-
+      <!-- Custom styles for this template -->
       <link rel='stylesheet' href='{% static "css/bootstrap.min.css" %}' />
+      <link rel='stylesheet' href='{% static "css/navbar-static-top.css" %}' />
+      <link rel='stylesheet' href='{% static "css/sticky-footer-navbar.css" %}' />
+      <link href="{% static 'css/font-awesome.min.css'%}" rel="stylesheet">
 
       {% block dropzonejs-styles %}{% endblock %}
       {% block profile-styles %}{% endblock %}
       {% block dashboard-styles %}{% endblock %}
+      {% block login-form-styles %}{% endblock %}
 
-    <!-- Custom styles for this template -->
-    <link rel='stylesheet' href='{% static "css/navbar-static-top.css" %}' />
     <style>
     .alert-top-message {
         margin-bottom: 0px;
@@ -60,18 +79,18 @@
     <![endif]-->
   </head>
 
-  <body>
+  <body class="{{ style }}">
       {% if request.session.marketing_message %}
       <div class='alert alert-top-message alert-dismissible' role='alert'>
         <button id='marketing-message-btn' type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-          <div class="container">
+          <div class="container-fuild">
             <h3>{{ request.session.marketing_message|safe }}</h3>
           </div>
       </div>
       {% endif %}
 
       {% include 'navbar.html' %}
-      <div id="messages-container" class="container">
+      <div id="messages-container" class="container-fluid">
       {% if messages %}
             {% for message in messages %}
                 <div class='alert {% if "success" in message.tags %}alert-success{% elif "warning" in message.tags%}alert-warning{% elif "error" in message.tags %}alert-danger{% endif %} alert-dismissible' role='alert'>
@@ -84,27 +103,70 @@
          {% endif %}
       </div>
 
-      {% block jumbotron %}
-      {% endblock %}
-      {% block jumbotron2 %}
-      {% endblock %}
+      {% block dropzonejs-uploader %}{% endblock %}
 
-      <div id="dropzone-container" class="container">
-          {% block dropzonejs-uploader %}
-          {% endblock %}
-      </div>
+      {% block jumbotron %}{% endblock %}
+      {% block jumbotron2 %}{% endblock %}
 
-      <div class="container">
+      {% block content %}{% endblock %}
 
-          {% block content %}
-          {% endblock %}
+      <footer class="footer-distributed">
+          <div class="footer-left">
 
-      </div> <!-- /container -->
+              <h3>PD <span>Postdata</span></h3>
 
-      <footer class="footer">
-          <div class="container">
-              <p class="text-muted">Place sticky footer content here.</p>
+              <p class="footer-links">
+                  <a href="#">Inicio</a>
+                  ·
+                  <a href="#">Productos</a>
+                  ·
+                  <a href="#">Nosotros</a>
+                  ·
+                  <a href="#">Faq</a>
+                  ·
+                  <a href="#">Contacto</a>
+              </p>
+
+              <p class="footer-company-name">Postdata © 2015</p>
           </div>
+
+          <div class="footer-center">
+
+              <div>
+                  <i class="fa fa-map-marker"></i>
+                  <p><span>21 Revolution Street</span> Paris, France</p>
+              </div>
+
+              <div>
+                  <i class="fa fa-phone"></i>
+                  <p>+1 555 123456</p>
+              </div>
+
+              <div>
+                  <i class="fa fa-envelope"></i>
+                  <p><a href="mailto:support@company.com">support@email.com</a></p>
+              </div>
+
+          </div>
+
+          <div class="footer-right">
+
+              <p class="footer-company-about">
+                  <span>Sobre nosotros</span>
+                  Lorem ipsum dolor sit amet, consectateur adispicing elit. Fusce euismod convallis velit, eu auctor lacus vehicula sit amet.
+              </p>
+
+              <div class="footer-icons">
+
+                  <a href="#"><i class="fa fa-facebook"></i></a>
+                  <a href="#"><i class="fa fa-twitter"></i></a>
+                  <a href="#"><i class="fa fa-instagram"></i></a>
+                  <a href="#"><i class="fa fa-youtube"></i></a>
+
+              </div>
+
+          </div>
+
       </footer>
 
       {% include "modal.html" %}

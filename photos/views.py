@@ -1,6 +1,6 @@
 from django.http import JsonResponse
 
-from django.shortcuts import render, HttpResponseRedirect, HttpResponse
+from django.shortcuts import render, HttpResponseRedirect, HttpResponse, Http404
 from django.core.urlresolvers import reverse
 from django.http import QueryDict
 
@@ -14,6 +14,11 @@ from products.models import Product
 from django.views.generic.edit import FormView
 
 from photos.models import Photo
+
+
+def grouped(l, n):
+    for i in xrange(0, len(l), n):
+        yield l[i:i+n]
 
 class MultiAttachmentMixin(object):
 
@@ -77,9 +82,16 @@ class UploadView(MultiAttachmentMixin, FormView):
 
 
 def sort_photos(request):
-    photo_list = Photo.objects.all()[:20]
-    context = {'photo_list': photo_list, }
-    return render(request, 'photos/sortable.html', context)
+    if request.POST:
+        form_uuid = request.POST.get('temp_hash')
+        print(request.POST)
+        photo_list = grouped(Photo.objects.filter(temp_hash=form_uuid), 4)
+        context = {'photo_list': photo_list, }
+        template = 'photos/sortable.html'
+
+        return render(request, template, context)
+
+    return Http404(request)
 
 
 def upload(request):

@@ -4,11 +4,15 @@ from django.forms.widgets import TextInput
 
 from accounts.models import UserProfile
 
-from django.contrib.auth import get_user_model
-
-User = get_user_model()
+from django.contrib.auth.models import User
 
 from .models import UserAddress
+
+default_errors = {
+    'required': 'Este campo es obligatorio!',
+    'invalid': 'Por favor, ingresa un valor valido!',
+    'min-length': '',
+}
 
 
 class UserForm(forms.ModelForm):
@@ -92,8 +96,19 @@ class UserAddressForm(forms.ModelForm):
 
 
 class LoginForm(forms.Form):
-    username = forms.CharField()
-    password = forms.CharField(widget=forms.PasswordInput())
+    username = forms.CharField(
+        error_messages=default_errors,
+        widget=forms.TextInput(
+            attrs={'id': 'login-username', 'class': 'form-control', 'required': True,
+                   'placeholder': 'usuario o correo electronico', 'autofocus': True, }
+        )
+    )
+    password = forms.CharField(
+        error_messages=default_errors,
+        widget=forms.PasswordInput(
+            attrs={'id': 'login-password', 'class': 'form-control', 'required': True, 'placeholder': 'contraseña', }
+        )
+    )
 
     def clean_username(self):
         username = self.cleaned_data.get("username")
@@ -119,21 +134,54 @@ class LoginForm(forms.Form):
 
 
 class RegistrationForm(forms.ModelForm):
-    email = forms.EmailField(label='Your Email')
-    password1 = forms.CharField(label='Password',
-                                widget=forms.PasswordInput())
-    password2 = forms.CharField(label='Password Confirmation',
-                                widget=forms.PasswordInput())
+    # email = forms.EmailField(label='Your Email')
+    password1 = forms.CharField(
+        min_length=8,
+        label='Password',
+        error_messages=default_errors,
+        widget=forms.PasswordInput(
+            attrs={'class': 'form-control', 'placeholder': 'Contraseña','name': 'password1', }
+        )
+    )
+    password2 = forms.CharField(
+        min_length=8,
+        label='Password Confirmation',
+        error_messages=default_errors,
+        widget=forms.PasswordInput(
+            attrs={'class': 'form-control', 'placeholder': 'Confirmar contraseña',
+                   'name': 'password2', }
+        )
+    )
 
     class Meta:
         model = User
-        fields = ['username', 'email']
+        fields = ['username', 'email', ]
+
+        widgets = {
+            'username': forms.TextInput(
+                attrs={'id': 'login-username', 'class': 'form-control', 'required': True,
+                       'placeholder': 'Nombre de usuario', 'autofocus': True, 'name': 'username', }
+            ),
+            'email': forms.EmailInput(
+                attrs={'class': 'form-control', 'required': True, 'placeholder': 'Correo electronico',
+                       'name': 'email', }
+            ),
+        }
+
+        error_messages = {
+            'username': {
+                'required': "Este campo es obligatorio!",
+            },
+            'password': {
+                'required': "Este campo es obligatorio!",
+            },
+        }
 
     def clean_password2(self):
         password1 = self.cleaned_data.get('password1')
         password2 = self.cleaned_data.get('password2')
         if password1 and password2 and password1 != password2:
-            raise forms.ValidationError("Las contraseñas ingresadas no coinciden!")
+            raise forms.ValidationError("Las contraseñas no coinciden!")
         return password2
 
     def clean_email(self):
@@ -141,8 +189,8 @@ class RegistrationForm(forms.ModelForm):
         user_count = User.objects.filter(email=email).count()
         if user_count > 0:
             raise forms.ValidationError(
-                "Este correo electronico ya ha sido registrado. Por favor, "
-                "confirma la informacion e intentalo de nuevo o reinicia tu contraseña")
+                "Este correo electronico ya existe! Por favor, "
+                "confirma tus datos o reinicia tu contraseña")
         return email
 
     def save(self, commit=True):

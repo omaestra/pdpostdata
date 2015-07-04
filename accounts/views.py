@@ -68,7 +68,7 @@ def logout_view(request):
 def login_view(request):
     login_form = LoginForm(request.POST or None)
     btn = "Iniciar sesion"
-
+    print(request.POST)
     if login_form.is_valid():
         redirect_to = request.GET.get('next', '')
         username = login_form.cleaned_data['username']
@@ -92,7 +92,8 @@ def login_view(request):
     context = {
         "login_form": login_form,
         "submit_btn": btn,
-        "class_name": login_form.__class__.__name__
+        "class_name": login_form.__class__.__name__,
+        "style": 'body-background',
     }
     return render(request, "form.html", context)
 
@@ -122,7 +123,8 @@ def registration_view(request):
     context = {
         "registration_form": form,
         "submit_btn": btn,
-        "class_name": form.__class__.__name__
+        "class_name": form.__class__.__name__,
+        "style": 'body-background',
     }
     return render(request, "form.html", context)
 

@@ -8,213 +8,215 @@
 {% endblock %}
 
 {% block content %}
+    <div class="container">
 
-<div class="row profile">
-    <div class="col-md-3">
-        {% include 'accounts/profile-navbar.html' %}
-    </div>
-    <div class="col-md-9">
-        <div class="profile-content">
-            <div class="tab-content">
-                <div class="tab-pane active" id="profile">
-                    <div class="panel panel-primary">
-                        <div class="panel-heading">
-                            Informacion personal
-                        </div>
-                        <table class="table table-hover">
-                            <thead>
-                              <tr>
-                                <th>Nombre</th>
-                                <th>Apellido</th>
-                                <th>Username</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              <tr>
-                                <td>{{ user.first_name }}</td>
-                                <td>{{ user.last_name }}</td>
-                                <td>{{ user.username }}</td>
-                              </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="panel panel-primary">
-                        <div class="panel-heading">Direccion de envio</div>
-
-                        <table class="table table-hover">
-                            <thead>
-                            <tr>
-                                <th>Direccion de envio</th>
-                                <th>Telefono</th>
-                                <th></th>
-                                <th></th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            {% for useraddress in user.useraddress_set.all %}
-                                <tr>
-                                    <td>{{ useraddress.get_address }}</td>
-                                    <td>{{ useraddress.phone }}</td>
-                                    <td>
-                                        <a href="#">
-                                            <span class="glyphicon glyphicon-edit"></span>
-                                        </a>
-                                    </td>
-                                    <td>
-                                        <a href='{% url "delete_user_address" useraddress.id %}'>
-                                            <span class="glyphicon glyphicon-remove"></span>
-                                        </a>
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                <div class="tab-pane" id="settings">
-                    <div class="panel panel-primary">
-                        <div class="panel-heading">Configuracion de la cuenta</div>
-                        {% if profile_form and user_form %}
-                            <form method="POST" action="{% url 'user_profile' %}" enctype="multipart/form-data" class="form-horizontal" role="form">
-                                {% csrf_token %}
-                                <table class="table table-hover">
-                                    {{ profile_form }}
-                                    {{ user_form }}
-                                </table>
-                                <div class="form-group">
-                                    <div class="col-lg-offset-2 col-lg-10">
-                                        <input class="btn btn-primary btn-responsive" type="submit" value="Aceptar">
-                                    </div>
+        <div class="row profile">
+            <div class="col-md-3">
+                {% include 'accounts/profile-navbar.html' %}
+            </div>
+            <div class="col-md-9">
+                <div class="profile-content">
+                    <div class="tab-content">
+                        <div class="tab-pane active" id="profile">
+                            <div class="panel panel-primary">
+                                <div class="panel-heading">
+                                    Informacion personal
                                 </div>
-                            </form>
-                        {% endif %}
-                    </div>
-                    <div class="panel panel-primary">
-                        <div class="panel-heading">Direccion de envio</div>
-                        {% if address_form %}
-                            {% if address_form.errors %}
-                                {% for error in address_form.non_field_errors %}
-                                    <div class="alert alert-error">
-                                        <strong>{{ error|escape }}</strong>
-                                    </div>
-                                {% endfor %}
-                            {% endif %}
-                            <form method="POST" action="{% url 'add_user_address' %}" class="form-horizontal" role="form">
-                                {% csrf_token %}
                                 <table class="table table-hover">
-                                    {{ address_form }}
-                                </table>
-                                <div class="form-group">
-                                    <div class="col-lg-offset-2 col-lg-10">
-                                        <input class="btn btn-primary btn-responsive" type="submit" value="Agregar">
-                                    </div>
-                                </div>
-                            </form>
-                        {% endif %}
-                    </div>
-                </div>
-                <div class="tab-pane" id="orders">
-                    <div class="panel panel-primary">
-                            <div class="panel-heading">Mis Pedidos</div>
-                            <!-- /.panel-heading -->
-                            <div class="panel-body">
-                                <table class="table table-hover" style="color: #000;">
                                     <thead>
-                                        <tr>
-                                            <th>#</th>
-                                            <th>Estatus</th>
-                                            <th>Total</th>
-                                            <th>Fecha creacion</th>
-                                            <th>Productos</th>
-                                            <th></th>
-                                        </tr>
+                                      <tr>
+                                        <th>Nombre</th>
+                                        <th>Apellido</th>
+                                        <th>Username</th>
+                                      </tr>
                                     </thead>
                                     <tbody>
-                                        {% for order in user.order_set.all %}
-                                            <tr>
-                                                <td>
-                                                    <a class="btn btn-primary btn-xs" role="button" data-toggle="collapse"
-                                                       href="#{{ order.order_id }}" aria-expanded="false"
-                                                       aria-controls="collapseExample">{{ order.order_id }}
-                                                    </a>
-                                                </td>
-                                                <td>{{ order.status }}</td>
-                                                <td>Bs.F {{ order.final_total }}</td>
-                                                <td>{{ order.timestamp }}</td>
-                                                <td>
-                                                    <span class="badge">{{ order.cart.cartitem_set.count }}</span>
-                                                </td>
-                                                {% if not order.orderrating %}
-                                                    <td><a href="" data-toggle="modal" data-target="#rateOrderModal"
-                                                            data-order_number="{{ order.order_id }}"
-                                                            data-user="{{ user.username }}"
-                                                            data-order_id="{{ order.id }}">Que tal estuvo?
-                                                        </a>
-                                                    </td>
-                                                {% endif %}
-                                            </tr>
-                                            <tr>
-                                                <td colspan="6" class="hiddenRow">
-                                                    <div class="collapse" id="{{ order.order_id }}">
-                                                        <table class="table table-hover"style="color: #000;">
-                                                            <thead>
-                                                                <tr>
-                                                                    <th>Producto</th>
-                                                                    <th>Cantidad</th>
-                                                                    <th>Total</th>
-                                                                    <th>Notas</th>
-                                                                    <th>Imagenes</th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody>
-                                                                {% for item in order.cart.cartitem_set.all %}
-                                                                    <tr>
-                                                                        <td>{{ item.product.title }}</td>
-                                                                        <td>{{ item.quantity }}</td>
-                                                                        <td>Bs.F {{ item.line_total }}</td>
-                                                                        <td>{{ item.notes }}</td>
-                                                                        <td>
-                                                                            <span class="badge">
-                                                                                {{ item.photo_set.count }} / {{ item.product.image_total }}
-                                                                            </span>
-                                                                        </td>
-
-                                                                    </tr>
-                                                                {% endfor %}
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        {% endfor %}
+                                      <tr>
+                                        <td>{{ user.first_name }}</td>
+                                        <td>{{ user.last_name }}</td>
+                                        <td>{{ user.username }}</td>
+                                      </tr>
                                     </tbody>
                                 </table>
                             </div>
-                            <!-- /.panel-body -->
-                            <div class="panel-footer">
-                                <i class="glyphicon glyphicon-info-sign"></i>
-                                Puedes hacer clic en el numero del pedido para ver el detalle del mismo.
+                            <div class="panel panel-primary">
+                                <div class="panel-heading">Direccion de envio</div>
+
+                                <table class="table table-hover">
+                                    <thead>
+                                    <tr>
+                                        <th>Direccion de envio</th>
+                                        <th>Telefono</th>
+                                        <th></th>
+                                        <th></th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for useraddress in user.useraddress_set.all %}
+                                        <tr>
+                                            <td>{{ useraddress.get_address }}</td>
+                                            <td>{{ useraddress.phone }}</td>
+                                            <td>
+                                                <a href="#">
+                                                    <span class="glyphicon glyphicon-edit"></span>
+                                                </a>
+                                            </td>
+                                            <td>
+                                                <a href='{% url "delete_user_address" useraddress.id %}'>
+                                                    <span class="glyphicon glyphicon-remove"></span>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
-                </div>
-                <div class="tab-pane" id="help">
-                    <div class="panel panel-primary">
-                        <div class="panel-heading">Ayuda</div>
-                    </div>
-                </div>
-                <div class="tab-pane" id="order">
-                    <div class="panel panel-primary">
-                        <div class="panel-heading">Pedido #
-                            <a href="#orders" data-toggle="tab" style="color: #FFF;">Volver</a>
+                        <div class="tab-pane" id="settings">
+                            <div class="panel panel-primary">
+                                <div class="panel-heading">Configuracion de la cuenta</div>
+                                {% if profile_form and user_form %}
+                                    <form method="POST" action="{% url 'user_profile' %}" enctype="multipart/form-data" class="form-horizontal" role="form">
+                                        {% csrf_token %}
+                                        <table class="table table-hover">
+                                            {{ profile_form }}
+                                            {{ user_form }}
+                                        </table>
+                                        <div class="form-group">
+                                            <div class="col-lg-offset-2 col-lg-10">
+                                                <input class="btn btn-primary btn-responsive" type="submit" value="Aceptar">
+                                            </div>
+                                        </div>
+                                    </form>
+                                {% endif %}
+                            </div>
+                            <div class="panel panel-primary">
+                                <div class="panel-heading">Direccion de envio</div>
+                                {% if address_form %}
+                                    {% if address_form.errors %}
+                                        {% for error in address_form.non_field_errors %}
+                                            <div class="alert alert-error">
+                                                <strong>{{ error|escape }}</strong>
+                                            </div>
+                                        {% endfor %}
+                                    {% endif %}
+                                    <form method="POST" action="{% url 'add_user_address' %}" class="form-horizontal" role="form">
+                                        {% csrf_token %}
+                                        <table class="table table-hover">
+                                            {{ address_form }}
+                                        </table>
+                                        <div class="form-group">
+                                            <div class="col-lg-offset-2 col-lg-10">
+                                                <input class="btn btn-primary btn-responsive" type="submit" value="Agregar">
+                                            </div>
+                                        </div>
+                                    </form>
+                                {% endif %}
+                            </div>
                         </div>
-                        <table class="table table-hover">
-                        </table>
+                        <div class="tab-pane" id="orders">
+                            <div class="panel panel-primary">
+                                    <div class="panel-heading">Mis Pedidos</div>
+                                    <!-- /.panel-heading -->
+                                    <div class="panel-body">
+                                        <table class="table table-hover" style="color: #000;">
+                                            <thead>
+                                                <tr>
+                                                    <th>#</th>
+                                                    <th>Estatus</th>
+                                                    <th>Total</th>
+                                                    <th>Fecha creacion</th>
+                                                    <th>Productos</th>
+                                                    <th></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for order in user.order_set.all %}
+                                                    <tr>
+                                                        <td>
+                                                            <a class="btn btn-primary btn-xs" role="button" data-toggle="collapse"
+                                                               href="#{{ order.order_id }}" aria-expanded="false"
+                                                               aria-controls="collapseExample">{{ order.order_id }}
+                                                            </a>
+                                                        </td>
+                                                        <td>{{ order.status }}</td>
+                                                        <td>Bs.F {{ order.final_total }}</td>
+                                                        <td>{{ order.timestamp }}</td>
+                                                        <td>
+                                                            <span class="badge">{{ order.cart.cartitem_set.count }}</span>
+                                                        </td>
+                                                        {% if not order.orderrating %}
+                                                            <td><a href="" data-toggle="modal" data-target="#rateOrderModal"
+                                                                    data-order_number="{{ order.order_id }}"
+                                                                    data-user="{{ user.username }}"
+                                                                    data-order_id="{{ order.id }}">Que tal estuvo?
+                                                                </a>
+                                                            </td>
+                                                        {% endif %}
+                                                    </tr>
+                                                    <tr>
+                                                        <td colspan="6" class="hiddenRow">
+                                                            <div class="collapse" id="{{ order.order_id }}">
+                                                                <table class="table table-hover"style="color: #000;">
+                                                                    <thead>
+                                                                        <tr>
+                                                                            <th>Producto</th>
+                                                                            <th>Cantidad</th>
+                                                                            <th>Total</th>
+                                                                            <th>Notas</th>
+                                                                            <th>Imagenes</th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody>
+                                                                        {% for item in order.cart.cartitem_set.all %}
+                                                                            <tr>
+                                                                                <td>{{ item.product.title }}</td>
+                                                                                <td>{{ item.quantity }}</td>
+                                                                                <td>Bs.F {{ item.line_total }}</td>
+                                                                                <td>{{ item.notes }}</td>
+                                                                                <td>
+                                                                                    <span class="badge">
+                                                                                        {{ item.photo_set.count }} / {{ item.product.image_total }}
+                                                                                    </span>
+                                                                                </td>
+
+                                                                            </tr>
+                                                                        {% endfor %}
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <!-- /.panel-body -->
+                                    <div class="panel-footer">
+                                        <i class="glyphicon glyphicon-info-sign"></i>
+                                        Puedes hacer clic en el numero del pedido para ver el detalle del mismo.
+                                    </div>
+                                </div>
+                        </div>
+                        <div class="tab-pane" id="help">
+                            <div class="panel panel-primary">
+                                <div class="panel-heading">Ayuda</div>
+                            </div>
+                        </div>
+                        <div class="tab-pane" id="order">
+                            <div class="panel panel-primary">
+                                <div class="panel-heading">Pedido #
+                                    <a href="#orders" data-toggle="tab" style="color: #FFF;">Volver</a>
+                                </div>
+                                <table class="table table-hover">
+                                </table>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-</div>
+    </div> <!-- /container -->
 
     {% include 'accounts/order_rate_modal.html' %}
 
