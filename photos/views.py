@@ -1,8 +1,9 @@
 from django.http import JsonResponse
 
-from django.shortcuts import render, HttpResponseRedirect, HttpResponse, Http404
+from django.shortcuts import render, HttpResponseRedirect, HttpResponse, Http404, render_to_response
 from django.core.urlresolvers import reverse
 from django.http import QueryDict
+from django.template import RequestContext
 
 from .forms import PhotoForm
 from .models import Photo
@@ -12,16 +13,17 @@ from products.models import Product
 # Create your views here.
 
 from django.views.generic.edit import FormView
+from photos.forms import JcropForm
 
 from photos.models import Photo
 
 
 def grouped(l, n):
     for i in xrange(0, len(l), n):
-        yield l[i:i+n]
+        yield l[i:i + n]
+
 
 class MultiAttachmentMixin(object):
-
     def post(self, request, *args, **kwargs):
         # Ajax POST for file uploads
         if request.is_ajax():
@@ -35,15 +37,15 @@ class MultiAttachmentMixin(object):
                 response = {'photos': []}
                 for photo in request.FILES.getlist('photos'):
                     # Create a new entry in our database
-                    new_image = Photo(image_field=photo,
+                    new_image = Photo(image=photo,
                                       temp_hash=request.POST.get('temp_hash'))
                     # Save the image using the model's ImageField settings
                     new_image.save()
                     response['photos'].append({
                         'name': '%s' % new_image.id,
                         'size': '%d' % request.FILES.__sizeof__(),
-                        'url': '%s' % new_image.image_field.url,
-                        'thumbnailUrl': '%s' % new_image.image_field.url,
+                        'url': '%s' % new_image.image.url,
+                        'thumbnailUrl': '%s' % new_image.image.url,
                         'deleteUrl': '\/image\/delete\/%s' % new_image.id,
                         "deleteType": 'DELETE'
                     })
@@ -60,7 +62,7 @@ class MultiAttachmentMixin(object):
         files = Photo.objects.filter(temp_hash=self.request.POST.get('temp_hash'))
         # folder = Folder.objects.get(name='Customer Service')
         for f in files:
-            new_file = Photo(image_field=f)
+            new_file = Photo(image=f)
             # Save the image using the model's ImageField settings
             new_file.save()
             # Attach the new Filer files to the original form object.
@@ -70,8 +72,15 @@ class MultiAttachmentMixin(object):
         return super(MultiAttachmentMixin, self).form_valid(form)
 
     def get_context_data(self, *args, **kwargs):
+        # define a fixed aspect ratio for the user image
+        aspect = 105.0 / 75.0
+        # the final size of the user image
+        final_size = (105, 75)
         context = super(MultiAttachmentMixin, self).get_context_data(*args, **kwargs)
         context['product'] = Product.objects.get(slug=self.kwargs['slug'])
+        photo = Photo.objects.first()
+        context['photo'] = photo
+
         return context
 
 
@@ -79,6 +88,57 @@ class UploadView(MultiAttachmentMixin, FormView):
     template_name = 'photos/upload2.html'
     form_class = PhotoForm
     success_url = '/upload2/'
+
+
+def upload_crop(request):
+    # define a fixed aspect ratio for the user image
+    aspect = 105.0 / 75.0
+    # the final size of the user image
+    final_size = (105, 75)
+
+    profile = request.user.get_profile()
+
+    if request.method == "POST" and len(request.FILES) == 0:
+        # user submitted form with crop coordinates
+        form = JcropForm(request.POST)
+        if form.is_valid():
+            # apply cropping
+            form.crop()
+            form.resize(final_size)
+            form.save()
+            # redirect to profile display page
+        return HttpResponseRedirect("/")
+
+    elif request.method == "POST" and len(request.FILES):
+        # user uploaded a new image; save it and make sure it is not too large
+        # for our layout
+        img_fn = JcropForm.prepare_uploaded_img(request.FILES, image_upload_to,
+                                                profile, (370, 500))
+        if img_fn:
+            # store new image in the member instance
+            profile.avatar = img_fn  # 'avatar' is an ImageField
+            profile.save()
+
+            # redisplay the form with the new image; this is the same as for
+            # GET requests -> fall through to GET
+
+    elif request.method != "GET":
+        # only POST and GET, please
+        return HttpResponse(status=400)
+
+    # for GET requests, just display the form with current image
+    form = JcropForm(initial={"imagefile": profile.avatar},
+                     jcrop_options={
+                         "aspectRatio": aspect,
+                         "setSelect": "[100, 100, 50, 50]",
+                     }
+                     )
+
+    return render_to_response("photos/upload.html",
+                              {
+                                  "crop_form": form,
+                              },
+                              RequestContext(request))
 
 
 def sort_photos(request):
@@ -123,7 +183,6 @@ def upload(request):
 
 
 def make(request, slug):
-
     try:
         product = Product.objects.get(slug=slug)
     except Product.DoesNotExist:

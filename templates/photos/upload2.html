@@ -5,83 +5,123 @@
 {% block dropzonejs-styles %}
     <link rel="stylesheet" href="{% static 'css/dropzone.css' %}">
     <link rel="stylesheet" href="{% static 'css/pdpostdata.css' %}">
+    <link rel="stylesheet" href="{% static 'css/cropper.css' %}">
 {% endblock %}
 
 {% block dropzonejs-uploader %}
-<div id="dropzone-container" class="container-fluid">
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            <div class="row">
-                <div class="col-md-8">
-                    <h4>Fotos cargadas: <span id='image-count'>0</span> / {{ product.image_total }}</h4>
-                </div>
-                <div class="col-md-2">
-                    <form class="form form-inline" method="POST" action="{% url 'sort_photos' %}">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-default">
-                            <i class="glyphicon glyphicon-apple"></i> Arreglar fotos
-                        </button>
-                        {{ form.temp_hash }}
-                    </form>
-                </div>
-                <div class="col-md-2">
-                    <form class='form form-inline' method='POST' action='{% url "add_to_cart" product.slug %}'>
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-default">
-                            <i class="glyphicon glyphicon-shopping-cart"></i> Agregar al carrito
-                        </button>
-                        <input class="form-control"  name='qty' type='hidden' value='1'/>
-                        {{ form.temp_hash }}
-                    </form>
-                </div>
-            </div>
+    <!--<div class="modal fade" id="cropmodal" tabindex="-1" role="dialog" aria-labelledby="cropmodal" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="cropFormLabel"> Edita tu imagen! </h4>
+      </div>
+      <div class="modal-body">
+        <div class="text-center">
+        	<form action="" method="post" onsubmit="return checkCoords();">{% csrf_token %}
+				<input type="hidden" id="x" name="x" />
+				<input type="hidden" id="y" name="y" />
+				<input type="hidden" id="w" name="w" />
+				<input type="hidden" id="h" name="h" />
+				<div class="thumbnail">
+                    <img src="" id="jcrop_target" width="800px" height="600px"/>
+        		</div>
+
+        		<input type="submit" value="Crop Image" />
+        	</form>
         </div>
-        <div class="panel-body">
-            <div id="dropzone">
-                <form action="{% url 'make' product.slug %}" class="dropzone" id="myDropzone" method='POST' enctype="multipart/form-data">
-                    {% csrf_token %}
-                    {{ form.as_p }}
-                    <div class="dz-message">
-                        Zona de carga<br>
-                        <span class="note">
-                            (Carga tus fotos haciendo clic en el boton de carga
-                            o arrastrandolas aqui)
-                        </span>
-                    </div>
-                    <div class="fallback">
-                        <input name="file" type="file" multiple />
-                    </div>
-                </form>
-            </div>
-            <!-- The global file processing state -->
-            <div class="row">
-                <div class="col-xs-2">
-                    <a href="#" class="fileinput-button btn btn-primary" role="button">  Cargar fotos
-                        <span class="glyphicon glyphicon-cloud-upload"></span>
-                    </a>
-                </div>
-                <div class="col-xs-10">
-                    <span class="fileupload-process">
-                    <div id="total-progress" class="progress progress-striped active" style="opacity: 0;height: 34px"
-                         role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
-                        <div class="progress-bar progress-bar-success" style="width:0%;" data-dz-uploadprogress=""></div>
-                    </div>
-                </span>
-                </div>
-            </div>
-        </div>
-        <div class="panel-footer">
-            <div class="row">
-                <div class="col-xs-10">
-                    <p>
-                        Puedes cargar tus imagenes arrastrandolas al area de carga
-                        o haciendo clic en ella para elegir tus fotos.
-                    </p>
+      </div>
+    </div>
+  </div>
+</div>-->
+    <div class="modal fade" id="cropper-modal">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <form action="" method="POST">{% csrf_token %}
+                        <div id="cropper">
+                            <img src="" alt="Picture" width="600" height="600">
+                        </div>
+                        <input type="submit" value="Crop" />
+                    </form>
                 </div>
             </div>
         </div>
     </div>
-</div> <!-- /container -->
+    <div id="dropzone-container" class="container-fluid">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <div class="row">
+                    <div class="col-md-8">
+                        <h4>Fotos cargadas: <span id='image-count'>0</span> / {{ product.image_total }}</h4>
+                    </div>
+                    <div class="col-md-2">
+                        <form class="form form-inline" method="POST" action="{% url 'sort_photos' %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-default">
+                                <i class="glyphicon glyphicon-apple"></i> Arreglar fotos
+                            </button>
+                            {{ form.temp_hash }}
+                        </form>
+                    </div>
+                    <div class="col-md-2">
+                        <form class='form form-inline' method='POST' action='{% url "add_to_cart" product.slug %}'>
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-default">
+                                <i class="glyphicon glyphicon-shopping-cart"></i> Agregar al carrito
+                            </button>
+                            <input class="form-control"  name='qty' type='hidden' value='1'/>
+                            {{ form.temp_hash }}
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-body">
+                <div id="dropzone">
+                    <form action="{% url 'make' product.slug %}" class="dropzone" id="myDropzone" method='POST' enctype="multipart/form-data">
+                        {% csrf_token %}
+                        {{ form.as_p }}
+                        <div class="dz-message">
+                            Zona de carga<br>
+                            <span class="note">
+                                (Carga tus fotos haciendo clic en el boton de carga
+                                o arrastrandolas aqui)
+                            </span>
+                        </div>
+                        <div class="fallback">
+                            <input name="file" type="file" multiple />
+                        </div>
+                    </form>
+                </div>
+                <!-- The global file processing state -->
+                <div class="row">
+                    <div class="col-xs-2">
+                        <a href="#" class="fileinput-button btn btn-primary" role="button">  Cargar fotos
+                            <span class="glyphicon glyphicon-cloud-upload"></span>
+                        </a>
+                    </div>
+                    <div class="col-xs-10">
+                        <span class="fileupload-process">
+                        <div id="total-progress" class="progress progress-striped active" style="opacity: 0;height: 34px"
+                             role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                            <div class="progress-bar progress-bar-success" style="width:0%;" data-dz-uploadprogress=""></div>
+                        </div>
+                    </span>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-xs-10">
+                        <p>
+                            Puedes cargar tus imagenes arrastrandolas al area de carga
+                            o haciendo clic en ella para elegir tus fotos.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div> <!-- /container -->
     <!--<form id="uploadForm" action="{% url 'make' product.slug %}" method="post" enctype="multipart/form-data">
         {% csrf_token %}
         {{ form.as_p }}
@@ -99,7 +139,8 @@
             {{ form.temp_hash }}
         </form>
     </div>-->
-
+    <div class="container-fluid">
+<div class="row">
 <div class="table table-striped" class="files" id="previews">
 <div id="template">
     <div class="col-sm-1 col-md-2">
@@ -119,6 +160,8 @@
     </div>
 </div>
 </div>
+</div>
+    </div>
     <div id="dropzone-previews">
     </div>
     <!-- your popup hidden content -->
@@ -142,6 +185,7 @@
 
 {% block dropzonejs-scripts %}
     <script src="{% static 'js/dropzone.js' %}"></script>
+    <script src="{% static 'js/cropper.js' %}"></script>
     <script type="text/javascript">
 
         var image_count = 0;
@@ -215,30 +259,45 @@
             minFiles: 0,
             //previewTemplate: previewTemplate,
             //previewsContainer: "#previews", // Define the container to display the previews
-            thumbnailWidth: 150,
-            thumbnailHeight: 150,
+            //thumbnailWidth: 150,
+            //thumbnailHeight: 150,
             clickable: ".fileinput-button", // Define the element that should be used as click trigger to select files.
 
             init: function() {
                 var myDropzone = this;
 
                 this.on("success", function(file, responseText) {
-                    // evento lanzado al terminar de subir las imágenes en cola
+                    // Event thrown when upload event finish upload images on the queue
                     console.log(responseText);
                     //var mydropzone = this;
                     //myDropzone.emit("thumbnail", file, responseText.photos[0].url);
                     //file.previewElement.querySelector("img").src = responseText.photos[0].url;
+
+                    // Sets server generated image id to dropzonejs preview image.
                     file.previewElement.querySelector("img").id = responseText.photos[0].name;
+
+                    var editButton = Dropzone.createElement('<div class="pull-left"><a data-toggle="modal" ' +
+                            'data-target="#cropper-modal" data-image_url="' + responseText.photos[0].url + '" href="#">' +
+                            '<i class="glyphicon glyphicon-edit text-default"></i> Editar</a></div>');
+
+                    editButton.addEventListener('click', function() {
+                        $('#cropper').find('img').attr('src', responseText.photos[0].url);
+                    })
+
+                    // Add the button to the file preview element.
+                    file.previewElement.appendChild(editButton);
+
                     //$('#dropzone-previews').append('<div class="col-sm-1 col-md-3"><div class="thumbnail"><a><img class="img-responsive" id="' + responseText.photos[0].name + '" data-dz-thumbnail alt="' +responseText.photos[0].name+ '" src="' + responseText.photos[0].url + '"alt=""/></a> </div> <div class="caption"> <h3>Thumbnail label</h3> <p>Some sample text. Some sample text.</p> <p> <a href="#" class="btn btn-primary" role="button"> Button </a> <a href="#" class="btn btn-default" role="button">Button </a> </p> </div> </div>');
-                    // pop up #example1, #example2, #example3 with same content
+
                     $('#'+responseText.photos[0].name).popover({
                         html: true,
-                        trigger: 'click focus',
+                        trigger: 'focus',
                         container: '#dropzone-previews',
                         placement: 'bottom',
                         animation: true,
                         content: function () {
-                            return '<div><a href="' + responseText.photos[0].url + '">Editar</a></div>';
+                            return '<button class="btn btn-success" data-toggle="modal" data-target="#cropmodal" ' +
+                                    'data-image_url="' + responseText.photos[0].url + '" >Open image </button>'
                         },
                     });
 
@@ -254,7 +313,19 @@
                 });
 
                 this.on("addedfile", function(file) {
+                    var removeButton = Dropzone.createElement('<div class="pull-right"><a href="#"><i class="glyphicon glyphicon-trash text-danger"></i></a></div>');
+                    var _this = this;
 
+                    // Listen to the click event
+                    removeButton.addEventListener("click", function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        _this.removeFile(file);
+                    // If you want to the delete the file on the server as well, you can do the AJAX request here.
+                    });
+
+                    // Add the button to the file preview element.
+                    file.previewElement.appendChild(removeButton);
                     //image_count++
                     //$("#image-count").html(image_count);
 
@@ -280,8 +351,87 @@
                 this.on("queuecomplete", function(progress) {
                   document.querySelector("#total-progress").style.opacity = "0";
                 });
+
+                // remove extra images
+                this.on('maxfilesexceeded', function(file) {
+                    this.removeFile(file);
+                });
             }
         };
 
+    </script>
+    <!--<script type="text/javascript">
+        $('#cropmodal').on('show.bs.modal', function(e) {
+             e.stopPropagation();
+            //get data-image_url attribute of the clicked element
+            var image_url = $(e.relatedTarget).data('image_url');
+
+            //populate the img field
+            var modal = $(this)
+            modal.find('img').attr('src', image_url)
+
+            function updateCoords(c)
+            {
+                $('#x').val(c.x);
+                $('#y').val(c.y);
+                $('#w').val(c.w);
+                $('#h').val(c.h);
+            }
+            function checkCoords()
+            {
+                if (parseInt($('#w').val())) return true;
+                    alert('Please select a crop region then press submit.');
+                return false;
+            }
+            $('#jcrop_target').Jcrop({
+                minSize: [600, 600],
+                bgFade: true,
+                bgOpacity: .3,
+                boxWidth: 800,
+                boxHeight: 800,
+                aspectRatio: 1,
+                onSelect: updateCoords,
+                keySupport: false,
+                setSelect:   [ (800 * 4/5),
+                   (800 * 4/5),
+                   (800/5),
+                   (800/5) ]
+            });
+});
+
+$(function() {
+
+
+});
+
+
+</script>-->
+
+    <script>
+        $('#cropper-modal').on('shown.bs.modal', function () {
+            var $image = $('#cropper > img'),
+            cropBoxData,
+            canvasData;
+            $image.cropper({
+                autoCropArea: 0.8,
+                aspectRatio: 1,
+                minCropBoxWidth: 500,
+                minCropBoxHeight: 500,
+                zoomable: false,
+                movable: false,
+                built: function () {
+                    // Strict mode: set crop box data first
+                    $image.cropper('setCropBoxData', cropBoxData);
+                    $image.cropper('setCanvasData', canvasData);
+                }
+            });
+        }).on('hidden.bs.modal', function () {
+            var $image = $('#cropper > img'),
+            cropBoxData,
+            canvasData;
+            cropBoxData = $image.cropper('getCropBoxData');
+            canvasData = $image.cropper('getCanvasData');
+            $image.cropper('destroy');
+        });
     </script>
 {% endblock %}
