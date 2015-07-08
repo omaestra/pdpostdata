@@ -38,12 +38,25 @@
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-body">
-                    <form action="" method="POST">{% csrf_token %}
-                        <div id="cropper">
-                            <img src="" alt="Picture" width="600" height="600">
+                    <form class="form" action="" method="POST">{% csrf_token %}
+                        <input type="hidden" id="dataX" name="dataX" />
+                        <input type="hidden" id="dataY" name="dataY" />
+                        <input type="hidden" id="dataWidth" name="dataWidth" />
+                        <input type="hidden" id="dataHeight" name="dataHeight" />
+                        <input class="avatar-src" name="avatar_src" type="hidden">
+                        <input class="image_data" name="image_data" type="hidden">
+                        <div class="form-group">
+                            <div id="cropper" class="img-container">
+                                <img src="" alt="Picture" width="600" height="600">
+                            </div>
                         </div>
-                        <input type="submit" value="Crop" />
+                        <button type="submit" class="btn btn-primary">Crop
+                            <span class="glyphicon glyphicon-check"></span>
+                        </button>
                     </form>
+                </div>
+                <div class="modal-footer">
+
                 </div>
             </div>
         </div>
@@ -321,6 +334,9 @@
                         e.preventDefault();
                         e.stopPropagation();
                         _this.removeFile(file);
+
+                        var fileCount = myDropzone.files.length;
+                        $("#image-count").html(fileCount);
                     // If you want to the delete the file on the server as well, you can do the AJAX request here.
                     });
 
@@ -423,7 +439,23 @@ $(function() {
                     // Strict mode: set crop box data first
                     $image.cropper('setCropBoxData', cropBoxData);
                     $image.cropper('setCanvasData', canvasData);
-                }
+                },
+                crop: function(data) {
+                    $('#dataX').val(Math.round(data.x));
+                    $('#dataY').val(Math.round(data.y));
+                    $('#dataHeight').val(Math.round(data.height));
+                    $('#dataWidth').val(Math.round(data.width));
+                    $('#dataRotate').val(Math.round(data.rotate));
+                    var image_data = [
+                        '{"x":' + Math.round(data.x),
+                        '"y":' + Math.round(data.y),
+                        '"height":' + Math.round(data.height),
+                        '"width":' + Math.round(data.width),
+                        '"rotate":' + Math.round(data.rotate) + '}'
+                    ].join();
+
+                    $('.image_data').val(image_data);
+                  }
             });
         }).on('hidden.bs.modal', function () {
             var $image = $('#cropper > img'),
