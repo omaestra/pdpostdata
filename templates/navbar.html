@@ -1,21 +1,27 @@
-<!-- Static navbar -->
-    <div class="navbar navbar-default navbar-static-top" role="navigation">
+{% load tags %}
 
-      <div class="container-fluid">
+{% url 'home' as home %}
+{% url 'products' as products %}
+{% url 'cart' as cart %}
+{% url 'user_profile' as profile %}
+{% url 'auth_login' as login %}
+
+<!-- Static navbar -->
+<nav class="navbar navbar-default navbar-static-top" role="navigation">
+    <div class="container-fluid">
         <div class="navbar-header">
-          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          <a class="navbar-brand" href="{% url 'home' %}">Postdata
-          </a>
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="{% url 'home' %}">Postdata</a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
-                <li class="active"><a href="#">Inicio</a></li>
-                <li><a href="#">Nosotros</a></li>
+                <li class="{% active request home %}"><a href="{% url 'home' %}">Inicio</a></li>
+                <li class=""><a href="#">Nosotros</a></li>
                 <li><a href="#">Contacto</a></li>
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Dropdown <span class="caret"></span></a>
@@ -30,22 +36,16 @@
                     </ul>
                 </li>
             </ul>
-            <form class="navbar-form navbar-left" role="search" action='/s/'>
-                <div class="form-group">
-                    <input type="text" class="form-control" name='q' placeholder="Buscar producto">
-                </div>
-                <button type="submit" class="btn btn-default">Buscar</button>
-            </form>
             <ul class="nav navbar-nav navbar-right">
-                <li><a href="{% url 'products' %}">Productos</a></li>
-                <li><a href="{% url 'cart' %}"><span class="glyphicon glyphicon-shopping-cart"></span> <span class="badge">{% if not request.session.items_total %} 0 {% else %} {{ request.session.items_total }} {% endif%}</span></a></li>
+                <li class="{% active request products %}" ><a href="{% url 'products' %}">Productos</a></li>
+                <li class="{% active request cart %}"><a href="{% url 'cart' %}"><span class="glyphicon glyphicon-shopping-cart"></span> <span class="badge">{% if not request.session.items_total %} 0 {% else %} {{ request.session.items_total }} {% endif%}</span></a></li>
                 {% if user.is_authenticated %}
-                    <li><a href="{% url 'user_profile' %}">{{ user.username }}</a></li>
+                    <li class="{% active request profile %}"><a href="{% url 'user_profile' %}">{{ user.username }}</a></li>
                     <li><a href="{% url 'auth_logout' %}">Cerrar sesion</a></li>
                 {% else %}
-                    <li><a href="{% url 'auth_login' %}?next={{ request.get_full_path|urlencode }}">Iniciar sesion</a></li>
+                    <li class="{% active request login %}"><a href="{% url 'auth_login' %}?next={{ request.get_full_path|urlencode }}">Iniciar sesion</a></li>
                 {% endif %}
             </ul>
         </div><!--/.nav-collapse -->
-      </div>
     </div>
+</nav>

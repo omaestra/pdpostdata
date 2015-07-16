@@ -31,6 +31,7 @@ def home(request):
     context = {
         "products": products,
         "sliders": sliders,
+        "style": 'landing-page'
     }
     return render(request, template, context)
 

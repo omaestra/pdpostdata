@@ -22,7 +22,7 @@
                 <div class="panel" >
                     <div class="panel-heading">
                         <div class="panel-title">Iniciar sesion</div>
-                        <div style="float:right; font-size: 80%; position: relative; top:-10px"><a href="#">Olvidaste tu contraseña?</a></div>
+                        <div style="float:right; position: relative; top:-10px"><a href="#">Olvidaste tu contraseña?</a></div>
                     </div>
 
                     <div style="padding-top:30px" class="panel-body" >
@@ -58,15 +58,15 @@
                                 <!-- Button -->
 
                                 <div class="col-sm-12 controls">
-                                    <input type='submit' value='{% if submit_btn %}{{ submit_btn }}{% else %}Submit{% endif %}' class='btn btn-success' />
+                                    <input type='submit' value='{% if submit_btn %}{{ submit_btn }}{% else %}Submit{% endif %}' class='btn btn-success btn-fill' />
                                     <!--<a id="btn-login" href="#" class="btn btn-success">Login  </a>-->
-                                    <a id="btn-fblogin" href="#" class="btn btn-primary">Iniciar sesion con Facebook</a>
+                                    <a id="btn-fblogin" href="#" class="btn btn-fill btn-facebook">Iniciar sesion con Facebook</a>
                                 </div>
                             </div>
 
                             <div class="form-group">
                                 <div class="col-md-12 control">
-                                    <div style="border-top: 1px solid #999; padding-top:15px; font-size:85%" >
+                                    <div style="border-top: 1px solid #999; padding-top:15px;" >
                                         Aún no tienes una cuenta?
                                     <a href="{% url 'auth_register' %}">
                                         Registrate ahora!
@@ -84,7 +84,7 @@
                 <div class="panel">
                     <div class="panel-heading">
                         <div class="panel-title">Registrarse</div>
-                        <div style="float:right; font-size: 85%; position: relative; top:-10px"><a id="signinlink" href="{% url 'auth_login' %}">Iniciar sesion</a></div>
+                        <div style="float:right; position: relative; top:-10px"><a id="signinlink" href="{% url 'auth_login' %}">Iniciar sesion</a></div>
                     </div>
                     <div class="panel-body" >
                         <form id="signupform" class="form-horizontal" role="form" method="post" action="{% url 'auth_register' %}">
@@ -131,7 +131,7 @@
                             <div class="form-group">
                                 <!-- Button -->
                                 <div class="col-md-offset-3 col-md-9">
-                                    <input type='submit' value='{% if submit_btn %}{{ submit_btn }}{% else %}Submit{% endif %}' class='btn btn-success' />
+                                    <input type='submit' value='{% if submit_btn %}{{ submit_btn }}{% else %}Submit{% endif %}' class='btn btn-success btn-fill' />
                                     <span style="margin-left:8px;">ó</span>
                                 </div>
                             </div>
@@ -139,7 +139,7 @@
                             <div style="border-top: 1px solid #999; padding-top:20px"  class="form-group">
 
                                 <div class="col-md-offset-3 col-md-9">
-                                    <button id="btn-fbsignup" type="button" class="btn btn-primary"><i class="icon-facebook"></i>Registrarme con Facebook</button>
+                                    <button id="btn-fbsignup" type="button" class="btn btn-facebook btn-fill"><i class="icon-facebook"></i>Registrarme con Facebook</button>
                                 </div>
 
                             </div>

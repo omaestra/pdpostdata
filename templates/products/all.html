@@ -8,47 +8,45 @@
 {% endblock %}
 
 {% block content %}
-<div class="container-fluid">
-    <div class='row'>
-        {% for product in products %}
-            <div class='col-sm-3'>
-                <div class="thumbnail">
-                    {% if product.productimage_set.all %}
-                        {% for item in product.productimage_set.all %}
-                            {% if item.featured %}
-                                <div style="width:100px;margin:0 auto;">
+    <div class="wrapper">
+        <div class="section section-products">
+            <div class="container-fluid">
+                <h3 class="header-text text-center">Nuestros productos</h3>
+                <div class="row">
+                    {% for product in products %}
+                    <div class="col-md-3">
+                        <div class="card card-blue">
+                            {% if product.productimage_set.all %}
 
-                                    <a href='{{ product.get_absolute_url }}'>
-                                        <img class='img-responsive' src="{{ MEDIA_URL }}{{ item.image.url }}" />
-                                    </a>
-                                </div>
+                                {% for item in product.productimage_set.all %}
+                                    {% if item.featured %}
+                                        <div class="icon">
+                                            <img class='img-responsive' src="/media/{{ item.image }}" />
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                            {% else %}
+                                <img class='img-responsive' src='{% static "img/placeholder.svg" %}' />
                             {% endif %}
-                        {% endfor %}
-                    {% else %}
-                        <div style="width:100px;margin:0 auto;">
-                            <a href='{{ product.get_absolute_url }}'>
-                                <div class='background_img_thumb' style="height:100px;"></div>
-                            </a>
+                            <div class="text">
+                                <a href='{{ product.get_absolute_url }}'>
+                                    <h3>{{ product.title }}</h3>
+                                </a>
+                                <p>{{ product.description| truncatewords:15}}</p>
+                            </div>
+                            <p>
+                                <a href="{{ product.get_absolute_url }}" class="btn btn-info btn-fill" role="button">Ver</a>
+                                <a href="{% url 'make' product.slug %}" class="btn btn-info" role="button">
+                                    <span class="glyphicon glyphicon-shopping-cart"></span> Agregar al carrito
+                                </a>
+                            </p>
+
                         </div>
-                    {% endif %}
-
-                    <div class="caption">
-                        <a href='{{ product.get_absolute_url }}'> <h3>{{ product.title }}</h3></a>
-                        <p>{{ product.description|truncatewords:15}}</p>
-                        <p>
-                            <a href="{{ product.get_absolute_url }}" class="btn btn-primary" role="button">Ver</a>
-                            <a href="{% url 'make' product.slug %}" class="btn btn-default" role="button">
-                                <span class="glyphicon glyphicon-shopping-cart"></span> Agregar al carrito
-                            </a>
-                    </p>
                     </div>
-                 </div>
+                    {% endfor %}
+                </div>
             </div>
-
-        {% cycle "" "" "" "" "" "</div><br/><hr/><div class='row'>" %}
-        {% endfor %}
-
+        </div>
     </div>
-</div> <!-- /container -->
 
 {% endblock %}

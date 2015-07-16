@@ -29,40 +29,39 @@
 
       {% load staticfiles %}
       <!-- Custom styles for this template -->
-      <link rel='stylesheet' href='{% static "css/bootstrap.min.css" %}' />
-      <link rel='stylesheet' href='{% static "css/navbar-static-top.css" %}' />
+      <link rel='stylesheet' href='{% static "css/bootstrap.css" %}' />
       <link rel='stylesheet' href='{% static "css/sticky-footer-navbar.css" %}' />
       <link href="{% static 'css/font-awesome.min.css'%}" rel="stylesheet">
+  <link type="text/css" rel="stylesheet" href="{% static 'css/landing-page.css' %}"/>
+    <link type="text/css" rel="stylesheet" href="{% static 'css/pe-icon-7-stroke.css' %}"/>
 
       {% block dropzonejs-styles %}{% endblock %}
       {% block profile-styles %}{% endblock %}
       {% block dashboard-styles %}{% endblock %}
       {% block login-form-styles %}{% endblock %}
+      {% block styles %}{% endblock %}
 
     <style>
-    .alert-top-message {
-        margin-bottom: 0px;
-        border-radius: 0px;
-        text-align: center;
-        background-color: #DBDBDB;
+        {% block checkout-styles %}{% endblock %}
+        .credits{border-top:1px solid #555555;padding:25px 0 15px;text-align:center}
+        .alert-top-message {
+            margin-bottom: 0px;
+            border-radius: 0px;
+            text-align: center;
+            background-color: #DBDBDB;
 
-    }
-    .alert-top-message h3{
-        margin: 0 auto;
-    }
-    .modal-dialog {
-      margin-top: 15%;
-    }
-    {% block styles %}
-    {% endblock %}
-    .background_img_thumb {
-        width:100%;
-        height:100%;
-        background-image: url("{% static 'img/placeholder.svg' %}");
-        background-size:cover;
-        background-repeat:no-repeat;
-        background-position:center;
-    }
+        }
+        .alert-top-message h3{
+            margin: 0 auto;
+        }
+        .modal-dialog {
+        }
+        .background_img_thumb {
+            width:100%;
+            height:100%;
+            background-size:cover;
+            background: url("{% static 'img/placeholder.svg' %}") no-repeat center;
+        }
     </style>
 
     <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
@@ -79,7 +78,7 @@
     <![endif]-->
   </head>
 
-  <body class="{{ style }}">
+  <body class="{% if style %}{{ style }}{% else %}landing-page{% endif %}">
       {% if request.session.marketing_message %}
       <div class='alert alert-top-message alert-dismissible' role='alert'>
         <button id='marketing-message-btn' type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
@@ -105,68 +104,87 @@
 
       {% block dropzonejs-uploader %}{% endblock %}
 
+      {% block carousel %}{% endblock %}
       {% block jumbotron %}{% endblock %}
-      {% block jumbotron2 %}{% endblock %}
 
       {% block content %}{% endblock %}
 
       <footer class="footer-distributed">
-          <div class="footer-left">
+          <div class="row support">
+              <div class="col-lg-3 col-md-2 footer-left">
 
-              <h3>PD <span>Postdata</span></h3>
+                  <h3 class="styled">PD <span>Postdata</span></h3>
 
-              <p class="footer-links">
-                  <a href="#">Inicio</a>
-                  ·
-                  <a href="#">Productos</a>
-                  ·
-                  <a href="#">Nosotros</a>
-                  ·
-                  <a href="#">Faq</a>
-                  ·
-                  <a href="#">Contacto</a>
-              </p>
+                  <p class="footer-links">
+                      <a href="#">Inicio</a>
+                      ·
+                      <a href="#">Productos</a>
+                      ·
+                      <a href="#">Nosotros</a>
+                      ·
+                      <a href="#">Faq</a>
+                      ·
+                      <a href="#">Contacto</a>
+                  </p>
 
-              <p class="footer-company-name">Postdata © 2015</p>
+              </div>
+
+              <div class="col-lg-3 col-md-3 footer-center">
+                  <div>
+                      <i class="fa fa-map-marker"></i>
+                      <p><span>21 Revolution Street</span> Paris, France</p>
+                  </div>
+
+                  <div>
+                      <i class="fa fa-phone"></i>
+                      <p>+1 555 123456</p>
+                  </div>
+
+                  <div>
+                      <i class="fa fa-envelope"></i>
+                      <p><a href="mailto:support@company.com">support@email.com</a></p>
+                  </div>
+
+              </div>
+
+              <div class="col-lg-3 col-md-4 footer-center">
+                  <h4>Boletin de noticias</h4>
+
+                  <form accept-charset="UTF-8" action="{% url 'ajax_email_signup' %}" class="form-inline" data-remote="true" html="{:multipart=>true}" method="post">
+                      {% csrf_token %}
+
+                      <div style="margin:0;padding:0;display:inline"><input name="utf8" type="hidden" value="✓"></div>
+                      <div class="form-group">
+                          <label class="sr-only" for="exampleInputEmail2">Email address</label>
+                          <input class="form-control" id="subscribe_email" name="subscribe_email" placeholder="Enter Email" type="email">
+                      </div>
+
+                      <input class="btn btn-info btn-fill" name="commit" type="submit" value="Subscribe">
+                  </form>
+                  <h3 class="subscribers">1,665 Subscriptores</h3>
+              </div>
+
+              <div class="col-lg-3 col-md-3 footer-right">
+                  <h4>Sobre nosotros</h4>
+                  <p class="footer-company-about">
+                      Lorem ipsum dolor sit amet, consectateur adispicing elit. Fusce euismod convallis velit, eu auctor lacus vehicula sit amet.
+                  </p>
+
+                  <div class="footer-icons">
+
+                      <a href="#"><i class="fa fa-facebook"></i></a>
+                      <a href="#"><i class="fa fa-twitter"></i></a>
+                      <a href="#"><i class="fa fa-instagram"></i></a>
+                      <a href="#"><i class="fa fa-youtube"></i></a>
+
+                  </div>
+              </div>
           </div>
-
-          <div class="footer-center">
-
-              <div>
-                  <i class="fa fa-map-marker"></i>
-                  <p><span>21 Revolution Street</span> Paris, France</p>
+          <div class="row">
+              <div class="credits">
+                  <p class="footer-company-name">© 2015 Postdata, hecho con <i class="fa fa-heart" alt="love"></i> para un mejor servicio</p>
               </div>
-
-              <div>
-                  <i class="fa fa-phone"></i>
-                  <p>+1 555 123456</p>
-              </div>
-
-              <div>
-                  <i class="fa fa-envelope"></i>
-                  <p><a href="mailto:support@company.com">support@email.com</a></p>
-              </div>
-
           </div>
-
-          <div class="footer-right">
-
-              <p class="footer-company-about">
-                  <span>Sobre nosotros</span>
-                  Lorem ipsum dolor sit amet, consectateur adispicing elit. Fusce euismod convallis velit, eu auctor lacus vehicula sit amet.
-              </p>
-
-              <div class="footer-icons">
-
-                  <a href="#"><i class="fa fa-facebook"></i></a>
-                  <a href="#"><i class="fa fa-twitter"></i></a>
-                  <a href="#"><i class="fa fa-instagram"></i></a>
-                  <a href="#"><i class="fa fa-youtube"></i></a>
-
-              </div>
-
-          </div>
-
       </footer>
 
       {% include "modal.html" %}
@@ -176,6 +194,7 @@
       ================================================== -->
       <!-- Placed at the end of the document so the pages load faster -->
       <script src="{% static 'js/jquery.min.js' %}"></script>
+      <script src="{% static 'js/jquery-ui-1.10.4.custom.min.js' %}"></script>
       <!-- Latest compiled and minified JavaScript -->
       <script src="{% static 'js/bootstrap.min.js' %}"></script>
 
@@ -207,21 +226,21 @@
             //showModal()
             //setTimeout(showModal, 50000);
             $("#sendMarketingForm").click(function(e){
-              e.preventDefault()
-              var mForm = $("#sendForm").serialize()
+              e.preventDefault();
+              var mForm = $("#sendForm").serialize();
              $.ajax({
                   type: "POST",
                   url: "{% url 'ajax_email_signup' %}",
                   data: mForm,
                   success: function(data){
                     // console.log(data)
-                    $("#modalMessage").html("<p>" + data + "</p>")
+                    $("#modalMessage").html("<p>" + data + "</p>");
                      $("#marketingModal").modal("hide");
                   },
                   error: function(data){
                     // console.log(data)
                     // console.log(data.responseJSON)
-                    var obj = data.responseJSON
+                    var obj = data.responseJSON;
                     // console.log(obj)
                     // console.log(obj.email)
                     $("#modalMessage").html("<p style='color:red;'>" + obj.email + "</p>")

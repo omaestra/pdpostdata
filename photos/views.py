@@ -144,7 +144,7 @@ def upload_crop(request):
 def sort_photos(request):
     if request.POST:
         form_uuid = request.POST.get('temp_hash')
-        print(request.POST)
+        print("SORTING", request.POST, form_uuid)
         photo_list = grouped(Photo.objects.filter(temp_hash=form_uuid), 4)
         context = {'photo_list': photo_list, }
         template = 'photos/sortable.html'

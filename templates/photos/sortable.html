@@ -69,7 +69,7 @@
 	.grid li {
 		line-height: 80px;
 		float: left;
-		width: 160px;
+		/*width: 160px;*/
 		height: 160px;
 		text-align: center;
 	}
@@ -87,7 +87,7 @@
 	.disabled {
 		opacity: 0.5;
 	}
-    
+
     .sortable_exclude_dynamic {
 		margin: auto;
 		padding: 0;
@@ -105,20 +105,20 @@
 		color: #fff;
 		text-shadow: 0 1px 1px #ac4e00;
 		box-shadow: inset 0 1px 1px rgba(255,255,255,0.7);
-	} 
-        
+	}
+
     .sortable_exclude_dynamic li.correct {
 		border:1px solid #000000;
-        background:#cccccc;     
+        background:#cccccc;
             cursor:default;
-	}  
+	}
     .sortable_exclude_dynamic li.empty{
         border:none;
         background:none;
         color:#dcdcdc;
             cursor:default;
     }
-        
+
 	.over {
 		-webkit-box-shadow: 0 5px 10px rgba(0,0,0,0.2);
 		box-shadow: 0 5px 10px rgba(0,0,0,0.2);
@@ -202,21 +202,23 @@
 	<header>
 		<h1>Ordena tus imagenes!</h1>
 	</header>
-	<section>
+	<div class="container-fluid">
+    <div class="row">
 		<h2>Nombre del producto</h2>
-		<ul class="sortable grid" style="border: 1px solid;">
+		<ul class="sortable grid list-group" style="border: 1px solid;">
         {% for group in photo_list %}
-            <div class="col-md-2" style="background-color: #5b80b2; margin: 25px;">
+            <div class="col-lg-2 col-sm-3 col-xs-4" style="border: 1px solid #5b80b2; margin: 25px;">
                 {% for photo in group %}
-			        <li id="{{ photo.id }}">
-                        <img class="thumbnail" draggable="false" src="{{ photo.image_field.url }}" width="150" height="150"/>
+			        <li id="{{ photo.id }}" class="list-group-item">
+                        <img class="thumbnail img-responsive" draggable="false" src="{{ photo.image.url }}"/>
                     </li>
                 {% endfor %}
             <span style="border: 1px solid; ;text-align: center">PDStrips</span>
             </div>
         {% endfor %}
 		</ul>
-	</section>
+    </div>
+	</div>
     <section>
 		<h2><em>toArray</em> <span id="arrayResults"></span></h2>
 		<h2><em>toJSON</em> <span id="jsonResults"></span></h2>

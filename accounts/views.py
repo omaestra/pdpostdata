@@ -95,7 +95,7 @@ def login_view(request):
         "class_name": login_form.__class__.__name__,
         "style": 'body-background',
     }
-    return render(request, "form.html", context)
+    return render(request, "sign_form.html", context)
 
 
 def registration_view(request):
@@ -126,7 +126,7 @@ def registration_view(request):
         "class_name": form.__class__.__name__,
         "style": 'body-background',
     }
-    return render(request, "form.html", context)
+    return render(request, "sign_form.html", context)
 
 
 SHA1_RE = re.compile('^[a-f0-9]{40}$')
