@@ -240,7 +240,7 @@
                         if (e.lengthComputable) {
                             var percentComplete = e.loaded / e.total;
                             //Do something with upload progress
-                            console.log(percentComplete)
+                            console.log(percentComplete);
                             $('.progress-bar').css('width', (percentComplete)*100+'%');
                             $('#percent').text(Math.floor((percentComplete)*100)+'%');
                         }
@@ -295,7 +295,7 @@
 
                     editButton.addEventListener('click', function() {
                         $('#cropper').find('img').attr('src', responseText.photos[0].url);
-                    })
+                    });
 
                     // Add the button to the file preview element.
                     file.previewElement.appendChild(editButton);
@@ -315,7 +315,7 @@
                     });
 
                     // Keep count of uploaded files
-                    image_count++
+                    image_count++;
                     var fileCount = myDropzone.files.length;
                     $("#image-count").html(fileCount);
 

@@ -15,6 +15,7 @@ from django.core.urlresolvers import reverse
 from .forms import LoginForm, RegistrationForm, UserAddressForm, UserProfileForm, UserForm
 from .models import EmailConfirmed, UserDefaultAddress, UserProfile, UserAddress
 
+
 # Create your views here.
 @login_required
 def user_profile(request):
@@ -198,8 +199,8 @@ def add_user_address(request):
                    "form_title": form_title,
                    })
 
-def delete_user_address(request, address_id):
 
+def delete_user_address(request, address_id):
     address = UserAddress.objects.get(id=address_id)
     address.delete()
     # cartitem.carts = None
@@ -208,4 +209,3 @@ def delete_user_address(request, address_id):
     messages.success(request, "Direccion eliminada con exito!")
 
     return HttpResponseRedirect(reverse("user_profile"))
-

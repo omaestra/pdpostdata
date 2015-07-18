@@ -1,29 +1,24 @@
 {% load staticfiles %}
 
 <div class="profile-sidebar">
-    <!-- SIDEBAR USERPIC -->
+    <div class="profile-userpic">
         {% if user.userprofile.avatar %}
-            <img class='img-responsive img-thumbnail' src="{{ user.userprofile.avatar.url }}" />
+            <img class='img-responsive' src="{{ user.userprofile.avatar.url }}" />
         {% else %}
-            <img class='img-responsive img-thumbnail' src="{% static 'img/placeholder.svg' %}" />
+            <img class='img-responsive' src="{% static 'img/placeholder.svg' %}" />
         {% endif %}
+    </div>
 
-    <!-- END SIDEBAR USERPIC -->
-    <!-- SIDEBAR USER TITLE -->
     <div class="profile-usertitle">
         <div class="profile-usertitle-name">
             <h4>@{{ user.username }}</h4>
         </div>
     </div>
-    <!-- END SIDEBAR USER TITLE -->
-    <!-- SIDEBAR BUTTONS -->
     <div class="profile-userbuttons">
         <a class="btn btn-info btn-responsive" href="#"> Editar
             <span class="glyphicon glyphicon-edit"></span>
         </a>
     </div>
-    <!-- END SIDEBAR BUTTONS -->
-    <!-- SIDEBAR MENU -->
     <div class="profile-usermenu">
         <ul class="nav" id="profile-tab">
             <li class="active">
@@ -48,5 +43,4 @@
             </li>
         </ul>
     </div>
-    <!-- END MENU -->
 </div>

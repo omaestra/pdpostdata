@@ -140,7 +140,7 @@ class RegistrationForm(forms.ModelForm):
         label='Password',
         error_messages=default_errors,
         widget=forms.PasswordInput(
-            attrs={'class': 'form-control', 'placeholder': 'Contraseña','name': 'password1', }
+            attrs={'class': 'form-control', 'placeholder': 'Contraseña', 'name': 'password1', }
         )
     )
     password2 = forms.CharField(

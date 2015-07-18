@@ -35,11 +35,11 @@ function stripeResponseHandler(status, response) {
     // and submit
     //$form.get(0).submit();
   }
-};
-$("#addShippingAddress").click(function(e){
+}
+    $("#addShippingAddress").click(function(e){
   e.preventDefault();
   $("#shippingAddressForm").fadeToggle();
-})
+});
 {% if not current_addresses  %}
   $("#shippingAddressForm").fadeToggle();
 {% endif %}

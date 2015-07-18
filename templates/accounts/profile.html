@@ -22,66 +22,72 @@
                                 <div class="panel-heading">
                                     Informacion personal
                                 </div>
-                                <table class="table table-hover">
-                                    <thead>
-                                      <tr>
-                                        <th>Nombre</th>
-                                        <th>Apellido</th>
-                                        <th>Username</th>
-                                      </tr>
-                                    </thead>
-                                    <tbody>
-                                      <tr>
-                                        <td>{{ user.first_name }}</td>
-                                        <td>{{ user.last_name }}</td>
-                                        <td>{{ user.username }}</td>
-                                      </tr>
-                                    </tbody>
-                                </table>
+                                <div class="panel-body table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                          <tr>
+                                            <th>Nombre</th>
+                                            <th>Apellido</th>
+                                            <th>Username</th>
+                                          </tr>
+                                        </thead>
+                                        <tbody>
+                                          <tr>
+                                            <td>{{ user.first_name }}</td>
+                                            <td>{{ user.last_name }}</td>
+                                            <td>{{ user.username }}</td>
+                                          </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                             <div class="panel panel-primary">
                                 <div class="panel-heading">Direccion de envio</div>
-
-                                <table class="table table-hover">
-                                    <thead>
-                                    <tr>
-                                        <th>Direccion de envio</th>
-                                        <th>Telefono</th>
-                                        <th></th>
-                                        <th></th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    {% for useraddress in user.useraddress_set.all %}
+                                <div class="panel-body table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
                                         <tr>
-                                            <td>{{ useraddress.get_address }}</td>
-                                            <td>{{ useraddress.phone }}</td>
-                                            <td>
-                                                <a href="#">
-                                                    <span class="glyphicon glyphicon-edit"></span>
-                                                </a>
-                                            </td>
-                                            <td>
-                                                <a href='{% url "delete_user_address" useraddress.id %}'>
-                                                    <span class="glyphicon glyphicon-remove"></span>
-                                                </a>
-                                            </td>
+                                            <th>Direccion de envio</th>
+                                            <th>Telefono</th>
+                                            <th></th>
+                                            <th></th>
                                         </tr>
-                                    {% endfor %}
-                                    </tbody>
-                                </table>
+                                        </thead>
+                                        <tbody>
+                                        {% for useraddress in user.useraddress_set.all %}
+                                            <tr>
+                                                <td>{{ useraddress.get_address }}</td>
+                                                <td>{{ useraddress.phone }}</td>
+                                                <td>
+                                                    <a href="#">
+                                                        <span class="glyphicon glyphicon-edit"></span>
+                                                    </a>
+                                                </td>
+                                                <td>
+                                                    <a href='{% url "delete_user_address" useraddress.id %}'>
+                                                        <span class="glyphicon glyphicon-remove"></span>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                         <div class="tab-pane" id="settings">
                             <div class="panel panel-primary">
                                 <div class="panel-heading">Configuracion de la cuenta</div>
+
                                 {% if profile_form and user_form %}
                                     <form method="POST" action="{% url 'user_profile' %}" enctype="multipart/form-data" class="form-horizontal" role="form">
                                         {% csrf_token %}
-                                        <table class="table table-hover">
-                                            {{ profile_form }}
-                                            {{ user_form }}
-                                        </table>
+                                        <div class="panel-body table-responsive">
+                                            <table class="table table-hover">
+                                                {{ profile_form }}
+                                                {{ user_form }}
+                                            </table>
+                                        </div>
                                         <div class="form-group">
                                             <div class="col-lg-offset-2 col-lg-10">
                                                 <input class="btn btn-primary btn-responsive" type="submit" value="Aceptar">
@@ -102,9 +108,11 @@
                                     {% endif %}
                                     <form method="POST" action="{% url 'add_user_address' %}" class="form-horizontal" role="form">
                                         {% csrf_token %}
-                                        <table class="table table-hover">
-                                            {{ address_form }}
-                                        </table>
+                                        <div class="panel-body table-responsive">
+                                            <table class="table table-hover">
+                                                {{ address_form }}
+                                            </table>
+                                        </div>
                                         <div class="form-group">
                                             <div class="col-lg-offset-2 col-lg-10">
                                                 <input class="btn btn-primary btn-responsive" type="submit" value="Agregar">
@@ -116,87 +124,91 @@
                         </div>
                         <div class="tab-pane" id="orders">
                             <div class="panel panel-primary">
-                                    <div class="panel-heading">Mis Pedidos</div>
-                                    <!-- /.panel-heading -->
-                                    <div class="panel-body">
-                                        <table class="table table-hover" style="color: #000;">
-                                            <thead>
+                                <div class="panel-heading">Mis Pedidos</div>
+                                <!-- /.panel-heading -->
+                                <div class="panel-body table-responsive">
+                                    <table class="table table-hover" style="color: #000;">
+                                        <thead>
+                                            <tr>
+                                                <th>#</th>
+                                                <th>Estatus</th>
+                                                <th>Total</th>
+                                                <th>Fecha creacion</th>
+                                                <th>Productos</th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for order in user.order_set.all %}
                                                 <tr>
-                                                    <th>#</th>
-                                                    <th>Estatus</th>
-                                                    <th>Total</th>
-                                                    <th>Fecha creacion</th>
-                                                    <th>Productos</th>
-                                                    <th></th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {% for order in user.order_set.all %}
-                                                    <tr>
-                                                        <td>
-                                                            <a class="btn btn-primary btn-xs" role="button" data-toggle="collapse"
-                                                               href="#{{ order.order_id }}" aria-expanded="false"
-                                                               aria-controls="collapseExample">{{ order.order_id }}
+                                                    <td>
+                                                        <a class="btn btn-primary btn-xs" role="button" data-toggle="collapse"
+                                                           href="#{{ order.order_id }}" aria-expanded="false"
+                                                           aria-controls="collapseExample">{{ order.order_id }}
+                                                        </a>
+                                                    </td>
+                                                    <td>{{ order.status }}</td>
+                                                    <td>Bs.F {{ order.final_total }}</td>
+                                                    <td>{{ order.timestamp }}</td>
+                                                    <td>
+                                                        <span class="badge">{{ order.cart.cartitem_set.count }}</span>
+                                                    </td>
+                                                    {% if not order.orderrating %}
+                                                        <td><a href="" data-toggle="modal" data-target="#rateOrderModal"
+                                                                data-order_number="{{ order.order_id }}"
+                                                                data-user="{{ user.username }}"
+                                                                data-order_id="{{ order.id }}">Que tal estuvo?
                                                             </a>
                                                         </td>
-                                                        <td>{{ order.status }}</td>
-                                                        <td>Bs.F {{ order.final_total }}</td>
-                                                        <td>{{ order.timestamp }}</td>
+                                                    {% else %}
                                                         <td>
-                                                            <span class="badge">{{ order.cart.cartitem_set.count }}</span>
+                                                            <span class="fa fa-check-square-o"> Listo!</span>
                                                         </td>
-                                                        {% if not order.orderrating %}
-                                                            <td><a href="" data-toggle="modal" data-target="#rateOrderModal"
-                                                                    data-order_number="{{ order.order_id }}"
-                                                                    data-user="{{ user.username }}"
-                                                                    data-order_id="{{ order.id }}">Que tal estuvo?
-                                                                </a>
-                                                            </td>
-                                                        {% endif %}
-                                                    </tr>
-                                                    <tr>
-                                                        <td colspan="6" class="hiddenRow">
-                                                            <div class="collapse" id="{{ order.order_id }}">
-                                                                <table class="table table-hover"style="color: #000;">
-                                                                    <thead>
+                                                    {% endif %}
+                                                </tr>
+                                                <tr>
+                                                    <td colspan="6" class="hiddenRow">
+                                                        <div class="collapse" id="{{ order.order_id }}">
+                                                            <table class="table table-hover"style="color: #000;">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th>Producto</th>
+                                                                        <th>Cantidad</th>
+                                                                        <th>Total</th>
+                                                                        <th>Notas</th>
+                                                                        <th>Imagenes</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    {% for item in order.cart.cartitem_set.all %}
                                                                         <tr>
-                                                                            <th>Producto</th>
-                                                                            <th>Cantidad</th>
-                                                                            <th>Total</th>
-                                                                            <th>Notas</th>
-                                                                            <th>Imagenes</th>
-                                                                        </tr>
-                                                                    </thead>
-                                                                    <tbody>
-                                                                        {% for item in order.cart.cartitem_set.all %}
-                                                                            <tr>
-                                                                                <td>{{ item.product.title }}</td>
-                                                                                <td>{{ item.quantity }}</td>
-                                                                                <td>Bs.F {{ item.line_total }}</td>
-                                                                                <td>{{ item.notes }}</td>
-                                                                                <td>
-                                                                                    <span class="badge">
-                                                                                        {{ item.photo_set.count }} / {{ item.product.image_total }}
-                                                                                    </span>
-                                                                                </td>
+                                                                            <td>{{ item.product.title }}</td>
+                                                                            <td>{{ item.quantity }}</td>
+                                                                            <td>Bs.F {{ item.line_total }}</td>
+                                                                            <td>{{ item.notes }}</td>
+                                                                            <td>
+                                                                                <span class="badge">
+                                                                                    {{ item.photo_set.count }} / {{ item.product.image_total }}
+                                                                                </span>
+                                                                            </td>
 
-                                                                            </tr>
-                                                                        {% endfor %}
-                                                                    </tbody>
-                                                                </table>
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                {% endfor %}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                    <!-- /.panel-body -->
-                                    <div class="panel-footer">
-                                        <i class="glyphicon glyphicon-info-sign"></i>
-                                        Puedes hacer clic en el numero del pedido para ver el detalle del mismo.
-                                    </div>
+                                                                        </tr>
+                                                                    {% endfor %}
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
                                 </div>
+                                <!-- /.panel-body -->
+                                <div class="panel-footer">
+                                    <i class="glyphicon glyphicon-info-sign"></i>
+                                    Puedes hacer clic en el numero del pedido para ver el detalle del mismo.
+                                </div>
+                            </div>
                         </div>
                         <div class="tab-pane" id="help">
                             <div class="panel panel-primary">
@@ -227,25 +239,25 @@
     <script>
 
         $('#rateOrderModal').on('show.bs.modal', function (event) {
-            var button = $(event.relatedTarget) // Button that triggered the modal
-            var user = button.data('user') // Extract info from data-* attributes
-            var order_number = button.data('order_number') //Extract info from data-* attributes
-            var order_id = button.data('order_id') //Extract info from data-* attributes
+            var button = $(event.relatedTarget); // Button that triggered the modal
+            var user = button.data('user'); // Extract info from data-* attributes
+            var order_number = button.data('order_number'); //Extract info from data-* attributes
+            var order_id = button.data('order_id'); //Extract info from data-* attributes
 
             // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
             // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
 
-            var modal = $(this)
-            modal.find('#rateOrderModalLabel').text('Danos tu opinion ' + user + '!')
-            modal.find('.modal-header #order-label').text('Pedido Nro. #' + order_number)
-            modal.find('.modal-body #recipient-name').val(user)
-            modal.find('.modal-body #message-text').val("")
+            var modal = $(this);
+            modal.find('#rateOrderModalLabel').text('Danos tu opinion ' + user + '!');
+            modal.find('.modal-header #order-label').text('Pedido Nro. #' + order_number);
+            modal.find('.modal-body #recipient-name').val(user);
+            modal.find('.modal-body #message-text').val("");
             modal.find('.modal-header #order-id').val(order_id)
-        })
+        });
 
         $("#sendRateOrderForm").click(function(e){
-            e.preventDefault()
-            var mForm = $("#rateOrderForm").serialize()
+            e.preventDefault();
+            var mForm = $("#rateOrderForm").serialize();
             $.ajax({
                 type: "POST",
                 url: "{% url 'ajax_rate_order' %}",
@@ -253,14 +265,14 @@
 
                 success: function(data){
                     //console.log(data)
-                    $("#rateOrderModalMessage").html("<p>" + data.message + "</p>")
+                    $("#rateOrderModalMessage").html("<p>" + data.message + "</p>");
                     $("#rateOrderModal").modal("hide");
                     location.reload()
                 },
                 error: function(data){
-                    console.log(data)
-                    console.log(data.responseJSON)
-                    var obj = data.responseJSON
+                    console.log(data);
+                    console.log(data.responseJSON);
+                    var obj = data.responseJSON;
                     // console.log(obj)
                     // console.log(obj.email)
                     if (obj.comment) {

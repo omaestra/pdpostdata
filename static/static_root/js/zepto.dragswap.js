@@ -37,7 +37,7 @@
             exclude: '.disabled',
             prefix: getPrefix(),
             dropComplete: function () {
-                return;
+
             }
         };
 

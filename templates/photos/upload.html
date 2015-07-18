@@ -139,7 +139,7 @@
         var image_count = 0;
 
         $('input[type="file"]').change(function () {
-            image_count = $(this)[0].files.length
+            image_count = $(this)[0].files.length;
             $("#image-count").html(image_count);
         });
 
@@ -148,14 +148,14 @@
             var fileInput = document.getElementById("upload-image");
             console.log(fileInput);
             fileInput.addEventListener("change",function(e){
-              var files = this.files
+              var files = this.files;
               showThumbnail(files)
-            },false)
+            },false);
 
             fileDiv.addEventListener("click",function(e){
               $(fileInput).show().focus().click().hide();
               e.preventDefault();
-            },false)
+            },false);
 
             fileDiv.addEventListener("dragenter",function(e){
               e.stopPropagation();
@@ -179,8 +179,8 @@
 
             function showThumbnail(files){
               for(var i=0;i<files.length;i++){
-                var file = files[i]
-                var imageType = /image.*/
+                var file = files[i];
+                var imageType = /image.*/;
                 if(!file.type.match(imageType)){
                   console.log("Not an Image");
                   continue;
@@ -190,14 +190,14 @@
                 // image.classList.add("")
                 var thumbnail = document.getElementById("thumbnail");
                 image.file = file;
-                thumbnail.appendChild(image)
+                thumbnail.appendChild(image);
 
-                var reader = new FileReader()
+                var reader = new FileReader();
                 reader.onload = (function(aImg){
                   return function(e){
                     aImg.src = e.target.result;
                   };
-                }(image))
+                }(image));
                 var ret = reader.readAsDataURL(file);
                 var canvas = document.createElement("canvas");
                 ctx = canvas.getContext("2d");
@@ -219,7 +219,7 @@
             minFiles: {{ product.image_total }},
 
             init: function() {
-                var submitButton = document.querySelector("#submit-all")
+                var submitButton = document.querySelector("#submit-all");
                 var myDropzone = this;
 
                 submitButton.addEventListener("click", function() {
@@ -263,7 +263,7 @@
 			            $('#imagemodal').modal('show');
                     });
 
-                    image_count++
+                    image_count++;
                     $("#image-count").html(image_count);
                     var fileCount = myDropzone.files.length;
                 });
