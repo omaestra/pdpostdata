@@ -32,15 +32,16 @@
       <link rel='stylesheet' href='{% static "css/bootstrap.css" %}' />
       <link rel='stylesheet' href='{% static "css/sticky-footer-navbar.css" %}' />
       <link href="{% static 'css/font-awesome.min.css'%}" rel="stylesheet">
-  <link type="text/css" rel="stylesheet" href="{% static 'css/landing-page.css' %}"/>
-    <link type="text/css" rel="stylesheet" href="{% static 'css/pe-icon-7-stroke.css' %}"/>
-  <link type="text/css" rel="stylesheet" href="{% static 'css/pdpostdata.css' %}"/>
+      <link type="text/css" rel="stylesheet" href="{% static 'css/landing-page.css' %}"/>
+      <link type="text/css" rel="stylesheet" href="{% static 'css/pe-icon-7-stroke.css' %}"/>
+      <link type="text/css" rel="stylesheet" href="{% static 'css/pdpostdata.css' %}"/>
 
       {% block dropzonejs-styles %}{% endblock %}
       {% block profile-styles %}{% endblock %}
       {% block dashboard-styles %}{% endblock %}
       {% block login-form-styles %}{% endblock %}
       {% block styles %}{% endblock %}
+      {% block sortable-styles %}{% endblock %}
 
     <style>
         {% block checkout-styles %}{% endblock %}
@@ -63,6 +64,124 @@
             background-size:cover;
             background: url("{% static 'img/placeholder.svg' %}") no-repeat center;
         }
+        .boxLogo {
+	width: 100%;
+	position:absolute;
+}
+
+.box {
+   width: 20%;
+   padding-bottom: 20%;
+   position: relative;
+   float: left;
+    background-color: #F15962;
+}
+
+.box h3 {
+    text-align: center;
+    color: #FFF;
+}
+.boxInner {
+   position: absolute;
+   left: 0px;
+   right: 0px;
+   top: 0px;
+   bottom: 0px;
+   overflow: hidden;
+}
+.boxInner img {
+   width: 100%;
+}
+.boxInner .titleBox {
+   position: absolute;
+   bottom: 0;
+   left: 0;
+   right: 0;
+   margin-bottom: -100px;
+   background: #292C2F;
+   color: #D5D4D4;
+   padding: 10px;
+   text-align: center;
+   -webkit-transition: all 0.3s ease-out;
+   -moz-transition: all 0.3s ease-out;
+   -o-transition: all 0.3s ease-out;
+   transition: all 0.3s ease-out;
+    z-index: 2;
+}
+
+.btn-product {
+    color: #fff;
+    border-color: #F15962;
+}
+
+.btn-product-fill {
+    color: #fff;
+    background-color: #F15962;
+    border-color: #F15962;
+}
+
+.btn-product:hover,
+.btn-product:focus,
+.btn-product.focus,
+.btn-product:active,
+.btn-product.active {
+  color: #fff;
+  border-color: #e95a63;
+}
+
+.btn-product-fill:hover,
+.btn-product-fill:focus,
+.btn-product-fill.focus,
+.btn-product-fill:active,
+.btn-product-fill.active {
+  color: #fff;
+  border-color: #e95a63;
+    background-color: #e95a63;
+}
+
+.boxInner:hover .titleBox {
+    margin-bottom: 0;
+}
+
+.row-products:before, .row-products:after {
+    display: table;
+    content: " ";
+}
+
+.banner {
+    background: url(../../media/images/pdheader.png) center center no-repeat;
+    background-size: cover;
+    height: 300px;
+}
+
+        @media only screen and (max-width : 480px) {
+   /* Smartphone view: 1 tile */
+   .box {
+      width: 100%;
+      padding-bottom: 100%;
+   }
+}
+@media only screen and (max-width : 650px) and (min-width : 481px) {
+   /* Tablet view: 2 tiles */
+   .box {
+      width: 50%;
+      padding-bottom: 50%;
+   }
+}
+@media only screen and (max-width : 1050px) and (min-width : 651px) {
+   /* Small desktop / ipad view: 3 tiles */
+   .box {
+      width: 33.3%;
+      padding-bottom: 33.3%;
+   }
+}
+@media only screen and (max-width : 1290px) and (min-width : 1051px) {
+   /* Medium desktop: 4 tiles */
+   .box {
+      width: 25%;
+      padding-bottom: 25%;
+   }
+}
     </style>
 
     <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
@@ -133,7 +252,7 @@
               <div class="col-lg-3 col-md-3 footer-center">
                   <div>
                       <i class="fa fa-map-marker"></i>
-                      <p><span>21 Revolution Street</span> Paris, France</p>
+                      <p><span>21 Revolution Street</span> Caracas, Venezuela</p>
                   </div>
 
                   <div>
@@ -197,10 +316,12 @@
       <script src="{% static 'js/jquery.min.js' %}"></script>
       <script src="{% static 'js/jquery-ui-1.10.4.custom.min.js' %}"></script>
       <!-- Latest compiled and minified JavaScript -->
-      <script src="{% static 'js/bootstrap.min.js' %}"></script>
+      <script src="{% static 'js/bootstrap.js' %}"></script>
 
       {% block dropzonejs-scripts %}{% endblock %}
       {% block profile-scripts %}{% endblock %}
+      {% block sortable-scripts %}{% endblock %}
+
       <script>
           $(document).ready(function(){
             $("#marketing-message-btn").click(function(){

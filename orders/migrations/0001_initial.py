@@ -10,7 +10,7 @@ class Migration(migrations.Migration):
     dependencies = [
         ('accounts', '0001_initial'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('carts', '0002_auto_20150526_1200'),
+        ('carts', '0001_initial'),
     ]
 
     operations = [
@@ -19,7 +19,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('order_id', models.CharField(default=b'ABC', unique=True, max_length=120)),
-                ('status', models.CharField(default=b'Started', max_length=120, choices=[(b'Started', b'Started'), (b'Abandoned', b'Abandoned'), (b'Finished', b'Finished')])),
+                ('status', models.CharField(default=b'Pendiente', max_length=120, choices=[(b'Pendiente', b'Pendiente'), (b'Iniciado', b'Iniciado'), (b'Rechazado', b'Rechazado'), (b'Imprimiendo', b'Imprimiendo'), (b'Enviado', b'Enviado')])),
                 ('sub_total', models.DecimalField(default=10.99, max_digits=1000, decimal_places=2)),
                 ('tax_total', models.DecimalField(default=0.0, max_digits=1000, decimal_places=2)),
                 ('final_total', models.DecimalField(default=10.99, max_digits=1000, decimal_places=2)),
@@ -29,6 +29,15 @@ class Migration(migrations.Migration):
                 ('cart', models.ForeignKey(to='carts.Cart')),
                 ('shipping_address', models.ForeignKey(related_name='shipping_address', default=1, to='accounts.UserAddress')),
                 ('user', models.ForeignKey(blank=True, to=settings.AUTH_USER_MODEL, null=True)),
+            ],
+        ),
+        migrations.CreateModel(
+            name='OrderRating',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('comment', models.TextField(max_length=120)),
+                ('rate', models.DecimalField(max_digits=1, decimal_places=0, choices=[(1, 1), (2, 2), (3, 3), (4, 4), (5, 5)])),
+                ('order', models.OneToOneField(to='orders.Order')),
             ],
         ),
     ]

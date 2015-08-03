@@ -47,7 +47,7 @@ def remove_from_cart(request, id):
     # cartitem.carts = None
     # cartitem.save()
 
-    messages.success(request, "Item Successfully Deleted!")
+    messages.success(request, "Producto eliminado del carrito con exito!")
 
     return HttpResponseRedirect(reverse("cart"))
 
@@ -85,7 +85,7 @@ def add_to_cart(request, slug):
                 pass
 
         photos = Photo.objects.filter(temp_hash=request.POST.get('temp_hash'))
-        cart_item = CartItem.objects.create(cart=cart, product=product )
+        cart_item = CartItem.objects.create(cart=cart, product=product)
         cart_item.photo_set = photos
         if len(product_var) > 0:
             cart_item.variations.add(*product_var)

@@ -38,16 +38,13 @@
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-body">
-                    <form class="form" action="" method="POST">{% csrf_token %}
-                        <input type="hidden" id="dataX" name="dataX" />
-                        <input type="hidden" id="dataY" name="dataY" />
-                        <input type="hidden" id="dataWidth" name="dataWidth" />
-                        <input type="hidden" id="dataHeight" name="dataHeight" />
-                        <input class="avatar-src" name="avatar_src" type="hidden">
+                    <form id="cropperForm" class="form" action="{% url 'cropper' %}" method="POST">{% csrf_token %}
+                        <input class="image_src" name="image_src" type="hidden">
+                        <input class="image_id" name="image_id" type="hidden">
                         <input class="image_data" name="image_data" type="hidden">
                         <div class="form-group">
                             <div id="cropper" class="img-container">
-                                <img src="" alt="Picture" width="600" height="600">
+                                <img src="" alt="Picture">
                             </div>
                         </div>
                         <button type="submit" class="btn btn-primary">Crop
@@ -65,35 +62,37 @@
         <div class="panel panel-default">
             <div class="panel-heading">
                 <div class="row">
-                    <div class="col-md-8">
+                    <div class="col-lg-8">
                         <h4>Fotos cargadas: <span id='image-count'>0</span> / {{ product.image_total }}</h4>
                     </div>
-                    <div class="col-md-2">
+                    <div class="col-lg-3 pull-right">
+                    <div class="btn-group">
                         <form class="form form-inline" method="POST" action="{% url 'sort_photos' %}">
                             {% csrf_token %}
                             <button type="submit" class="btn btn-default">
                                 <i class="glyphicon glyphicon-apple"></i> Arreglar fotos
                             </button>
-                            {{ form.temp_hash }}
+                            {{ upload_form.temp_hash }}
                         </form>
                     </div>
-                    <div class="col-md-2">
+                    <div class="btn-group">
                         <form class='form form-inline' method='POST' action='{% url "add_to_cart" product.slug %}'>
                             {% csrf_token %}
                             <button type="submit" class="btn btn-default">
                                 <i class="glyphicon glyphicon-shopping-cart"></i> Agregar al carrito
                             </button>
                             <input class="form-control"  name='qty' type='hidden' value='1'/>
-                            {{ form.temp_hash }}
+                            {{ upload_form.temp_hash }}
                         </form>
                     </div>
+                        </div>
                 </div>
             </div>
             <div class="panel-body">
                 <div id="dropzone">
                     <form action="{% url 'make' product.slug %}" class="dropzone" id="myDropzone" method='POST' enctype="multipart/form-data">
                         {% csrf_token %}
-                        {{ form.as_p }}
+                        {{ upload_form.temp_hash }}
                         <div class="dz-message">
                             Zona de carga<br>
                             <span class="note">
@@ -102,7 +101,8 @@
                             </span>
                         </div>
                         <div class="fallback">
-                            <input name="file" type="file" multiple />
+{#                            <input name="file" type="file" multiple />#}
+                            {{ upload_form.file }}
                         </div>
                     </form>
                 </div>
@@ -126,10 +126,9 @@
             <div class="panel-footer">
                 <div class="row">
                     <div class="col-xs-10">
-                        <p>
+                        <i class="glyphicon glyphicon-info-sign"></i>
                             Puedes cargar tus imagenes arrastrandolas al area de carga
-                            o haciendo clic en ella para elegir tus fotos.
-                        </p>
+                            o haciendo clic en el boton para elegir tus fotos.
                     </div>
                 </div>
             </div>
@@ -203,7 +202,7 @@
 
         var image_count = 0;
 
-        $(document).ready(function (e) {
+        /*$(document).ready(function (e) {
             $('#uploadForm').on('submit',(function(e) {
                 e.preventDefault();
                 var formData = new FormData(this);
@@ -218,8 +217,8 @@
                     success:function(data){
                         console.log("success");
                         console.log("fjkdwhfjwhf"+ data);
-                        for (var i =0; i< data.photos.length; i++) {
-                            $('#dropzone-previews').append('<div class="col-lg-2 col-md-1 col-xs-1 thumb"><a class="thumbnail" href="#"> <img class="img-responsive" src="' + data.photos[i].url + '" alt=""> </a> </div>');
+                        for (var i =0; i< data.file.length; i++) {
+                            $('#dropzone-previews').append('<div class="col-lg-2 col-md-1 col-xs-1 thumb"><a class="thumbnail" href="#"> <img class="img-responsive" src="' + data.file[i].url + '" alt=""> </a> </div>');
                             //$('#dropzone-previews').append('<div class="col-sm-1 col-md-3"><div class="thumbnail"><a><img class="img-responsive" id="' + data.photos[i].name + '" data-dz-thumbnail alt="' + data.photos[i].name+ '" src="' + data.photos[i].url + '"alt=""/></a> </div> <div class="caption"> <h3>Thumbnail label</h3> <p>Some sample text. Some sample text.</p> <p> <a href="#" class="btn btn-primary" role="button"> Button </a> <a href="#" class="btn btn-default" role="button">Button </a> </p> </div> </div>');
                         }
 
@@ -253,9 +252,10 @@
             $("#id_photos").on("change", function() {
                 $("#uploadForm").submit();
             });
-        });
+        });*/
 
-        // Get the template HTML and remove it from the doumenthe template HTML and remove it from the doument
+        // Dropzone configuration
+        // Get the template HTML and remove it from the document.
         var previewNode = document.querySelector("#template");
         previewNode.id = "";
         var previewTemplate = previewNode.parentNode.innerHTML;
@@ -264,7 +264,7 @@
         Dropzone.options.myDropzone = {
             url: "{% url 'make' product.slug %}", // Set the url
             parallelUploads: 5,
-            paramName: "photos", // Name of our input file tag
+            paramName: "file", // Name of our input file tag
             removeLinks: true,
             acceptedFiles: "image/*",
             createImageThumbnails: true,
@@ -287,14 +287,14 @@
                     //file.previewElement.querySelector("img").src = responseText.photos[0].url;
 
                     // Sets server generated image id to dropzonejs preview image.
-                    file.previewElement.querySelector("img").id = responseText.photos[0].name;
+                    file.previewElement.querySelector("img").id = responseText.file[0].name;
 
                     var editButton = Dropzone.createElement('<div class="pull-left"><a data-toggle="modal" ' +
-                            'data-target="#cropper-modal" data-image_url="' + responseText.photos[0].url + '" href="#">' +
+                            'data-target="#cropper-modal" data-image_url="' + responseText.file[0].url + '" href="#">' +
                             '<i class="glyphicon glyphicon-edit text-default"></i> Editar</a></div>');
 
                     editButton.addEventListener('click', function() {
-                        $('#cropper').find('img').attr('src', responseText.photos[0].url);
+                        $('#cropper').find('img').attr('src', responseText.file[0].url).attr('id', responseText.file[0].name);
                     });
 
                     // Add the button to the file preview element.
@@ -302,7 +302,7 @@
 
                     //$('#dropzone-previews').append('<div class="col-sm-1 col-md-3"><div class="thumbnail"><a><img class="img-responsive" id="' + responseText.photos[0].name + '" data-dz-thumbnail alt="' +responseText.photos[0].name+ '" src="' + responseText.photos[0].url + '"alt=""/></a> </div> <div class="caption"> <h3>Thumbnail label</h3> <p>Some sample text. Some sample text.</p> <p> <a href="#" class="btn btn-primary" role="button"> Button </a> <a href="#" class="btn btn-default" role="button">Button </a> </p> </div> </div>');
 
-                    $('#'+responseText.photos[0].name).popover({
+                    $('#'+responseText.file[0].name).popover({
                         html: true,
                         trigger: 'focus',
                         container: '#dropzone-previews',
@@ -310,7 +310,7 @@
                         animation: true,
                         content: function () {
                             return '<button class="btn btn-success" data-toggle="modal" data-target="#cropmodal" ' +
-                                    'data-image_url="' + responseText.photos[0].url + '" >Open image </button>'
+                                    'data-image_url="' + responseText.file[0].url + '" >Open image </button>'
                         },
                     });
 
@@ -424,15 +424,13 @@ $(function() {
 </script>-->
 
     <script>
+    $(document).ready(function (e) {
+        var $image = $('#cropper').find('img'), cropBoxData, canvasData;
         $('#cropper-modal').on('shown.bs.modal', function () {
-            var $image = $('#cropper > img'),
-            cropBoxData,
-            canvasData;
+
             $image.cropper({
                 autoCropArea: 0.8,
                 aspectRatio: 1,
-                minCropBoxWidth: 500,
-                minCropBoxHeight: 500,
                 zoomable: false,
                 movable: false,
                 built: function () {
@@ -441,29 +439,58 @@ $(function() {
                     $image.cropper('setCanvasData', canvasData);
                 },
                 crop: function(data) {
-                    $('#dataX').val(Math.round(data.x));
-                    $('#dataY').val(Math.round(data.y));
-                    $('#dataHeight').val(Math.round(data.height));
-                    $('#dataWidth').val(Math.round(data.width));
-                    $('#dataRotate').val(Math.round(data.rotate));
                     var image_data = [
                         '{"x":' + Math.round(data.x),
                         '"y":' + Math.round(data.y),
-                        '"height":' + Math.round(data.height),
                         '"width":' + Math.round(data.width),
+                        '"height":' + Math.round(data.height),
                         '"rotate":' + Math.round(data.rotate) + '}'
                     ].join();
-
                     $('.image_data').val(image_data);
+                    $('.image_src').val($image.attr('src'));
+                    $('.image_id').val($image.attr('id'));
                   }
             });
         }).on('hidden.bs.modal', function () {
-            var $image = $('#cropper > img'),
-            cropBoxData,
-            canvasData;
             cropBoxData = $image.cropper('getCropBoxData');
             canvasData = $image.cropper('getCanvasData');
             $image.cropper('destroy');
         });
+
+        $('#cropperForm').on('submit', (function (e) {
+            e.preventDefault();
+            var formData = new FormData(this);
+            var _this = this;
+
+            $.ajax({
+                url: $(this).attr('action'),
+                type: 'post',
+                data: formData,
+                dataType: 'json',
+                processData: false,
+                contentType: false,
+
+                beforeSend: function () {
+
+                },
+
+                success: function (data) {
+                    $image.cropper('destroy');
+                    $('#cropperForm').get(0).reset();
+                    $('#cropper-modal').modal('hide');
+                    $('#dropzone').find("#" + data['original_image_id']).attr('src', data['path']).attr('width','120px').attr('height','120px')
+                },
+
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    alert(XMLHttpRequest);
+                },
+
+                complete: function () {
+
+                }
+            });
+        }));
+    });
+
     </script>
 {% endblock %}

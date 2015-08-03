@@ -1,7 +1,5 @@
-import zipfile
 from zipfile import ZipFile
 import cStringIO as StringIO
-from django.core.servers.basehttp import FileWrapper
 import os
 import datetime
 
@@ -15,6 +13,9 @@ from orders.models import Order
 from orders.models import STATUS_CHOICES
 
 # Shows the dashboard generic information
+from photos.models import Cropped
+
+
 @staff_member_required
 def dashboard(request):
     # Count of Users joined in the last 30 days
@@ -30,6 +31,7 @@ def dashboard(request):
 
     return render(request, template, context)
 
+
 # Return all the users joined in the last 30 days
 @staff_member_required
 def users(request):
@@ -44,6 +46,7 @@ def users(request):
     template = 'dashboards/dashboard_users.html'
 
     return render(request, template, context)
+
 
 # Return all the Orders
 @staff_member_required
@@ -66,7 +69,8 @@ def orders(request):
         order.status = new_status
         order.save()
 
-        messages.success(request, 'Estatus del pedido #%s cambiado de "%s" a "%s" con exito!' %(order.order_id, old_status, new_status))
+        messages.success(request, 'Estatus del pedido #%s cambiado de "%s" a "%s" con exito!' % (
+        order.order_id, old_status, new_status))
 
     # Count of Users joined in the last 30 days
     start_date = datetime.datetime.today() - datetime.timedelta(days=30)
@@ -82,24 +86,29 @@ def orders(request):
 
     return render(request, template, context)
 
-# Download a zip file which contains all the photos of the selected Order.
+
+# Download a zip file which contains all photos of the selected Order.
 @staff_member_required
 def send_zipfile(request, order_id=None):
-
     order = Order.objects.get(order_id=order_id)
     buffer_var = StringIO.StringIO()
     z = ZipFile(buffer_var, "w")
     for item in order.cart.cartitem_set.all():
         files = []
         for photo in item.photo_set.all():
-            files.append(photo.image_field.path)
+            files.append(photo.image.path)
+            try:
+                files.append(photo.cropped.image_cropped.path)
+            except Cropped.DoesNotExist:
+                pass
 
+        print(files)
         for f in files:
             z.write(f, os.path.join('%s-%s' % (item.product.title, item.id), os.path.basename(f)))
 
     z.close()
     buffer_var.seek(0)
     response = HttpResponse(buffer_var.read())
-    response['Content-Disposition'] = 'attachment; filename='+order_id+'.zip'
+    response['Content-Disposition'] = 'attachment; filename=' + order_id + '.zip'
     response['Content-Type'] = 'application/x-zip-compressed'
     return response

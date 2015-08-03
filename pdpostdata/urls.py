@@ -58,7 +58,8 @@ urlpatterns = [
 
     url(r'^photos/upload/$', 'photos.views.upload', name='upload'),
     url(r'^upload2/(?P<slug>[\w-]+)/$', 'photos.views.make', name='upload2'),
-    url(r'^make/(?P<slug>[\w-]+)/$', UploadView.as_view(), name='make'),
+    url(r'^make/(?P<slug>[\w-]+)/$', 'photos.views.make', name='make'),
+    url(r'^crop/$', 'photos.views.crop_image', name='cropper'),
     url(r'^sort/$', 'photos.views.sort_photos', name='sort_photos'),
 
     url(r'^dashboard/$', 'dashboards.views.dashboard', name='dashboard'),

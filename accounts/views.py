@@ -161,7 +161,6 @@ def activation_view(request, activation_key):
 
 
 def add_user_address(request):
-    print request.GET
     try:
         next_page = request.GET.get("next")
     except:

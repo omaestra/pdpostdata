@@ -56,9 +56,9 @@
     </table>
     <table name="accounts_userprofile" schema="" catalog="" type="TABLE">
       <column name="id" sqlType="INTEGER" precision="2000000000" scale="10" nullable="false" jdbcType="4"/>
+      <column name="avatar" sqlType="VARCHAR(100)" precision="2000000000" scale="10" nullable="true" jdbcType="12"/>
       <column name="updated" sqlType="DATETIME" precision="2000000000" scale="10" nullable="false" jdbcType="12"/>
       <column name="user_id" sqlType="INTEGER" precision="2000000000" scale="10" nullable="false" jdbcType="4"/>
-      <column name="avatar" sqlType="VARCHAR(100)" precision="2000000000" scale="10" nullable="true" jdbcType="12"/>
       <primary-key columns="id"/>
       <foreign-key name="#FAKE_accounts_userprofile_1" columns="user_id" ref-table="auth_user" ref-schema="" ref-catalog="" ref-columns="id" update-rule="3" delete-rule="3" deferrability="1"/>
     </table>
@@ -139,7 +139,7 @@
       <column name="updated" sqlType="DATETIME" precision="2000000000" scale="10" nullable="false" jdbcType="12"/>
       <column name="active" sqlType="BOOL" precision="2000000000" scale="10" nullable="false" jdbcType="4"/>
       <primary-key columns="id"/>
-      <exported-key name="#FAKE_carts_cartitem_1" table="carts_cartitem" schema="" catalog="" columns="cart_id"/>
+      <exported-key name="#FAKE_carts_cartitem_2" table="carts_cartitem" schema="" catalog="" columns="cart_id"/>
       <exported-key name="#FAKE_orders_order_3" table="orders_order" schema="" catalog="" columns="cart_id"/>
     </table>
     <table name="carts_cartitem" schema="" catalog="" type="TABLE">
@@ -149,15 +149,15 @@
       <column name="notes" sqlType="TEXT" precision="2000000000" scale="10" nullable="true" jdbcType="12"/>
       <column name="timestamp" sqlType="DATETIME" precision="2000000000" scale="10" nullable="false" jdbcType="12"/>
       <column name="updated" sqlType="DATETIME" precision="2000000000" scale="10" nullable="false" jdbcType="12"/>
-      <column name="product_id" sqlType="INTEGER" precision="2000000000" scale="10" nullable="false" jdbcType="4"/>
       <column name="cart_id" sqlType="INTEGER" precision="2000000000" scale="10" nullable="true" jdbcType="4"/>
+      <column name="product_id" sqlType="INTEGER" precision="2000000000" scale="10" nullable="false" jdbcType="4"/>
       <primary-key columns="id"/>
-      <foreign-key name="#FAKE_carts_cartitem_1" columns="cart_id" ref-table="carts_cart" ref-schema="" ref-catalog="" ref-columns="id" update-rule="3" delete-rule="3" deferrability="1"/>
-      <foreign-key name="#FAKE_carts_cartitem_2" columns="product_id" ref-table="products_product" ref-schema="" ref-catalog="" ref-columns="id" update-rule="3" delete-rule="3" deferrability="1"/>
+      <foreign-key name="#FAKE_carts_cartitem_1" columns="product_id" ref-table="products_product" ref-schema="" ref-catalog="" ref-columns="id" update-rule="3" delete-rule="3" deferrability="1"/>
+      <foreign-key name="#FAKE_carts_cartitem_2" columns="cart_id" ref-table="carts_cart" ref-schema="" ref-catalog="" ref-columns="id" update-rule="3" delete-rule="3" deferrability="1"/>
       <exported-key name="#FAKE_carts_cartitem_variations_2" table="carts_cartitem_variations" schema="" catalog="" columns="cartitem_id"/>
       <exported-key name="#FAKE_photos_photo_1" table="photos_photo" schema="" catalog="" columns="cart_item_id"/>
-      <index name="carts_cartitem_c44d83f7" unique="true" columns="cart_id"/>
       <index name="carts_cartitem_9bea82de" unique="true" columns="product_id"/>
+      <index name="carts_cartitem_c44d83f7" unique="true" columns="cart_id"/>
     </table>
     <table name="carts_cartitem_variations" schema="" catalog="" type="TABLE">
       <column name="id" sqlType="INTEGER" precision="2000000000" scale="10" nullable="false" jdbcType="4"/>
@@ -235,6 +235,7 @@
     <table name="orders_order" schema="" catalog="" type="TABLE">
       <column name="id" sqlType="INTEGER" precision="2000000000" scale="10" nullable="false" jdbcType="4"/>
       <column name="order_id" sqlType="VARCHAR(120)" precision="2000000000" scale="10" nullable="false" jdbcType="12"/>
+      <column name="status" sqlType="VARCHAR(120)" precision="2000000000" scale="10" nullable="false" jdbcType="12"/>
       <column name="sub_total" sqlType="DECIMAL" precision="2000000000" scale="10" nullable="false" jdbcType="6"/>
       <column name="tax_total" sqlType="DECIMAL" precision="2000000000" scale="10" nullable="false" jdbcType="6"/>
       <column name="final_total" sqlType="DECIMAL" precision="2000000000" scale="10" nullable="false" jdbcType="6"/>
@@ -244,7 +245,6 @@
       <column name="cart_id" sqlType="INTEGER" precision="2000000000" scale="10" nullable="false" jdbcType="4"/>
       <column name="shipping_address_id" sqlType="INTEGER" precision="2000000000" scale="10" nullable="false" jdbcType="4"/>
       <column name="user_id" sqlType="INTEGER" precision="2000000000" scale="10" nullable="true" jdbcType="4"/>
-      <column name="status" sqlType="VARCHAR(120)" precision="2000000000" scale="10" nullable="false" jdbcType="12"/>
       <primary-key columns="id"/>
       <foreign-key name="#FAKE_orders_order_1" columns="user_id" ref-table="auth_user" ref-schema="" ref-catalog="" ref-columns="id" update-rule="3" delete-rule="3" deferrability="1"/>
       <foreign-key name="#FAKE_orders_order_2" columns="shipping_address_id" ref-table="accounts_useraddress" ref-schema="" ref-catalog="" ref-columns="id" update-rule="3" delete-rule="3" deferrability="1"/>
@@ -259,56 +259,34 @@
     <table name="orders_orderrating" schema="" catalog="" type="TABLE">
       <column name="id" sqlType="INTEGER" precision="2000000000" scale="10" nullable="false" jdbcType="4"/>
       <column name="comment" sqlType="TEXT" precision="2000000000" scale="10" nullable="false" jdbcType="12"/>
-      <column name="order_id" sqlType="INTEGER" precision="2000000000" scale="10" nullable="false" jdbcType="4"/>
       <column name="rate" sqlType="DECIMAL" precision="2000000000" scale="10" nullable="false" jdbcType="6"/>
+      <column name="order_id" sqlType="INTEGER" precision="2000000000" scale="10" nullable="false" jdbcType="4"/>
       <primary-key columns="id"/>
       <foreign-key name="#FAKE_orders_orderrating_1" columns="order_id" ref-table="orders_order" ref-schema="" ref-catalog="" ref-columns="id" update-rule="3" delete-rule="3" deferrability="1"/>
     </table>
-    <table name="photos_crop" schema="" catalog="" type="TABLE">
+    <table name="photos_cropped" schema="" catalog="" type="TABLE">
       <column name="id" sqlType="INTEGER" precision="2000000000" scale="10" nullable="false" jdbcType="4"/>
-      <column name="crop_x" sqlType="INTEGER UNSIGNED" precision="2000000000" scale="10" nullable="true" jdbcType="4"/>
-      <column name="crop_y" sqlType="INTEGER UNSIGNED" precision="2000000000" scale="10" nullable="true" jdbcType="4"/>
-      <column name="crop_w" sqlType="INTEGER UNSIGNED" precision="2000000000" scale="10" nullable="true" jdbcType="4"/>
-      <column name="crop_h" sqlType="INTEGER UNSIGNED" precision="2000000000" scale="10" nullable="true" jdbcType="4"/>
+      <column name="image_cropped" sqlType="VARCHAR(100)" precision="2000000000" scale="10" nullable="false" jdbcType="12"/>
+      <column name="x" sqlType="INTEGER UNSIGNED" precision="2000000000" scale="10" nullable="false" jdbcType="4"/>
+      <column name="y" sqlType="INTEGER UNSIGNED" precision="2000000000" scale="10" nullable="false" jdbcType="4"/>
+      <column name="w" sqlType="INTEGER UNSIGNED" precision="2000000000" scale="10" nullable="true" jdbcType="4"/>
+      <column name="h" sqlType="INTEGER UNSIGNED" precision="2000000000" scale="10" nullable="true" jdbcType="4"/>
+      <column name="original_id" sqlType="VARCHAR(36)" precision="2000000000" scale="10" nullable="false" jdbcType="12"/>
       <primary-key columns="id"/>
+      <foreign-key name="#FAKE_photos_cropped_1" columns="original_id" ref-table="photos_photo" ref-schema="" ref-catalog="" ref-columns="id" update-rule="3" delete-rule="3" deferrability="1"/>
     </table>
     <table name="photos_photo" schema="" catalog="" type="TABLE">
       <column name="id" sqlType="VARCHAR(36)" precision="2000000000" scale="10" nullable="false" jdbcType="12"/>
+      <column name="temp_hash" sqlType="VARCHAR(255)" precision="2000000000" scale="10" nullable="false" jdbcType="12"/>
+      <column name="message" sqlType="TEXT" precision="2000000000" scale="10" nullable="false" jdbcType="12"/>
+      <column name="image" sqlType="VARCHAR(100)" precision="2000000000" scale="10" nullable="false" jdbcType="12"/>
       <column name="updated" sqlType="DATETIME" precision="2000000000" scale="10" nullable="false" jdbcType="12"/>
       <column name="created" sqlType="DATETIME" precision="2000000000" scale="10" nullable="false" jdbcType="12"/>
       <column name="cart_item_id" sqlType="INTEGER" precision="2000000000" scale="10" nullable="true" jdbcType="4"/>
-      <column name="temp_hash" sqlType="VARCHAR(255)" precision="2000000000" scale="10" nullable="false" jdbcType="12"/>
-      <column name="image" sqlType="VARCHAR(100)" precision="2000000000" scale="10" nullable="false" jdbcType="12"/>
-      <column name="message" sqlType="TEXT" precision="2000000000" scale="10" nullable="false" jdbcType="12"/>
-      <column name="image_cropped" sqlType="VARCHAR(100)" precision="2000000000" scale="10" nullable="false" jdbcType="12"/>
       <primary-key columns="id"/>
       <foreign-key name="#FAKE_photos_photo_1" columns="cart_item_id" ref-table="carts_cartitem" ref-schema="" ref-catalog="" ref-columns="id" update-rule="3" delete-rule="3" deferrability="1"/>
+      <exported-key name="#FAKE_photos_cropped_1" table="photos_cropped" schema="" catalog="" columns="original_id"/>
       <index name="photos_photo_31954a1f" unique="true" columns="cart_item_id"/>
-    </table>
-    <table name="photos_size" schema="" catalog="" type="TABLE">
-      <column name="id" sqlType="INTEGER" precision="2000000000" scale="10" nullable="false" jdbcType="4"/>
-      <column name="date_modified" sqlType="DATETIME" precision="2000000000" scale="10" nullable="true" jdbcType="12"/>
-      <column name="name" sqlType="VARCHAR(255)" precision="2000000000" scale="10" nullable="false" jdbcType="12"/>
-      <column name="slug" sqlType="VARCHAR(50)" precision="2000000000" scale="10" nullable="false" jdbcType="12"/>
-      <column name="height" sqlType="INTEGER UNSIGNED" precision="2000000000" scale="10" nullable="true" jdbcType="4"/>
-      <column name="width" sqlType="INTEGER UNSIGNED" precision="2000000000" scale="10" nullable="true" jdbcType="4"/>
-      <column name="aspect_ratio" sqlType="REAL" precision="2000000000" scale="10" nullable="true" jdbcType="6"/>
-      <column name="auto_crop" sqlType="BOOL" precision="2000000000" scale="10" nullable="false" jdbcType="4"/>
-      <column name="retina" sqlType="BOOL" precision="2000000000" scale="10" nullable="false" jdbcType="4"/>
-      <column name="size_set_id" sqlType="INTEGER" precision="2000000000" scale="10" nullable="true" jdbcType="4"/>
-      <primary-key columns="id"/>
-      <foreign-key name="#FAKE_photos_size_1" columns="size_set_id" ref-table="photos_sizeset" ref-schema="" ref-catalog="" ref-columns="id" update-rule="3" delete-rule="3" deferrability="1"/>
-      <index name="photos_size_e1183709" unique="true" columns="size_set_id"/>
-      <index name="photos_size_2dbcba41" unique="true" columns="slug"/>
-      <index name="photos_size_b068931c" unique="true" columns="name"/>
-    </table>
-    <table name="photos_sizeset" schema="" catalog="" type="TABLE">
-      <column name="id" sqlType="INTEGER" precision="2000000000" scale="10" nullable="false" jdbcType="4"/>
-      <column name="name" sqlType="VARCHAR(255)" precision="2000000000" scale="10" nullable="false" jdbcType="12"/>
-      <column name="slug" sqlType="VARCHAR(50)" precision="2000000000" scale="10" nullable="false" jdbcType="12"/>
-      <primary-key columns="id"/>
-      <exported-key name="#FAKE_photos_size_1" table="photos_size" schema="" catalog="" columns="size_set_id"/>
-      <index name="photos_sizeset_b068931c" unique="true" columns="name"/>
     </table>
     <table name="products_category" schema="" catalog="" type="TABLE">
       <column name="id" sqlType="INTEGER" precision="2000000000" scale="10" nullable="false" jdbcType="4"/>
@@ -335,7 +313,7 @@
       <column name="active" sqlType="BOOL" precision="2000000000" scale="10" nullable="false" jdbcType="4"/>
       <column name="update_defaults" sqlType="BOOL" precision="2000000000" scale="10" nullable="false" jdbcType="4"/>
       <primary-key columns="id"/>
-      <exported-key name="#FAKE_carts_cartitem_2" table="carts_cartitem" schema="" catalog="" columns="product_id"/>
+      <exported-key name="#FAKE_carts_cartitem_1" table="carts_cartitem" schema="" catalog="" columns="product_id"/>
       <exported-key name="#FAKE_products_product_category_2" table="products_product_category" schema="" catalog="" columns="product_id"/>
       <exported-key name="#FAKE_products_productimage_1" table="products_productimage" schema="" catalog="" columns="product_id"/>
       <exported-key name="#FAKE_products_variation_1" table="products_variation" schema="" catalog="" columns="product_id"/>

@@ -1,20 +1,29 @@
-from django.http import JsonResponse
+import StringIO
+from django.core.files import File
+from os.path import sep
+from os import path
+import os
+import json
 
-from django.shortcuts import render, HttpResponseRedirect, HttpResponse, Http404, render_to_response
+from PIL import Image
+
+from django.http import JsonResponse
+from django.views.decorators.http import require_POST
+from django.shortcuts import render, HttpResponseRedirect, HttpResponse, Http404, render_to_response, get_object_or_404
+from django.http import JsonResponse, HttpResponseBadRequest
 from django.core.urlresolvers import reverse
 from django.http import QueryDict
 from django.template import RequestContext
+from django.forms import ValidationError
 
 from .forms import PhotoForm
-from .models import Photo
-from carts.models import Cart, CartItem
+from .models import Photo, Cropped
+from pdpostdata import settings
 from products.models import Product
 
 # Create your views here.
 
 from django.views.generic.edit import FormView
-from photos.forms import JcropForm
-
 from photos.models import Photo
 
 
@@ -34,14 +43,14 @@ class MultiAttachmentMixin(object):
 
             if file_form.is_valid():
                 # file_form.save()
-                response = {'photos': []}
-                for photo in request.FILES.getlist('photos'):
+                response = {'file': []}
+                for photo in request.FILES.getlist('file'):
                     # Create a new entry in our database
                     new_image = Photo(image=photo,
                                       temp_hash=request.POST.get('temp_hash'))
                     # Save the image using the model's ImageField settings
                     new_image.save()
-                    response['photos'].append({
+                    response['file'].append({
                         'name': '%s' % new_image.id,
                         'size': '%d' % request.FILES.__sizeof__(),
                         'url': '%s' % new_image.image.url,
@@ -78,8 +87,6 @@ class MultiAttachmentMixin(object):
         final_size = (105, 75)
         context = super(MultiAttachmentMixin, self).get_context_data(*args, **kwargs)
         context['product'] = Product.objects.get(slug=self.kwargs['slug'])
-        photo = Photo.objects.first()
-        context['photo'] = photo
 
         return context
 
@@ -182,11 +189,37 @@ def upload(request):
     return render(request, "photos/upload.html", context)
 
 
-def make(request, slug):
-    try:
-        product = Product.objects.get(slug=slug)
-    except Product.DoesNotExist:
-        pass
+def make(request, slug=None):
+    product = get_object_or_404(Product, slug=slug)
+
+    if request.method == "POST":
+        print(request.POST)
+        print(request.FILES)
+
+        form = PhotoForm(request.POST, request.FILES or None)
+        if form.is_valid():
+            response = {'file': []}
+
+            photo = request.FILES.get('file')
+            # [...] Process the file. Resize it, create thumbnails, etc.
+            # Get an instance of picture model (defined below)
+            new_image = Photo(image=photo, temp_hash=request.POST.get('temp_hash'))
+            # Save the image using the model's ImageField settings
+            new_image.save()
+
+            response['file'].append({
+                'name': '%s' % new_image.id,
+                'size': '%d' % request.FILES.__sizeof__(),
+                'url': '%s' % new_image.image.url,
+                'thumbnailUrl': '%s' % new_image.image.url,
+                'deleteUrl': '\/image\/delete\/%s' % new_image.id,
+                "deleteType": 'DELETE'
+            })
+
+            # return HttpResponse('{"status":"success"}', content_type='application/json')
+            return JsonResponse(response)
+        # return HttpResponse('{"status":"error: %s"}' % file_form.errors, content_type='application/json')
+        return JsonResponse({'response': form.errors, })
 
     # uploaded_images = []  # product variation
     # if request.method == "POST":
@@ -228,9 +261,70 @@ def make(request, slug):
     # error message
     form = PhotoForm()
     context = {
-        'form': form,
+        'upload_form': form,
         'product': product,
-        "class_name": form.__class__.__name__
+        'class_name': form.__class__.__name__
     }
 
-    return render(request, "photos/upload.html", context)
+    return render(request, "photos/upload2.html", context)
+
+
+@require_POST
+def crop_image(request):
+    try:
+        if request.method == 'POST':
+            box = json.loads(request.POST.get('image_data', None))
+            image_id = request.POST.get('image_id', None)
+            photo = Photo.objects.get(id=image_id)
+            img = Image.open(photo.image.path, mode='r')
+
+            x = box['x']
+            y = box['y']
+            width = box['width']
+            height = box['height']
+
+            values = (x, y, x + width, y + height)
+
+            if width and height and (width != img.size[0] or height != img.size[1]):
+                cropped_image = img.crop(values).resize((width, height), Image.ANTIALIAS)
+            else:
+                raise
+
+            tempfile_io = StringIO.StringIO()
+            cropped_image.save(tempfile_io, format='JPEG', overwrite=True)
+            from django.core.files.uploadedfile import InMemoryUploadedFile
+            image_file = InMemoryUploadedFile(tempfile_io, None, 'crop.jpg', 'image/jpeg', tempfile_io.len, None)
+
+            # Get the filename from the original image field, i.e: "image.jpg"
+            filename = photo.image.path.split(sep)[-1]
+            # Get the extension of the original image
+            ext = filename.split('.')[-1]
+            filename = "%s.%s" % (str(photo.id), ext)
+
+            new_cropped_file, created = Cropped.objects.get_or_create(original=photo)
+            new_cropped_file.x = x
+            new_cropped_file.y = y
+            new_cropped_file.w = width
+            new_cropped_file.h = height
+
+            new_cropped_file.image_cropped.save('crop_%s' % filename, image_file)
+            new_cropped_file.save()
+
+            data = {
+                'path': new_cropped_file.image_cropped.url,
+                'cropped_image_id': new_cropped_file.id,
+                'original_image_id': photo.id,
+            }
+
+            return JsonResponse(data)
+
+    except Photo.DoesNotExist:
+        print("Error el objeto 'Photo' no existe")
+
+    except IOError:
+        print("HFJh")
+        raise ValidationError("Error, no se pudo abrir el archivo de imagen")
+
+    except Exception as e:
+        print(e.message, type(e))
+        return JsonResponse({'errors': 'ilegal request', })

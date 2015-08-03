@@ -153,16 +153,16 @@
                                                     <td>
                                                         <span class="badge">{{ order.cart.cartitem_set.count }}</span>
                                                     </td>
-                                                    {% if not order.orderrating %}
+                                                    {% if order.status == 'Enviado' and not order.orderrating %}
                                                         <td><a href="" data-toggle="modal" data-target="#rateOrderModal"
                                                                 data-order_number="{{ order.order_id }}"
                                                                 data-user="{{ user.username }}"
                                                                 data-order_id="{{ order.id }}">Que tal estuvo?
                                                             </a>
                                                         </td>
-                                                    {% else %}
+                                                    {% elif order.status = 'Enviado' and order.orderrating %}
                                                         <td>
-                                                            <span class="fa fa-check-square-o"> Listo!</span>
+                                                            <span class="fa fa-check-square-o"></span> Listo!
                                                         </td>
                                                     {% endif %}
                                                 </tr>

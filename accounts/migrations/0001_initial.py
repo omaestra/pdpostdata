@@ -67,7 +67,7 @@ class Migration(migrations.Migration):
             name='UserProfile',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('image', models.ImageField(null=True, upload_to=accounts.models.get_image_path, blank=True)),
+                ('avatar', models.ImageField(null=True, upload_to=accounts.models.get_image_path, blank=True)),
                 ('updated', models.DateTimeField(auto_now=True)),
                 ('user', models.OneToOneField(to=settings.AUTH_USER_MODEL)),
             ],

@@ -19,3 +19,16 @@ footer > * { max-width: 720px; margin-left: auto; margin-right: auto; }
 @media (min-width: 720px) { footer .license { text-align: justify; } }
 footer .logo { margin: 2.8rem 0; width: 270px; }
 */
+
+.navbar-default .navbar-nav > .active > a, .navbar-default .navbar-nav > .active > a:hover, .navbar-default .navbar-nav > .active > a:focus {
+  background-color: #109cff;
+  color: white;
+}
+
+.img-product {
+
+}
+
+.img-product img {
+    margin: 0 auto;;
+}

@@ -1,6 +1,5 @@
 {% extends 'base.html' %}
 
-
 {% load staticfiles %}
 
 {% block head_title %}
@@ -8,7 +7,71 @@
 {% endblock %}
 
 {% block content %}
+    <div class="banner">
+        <div class="wrapper">
+            <h1></h1>
+        </div>
+    </div>
     <div class="wrapper">
+        <div class="container-fluid">
+            <div class="row">
+            <!-- Define all of the tiles: -->
+                {% for product in products %}
+                    <div class="box">
+                        <div class="boxInner">
+                            <div class="text">
+                                <h3 class="styled">{{ product.title }}</h3>
+                                <p></p>
+                            </div>
+                            <div class="titleBox">
+                                <p>
+                                    <a href="{{ product.get_absolute_url }}" class="btn btn-product-fill" role="button">Ver</a>
+                                    <a href="{% url 'make' product.slug %}" class="btn btn-product" role="button">
+                                        <span class="glyphicon glyphicon-shopping-cart"></span> Agregar al carrito
+                                    </a>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="box">
+                        <div class="boxInner">
+                            {% if product.productimage_set.all %}
+                                <div id="description-carousel" class="carousel fade" data-ride="carousel" data-interval="3000">
+                                    <div class="carousel-inner">
+                                        {% for item in product.productimage_set.all %}
+                                            <div class="item {% if item.featured %}active{% endif %}">
+                                                <div class="img-product">
+                                                    <img class='img-responsive' src="/media/{{ item.image }}" />
+                                                </div>
+                                            </div>
+                                            <div class="titleBox">{{ product.description }}</div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            {% else %}
+                                <img class='img-responsive' src='{% static "img/placeholder.svg" %}' />
+                            {% endif %}
+                        </div>
+                    </div>
+                    <!--<div class="box">
+                        <div class="boxInner">
+                            {% if product.productimage_set.all %}
+                                {% for item in product.productimage_set.all %}
+                                    {% if item.featured %}
+                                        <div class="img-product">
+                                            <img class='img-responsive' src="/media/{{ item.image }}" />
+                                        </div>
+                                    {% endif %}
+                                    <div class="titleBox">{{ product.description }}</div>
+                                {% endfor %}
+                            {% else %}
+                                <img class='img-responsive' src='{% static "img/placeholder.svg" %}' />
+                            {% endif %}
+                        </div>
+                    </div>-->
+                {% endfor %}
+            </div>
+        </div>
         <div class="section section-products">
             <div class="container-fluid">
                 <h3 class="header-text text-center">Nuestros productos</h3>
@@ -20,7 +83,7 @@
 
                                 {% for item in product.productimage_set.all %}
                                     {% if item.featured %}
-                                        <div class="icon">
+                                        <div class="img-product">
                                             <img class='img-responsive' src="/media/{{ item.image }}" />
                                         </div>
                                     {% endif %}

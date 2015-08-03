@@ -35,7 +35,7 @@
             dropClass: 'drop',
             dropAnimation: false,
             exclude: '.disabled',
-            prefix: getPrefix(),
+            //prefix: getPrefix(),
             dropComplete: function () {
 
             }

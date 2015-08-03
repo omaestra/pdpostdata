@@ -30,7 +30,7 @@ class Migration(migrations.Migration):
                 ('notes', models.TextField(null=True, blank=True)),
                 ('timestamp', models.DateTimeField(auto_now_add=True)),
                 ('updated', models.DateTimeField(auto_now=True)),
-                ('carts', models.ForeignKey(blank=True, to='carts.Cart', null=True)),
+                ('cart', models.ForeignKey(blank=True, to='carts.Cart', null=True)),
                 ('product', models.ForeignKey(to='products.Product')),
                 ('variations', models.ManyToManyField(to='products.Variation', blank=True)),
             ],

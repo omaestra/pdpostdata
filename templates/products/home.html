@@ -2,7 +2,7 @@
 {% load staticfiles %}
 
 {% block head_title %}
-Welcome to
+Bienvenido a
 {% endblock %}
 
 {% block styles %}
@@ -44,13 +44,14 @@ Welcome to
 {% block carousel %}
 {% if sliders %}
   <div class='container-fluid' style='margin-top: -19px;margin-bottom: 19px;'>
-            <div id="carousel-example-generic" class="carousel slide" data-ride="carousel">
+      <div id="carousel-example-generic" class="carousel slide" data-ride="carousel">
           <!-- Indicators -->
           <ol class="carousel-indicators">
-           {% for slider in sliders %}
-            <li data-target="#carousel-example-generic" data-slide-to="{{ forloop.counter }}"{% if forloop.first %}class="active"{% endif %}>
-            </li>
-            {% endfor %}
+              {% for slider in sliders %}
+                  <li data-target="#carousel-example-generic" data-slide-to="{{ forloop.counter }}"{% if forloop.first %}class="active"{% endif %}>
+
+                  </li>
+              {% endfor %}
           </ol>
 
           <!-- Wrapper for slides -->
@@ -95,7 +96,49 @@ Welcome to
 {% block content %}
 
     <div class="wrapper">
-
+        <div class="container-fluid">
+            <div class="row">
+            <!-- Define all of the tiles: -->
+                {% for product in products %}
+                    <div class="box">
+                        <div class="boxInner">
+                            <div class="text">
+                                <h3 class="styled">{{ product.title }}</h3>
+                                <p></p>
+                            </div>
+                            <div class="titleBox">
+                                <p>
+                                    <a href="{{ product.get_absolute_url }}" class="btn btn-product-fill" role="button">Ver</a>
+                                    <a href="{% url 'make' product.slug %}" class="btn btn-product" role="button">
+                                        <span class="glyphicon glyphicon-shopping-cart"></span> Agregar al carrito
+                                    </a>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="box">
+                        <div class="boxInner">
+                            {% if product.productimage_set.all %}
+                                <div id="description-carousel" class="carousel fade" data-ride="carousel" data-interval="3000">
+                                    <div class="carousel-inner">
+                                        {% for item in product.productimage_set.all %}
+                                            <div class="item {% if item.featured %}active{% endif %}">
+                                                <div class="img-product">
+                                                    <img class='img-responsive' src="/media/{{ item.image }}" />
+                                                </div>
+                                            </div>
+                                            <div class="titleBox">{{ product.description }}</div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            {% else %}
+                                <img class='img-responsive' src='{% static "img/placeholder.svg" %}' />
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
     <div class="section section-products">
         <div class="container-fluid">
             <h4 class="header-text text-center">Nuestros productos</h4>
@@ -104,10 +147,9 @@ Welcome to
                 <div class="col-md-3">
                     <div class="card card-blue">
                         {% if product.productimage_set.all %}
-
                             {% for item in product.productimage_set.all %}
                                 {% if item.featured %}
-                                    <div class="icon">
+                                    <div class="img-product">
                                         <img class='img-responsive' src="/media/{{ item.image }}" />
                                     </div>
                                 {% endif %}
@@ -158,7 +200,7 @@ Welcome to
                 <h4 class="header-text text-center">¿Cómo obtengo mis fotos?</h4>
                 <div class="row">
                     <div class="col-md-6">
-                        <div id="description-carousel" class="carousel fade" data-ride="carousel">
+                        <div id="description-carousel" class="carousel fade" data-ride="carousel" data-pause="false">
                             <div class="carousel-inner">
                                 <div class="item active">
                                     <img src="media/images/pdpostdata-logo.png" alt="">
@@ -171,7 +213,7 @@ Welcome to
                                 </div>
                             </div>
 
-                            <ol class="carousel-indicators carousel-indicators-blue">
+                            <ol class="carousel-indicators carousel-indicators-blue" style="pointer-events:none;">
                                 <li data-target="#description-carousel" data-slide-to="0" class="active"></li>
                                 <li data-target="#description-carousel" data-slide-to="1" class=""></li>
                                 <li data-target="#description-carousel" data-slide-to="2" class=""></li>
@@ -179,7 +221,7 @@ Welcome to
                         </div>
                     </div>
                     <div class="col-md-5 col-md-offset-1">
-                        <div id="description-carousel" class="carousel fade" data-ride="carousel">
+                        <div id="description-carousel" class="carousel fade" data-ride="carousel" data-pause="false">
                             <div class="carousel-inner" style="box-shadow: none;">
                                 <div class="item active">
                                     <h4 class="header-text">Paso 1. Elige tu producto</h4>
@@ -241,16 +283,16 @@ Welcome to
 
         <div class="section section-features">
             <div class="container border-top">
-                <h4 class="header-text text-center">Features</h4>
+                <h4 class="header-text text-center">Caracteristicas</h4>
                 <div class="row">
                     <div class="col-md-4">
                         <div class="card card-blue">
                             <div class="icon">
-                                <i class="pe-7s-note2"></i>
+                                <i class="pe-7s-print"></i>
                             </div>
                             <div class="text">
-                                <h4>Online Customers Management</h4>
-                                <p>All appointments sync with your Google calendar so your availability is always up to date. See your schedule at a glance from any device.</p>
+                                <h4>Imprimimos tus fotografias</h4>
+                                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse velit purus, dictum varius aliquet id, ultrices at felis. Proin pretium dolor ut elit porta, quis imperdiet libero imperdiet.</p>
                             </div>
                         </div>
                     </div>
@@ -259,17 +301,17 @@ Welcome to
                             <div class="icon">
                                 <i class="pe-7s-bell"></i>
                             </div>
-                            <h4>Smart Notifications on hands</h4>
-                            <p>Automatic text and email reminders make sure customers always remember their upcoming appointments.</p>
+                            <h4>Notificamos el estado de tu pedido</h4>
+                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse velit purus, dictum varius aliquet id, ultrices at felis.</p>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="card card-blue">
                             <div class="icon">
-                                <i class="pe-7s-graph1"></i>
+                                <i class="pe-7s-paper-plane"></i>
                             </div>
-                            <h4>Know your business better now</h4>
-                            <p>Take payments and run your business on the go, in your store and then see how it all adds up with analytics.</p>
+                            <h4>Enviamos tu pedido a casa</h4>
+                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse velit purus, dictum varius aliquet id, ultrices at felis. Proin pretium dolor ut elit porta, quis imperdiet libero imperdiet.</p>
                         </div>
                     </div>
                 </div>
