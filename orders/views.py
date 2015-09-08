@@ -1,3 +1,4 @@
+# coding=utf-8
 import time
 import json
 
@@ -33,7 +34,7 @@ def checkout(request):
         cart = Cart.objects.get(id=the_id)
     except:
         the_id = None
-        # return HttpResponseRedirect("/cart/")
+        messages.warning(request, "Oops! Aún no has enviado ningún pedido para ser procesado!")
         return HttpResponseRedirect(reverse("cart"))
 
     try:
@@ -47,6 +48,7 @@ def checkout(request):
     except:
         new_order = None
         # work on some error message
+        messages.warning(request, "Oops! Aún no has enviado ningún pedido para ser procesado!")
         return HttpResponseRedirect(reverse("cart"))
     final_amount = 0
     if new_order is not None:
@@ -93,8 +95,16 @@ def checkout(request):
         new_order.save()
         del request.session['cart_id']
         del request.session['items_total']
-        messages.success(request, "Thank your order. It has been completed!")
-        return HttpResponseRedirect(reverse("user_orders"))
+
+        messages.success(request, "Tu pedido ha sido completado! Estaremos en contacto!")
+
+        context = {
+            "order": new_order,
+            "current_addresses": current_addresses,
+            "billing_addresses": billing_addresses,
+        }
+
+        return render(request, "orders/order_details.html", context)
 
     context = {
         "order": new_order,

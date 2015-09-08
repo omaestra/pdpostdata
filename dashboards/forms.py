@@ -3,6 +3,7 @@ from django import forms
 from orders.models import Order
 from orders.models import STATUS_CHOICES
 
+
 class OrderForm(forms.ModelForm):
 
     class Meta:

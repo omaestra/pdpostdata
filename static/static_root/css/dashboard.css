@@ -117,12 +117,23 @@ body {
  * Panel dashboard styles
  */
 
-.panel {
-  color: #FFF;
-}
-
 .panel-green {
   background-color: #5cb85c;
+}
+.panel-green > .panel-heading {
+    color: #fff;
+    background-color: #5cb85c;
+    border-color: #5cb85c;
+}
+.panel-green > .panel-heading + .panel-collapse > .panel-body {
+    border-top-color: #5cb85c;
+}
+.panel-green > .panel-heading .badge {
+    color: #5cb85c;
+    background-color: #fff;
+}
+.panel-green > .panel-footer + .panel-collapse > .panel-body {
+    border-bottom-color: #5cb85c;
 }
 
 .panel-green a {

@@ -43,7 +43,8 @@ Bienvenido a
 
 {% block carousel %}
 {% if sliders %}
-  <div class='container-fluid' style='margin-top: -19px;margin-bottom: 19px;'>
+  <div class='container-fluid' style='margin-top: -19px;margin-bottom: 0px;'>
+  <div class="row">
       <div id="carousel-example-generic" class="carousel slide" data-ride="carousel">
           <!-- Indicators -->
           <ol class="carousel-indicators">
@@ -89,7 +90,7 @@ Bienvenido a
         </div>
 
     </div>
-
+</div>
     {% endif %}
 {% endblock %}
 
@@ -139,7 +140,7 @@ Bienvenido a
                 {% endfor %}
             </div>
         </div>
-    <div class="section section-products">
+    <!--<div class="section section-products">
         <div class="container-fluid">
             <h4 class="header-text text-center">Nuestros productos</h4>
             <div class="row">
@@ -175,7 +176,7 @@ Bienvenido a
                 {% endfor %}
             </div>
         </div>
-    </div>
+    </div>-->
 
 
         <!--<div class="section section-presentation">
@@ -199,87 +200,141 @@ Bienvenido a
             <div class="container border-top">
                 <h4 class="header-text text-center">¿Cómo obtengo mis fotos?</h4>
                 <div class="row">
-                    <div class="col-md-6">
-                        <div id="description-carousel" class="carousel fade" data-ride="carousel" data-pause="false">
+                        <div id="tutorial-carousel" class="carousel fade" data-ride="carousel">
                             <div class="carousel-inner">
                                 <div class="item active">
-                                    <img src="media/images/pdpostdata-logo.png" alt="">
+                                    <div class="col-md-6">
+                                        <img class="img-responsive" src="media/images/postdata-logo.png" alt="">
+                                    </div>
+                                    <div class="col-md-5 col-md-offset-1">
+                                        <h4 class="header-text">Paso 1. Elige tu producto</h4>
+                                        <p>
+                                            With all the apps that users love! Make it easy for users to share, like, post and tweet their favourite things from the app. Be sure to let users know they continue to remain connected while using your app!
+                                        </p>
+                                        <a href="#" class="btn btn-info btn-fill">Ver tutorial</a>
+                                    </div>
                                 </div>
                                 <div class="item">
-                                    <img src="media/images/postdata-logo.png" alt="">
+                                    <div class="col-md-6">
+                                        <img class="img-responsive" src="media/images/postdata-logo.png" alt="">
+                                    </div>
+                                    <div class="col-md-5 col-md-offset-1">
+                                        <h4 class="header-text">Paso 2. Carga tus fotos</h4>
+                                        <p>
+                                            With all the apps that users love! Make it easy for users to share, like, post and tweet their favourite things from the app. Be sure to let users know they continue to remain connected while using your app!
+                                        </p>
+                                        <a href="#" class="btn btn-info btn-fill">Ver tutorial</a>
+                                    </div>
                                 </div>
                                 <div class="item">
-                                    <img src="media/images/pdpostdata-logo.png" alt="">
-                                </div>
-                            </div>
-
-                            <ol class="carousel-indicators carousel-indicators-blue" style="pointer-events:none;">
-                                <li data-target="#description-carousel" data-slide-to="0" class="active"></li>
-                                <li data-target="#description-carousel" data-slide-to="1" class=""></li>
-                                <li data-target="#description-carousel" data-slide-to="2" class=""></li>
-                            </ol>
-                        </div>
-                    </div>
-                    <div class="col-md-5 col-md-offset-1">
-                        <div id="description-carousel" class="carousel fade" data-ride="carousel" data-pause="false">
-                            <div class="carousel-inner" style="box-shadow: none;">
-                                <div class="item active">
-                                    <h4 class="header-text">Paso 1. Elige tu producto</h4>
-                                    <p>
-                                        With all the apps that users love! Make it easy for users to share, like, post and tweet their favourite things from the app. Be sure to let users know they continue to remain connected while using your app!
-                                    </p>
-                                    <a href="#" class="btn btn-info btn-fill">Ver tutorial</a>
-                                </div>
-                                <div class="item">
-                                    <h4 class="header-text">Paso 2. Carga tus fotos</h4>
-                                    <p>
-                                        With all the apps that users love! Make it easy for users to share, like, post and tweet their favourite things from the app. Be sure to let users know they continue to remain connected while using your app!
-                                    </p>
-                                    <a href="#" class="btn btn-info btn-fill">Ver tutorial</a>
-                                </div>
-                                <div class="item">
-                                    <h4 class="header-text">Paso 3. Realiza el pago</h4>
-                                    <p>
-                                        With all the apps that users love! Make it easy for users to share, like, post and tweet their favourite things from the app. Be sure to let users know they continue to remain connected while using your app!
-                                    </p>
-                                    <a href="#" class="btn btn-info btn-fill">Ver tutorial</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!--<div class="row">
-                    <div class="col-md-5 col-md-offset-1">
-                        <h4 class="header-text">Paso 2. Carga tus imagenes!</h4>
-                        <p>
-                            With all the apps that users love! Make it easy for users to share, like, post and tweet their favourite things from the app. Be sure to let users know they continue to remain connected while using your app!
-                        </p>
-                        <a href="http://www.creative-tim.com/product/awesome-landing-page" class="btn btn-info btn-fill">Get Free Demo</a>
-                    </div>
-                    <div class="col-md-6">
-                        <div id="description-carousel" class="carousel fade" data-ride="carousel">
-                            <div class="carousel-inner">
-                                <div class="item">
-                                    <img src="media/images/pdpostdata-logo.png" alt="">
-                                </div>
-                                <div class="item active">
-                                    <img src="media/images/postdata-logo.png" alt="">
-                                </div>
-                                <div class="item">
-                                    <img src="media/images/pdpostdata-logo.png" alt="">
+                                    <div class="col-md-6">
+                                        <img class="img-responsive" src="media/images/postdata-logo.png" alt="">
+                                    </div>
+                                    <div class="col-md-5 col-md-offset-1">
+                                        <h4 class="header-text">Paso 3. Realiza el pago</h4>
+                                        <p>
+                                            With all the apps that users love! Make it easy for users to share, like, post and tweet their favourite things from the app. Be sure to let users know they continue to remain connected while using your app!
+                                        </p>
+                                        <a href="#" class="btn btn-info btn-fill">Ver tutorial</a>
+                                    </div>
                                 </div>
                             </div>
 
                             <ol class="carousel-indicators carousel-indicators-blue">
-                                <li data-target="#description-carousel" data-slide-to="0" class=""></li>
-                                <li data-target="#description-carousel" data-slide-to="1" class="active"></li>
-                                <li data-target="#description-carousel" data-slide-to="2" class=""></li>
+                                <li data-target="#tutorial-carousel" data-slide-to="0" class="active"></li>
+                                <li data-target="#tutorial-carousel" data-slide-to="1" class=""></li>
+                                <li data-target="#tutorial-carousel" data-slide-to="2" class=""></li>
                             </ol>
                         </div>
                     </div>
-                </div>-->
-            </div>
+                </div>
         </div>
+
+{#        <div class="section section-demo">#}
+{#            <div class="container border-top">#}
+{#                <h4 class="header-text text-center">¿Cómo obtengo mis fotos?</h4>#}
+{#                <div class="row">#}
+{#                    <div class="col-md-6">#}
+{#                        <div id="description-carousel" class="carousel fade" data-ride="carousel" data-pause="false">#}
+{#                            <div class="carousel-inner">#}
+{#                                <div class="item active">#}
+{#                                    <img src="media/images/pdpostdata-logo.png" alt="">#}
+{#                                </div>#}
+{#                                <div class="item">#}
+{#                                    <img src="media/images/postdata-logo.png" alt="">#}
+{#                                </div>#}
+{#                                <div class="item">#}
+{#                                    <img src="media/images/pdpostdata-logo.png" alt="">#}
+{#                                </div>#}
+{#                            </div>#}
+{##}
+{#                            <ol class="carousel-indicators carousel-indicators-blue" style="pointer-events:none;">#}
+{#                                <li data-target="#description-carousel" data-slide-to="0" class="active"></li>#}
+{#                                <li data-target="#description-carousel" data-slide-to="1" class=""></li>#}
+{#                                <li data-target="#description-carousel" data-slide-to="2" class=""></li>#}
+{#                            </ol>#}
+{#                        </div>#}
+{#                    </div>#}
+{#                    <div class="col-md-5 col-md-offset-1">#}
+{#                        <div id="description-carousel" class="carousel fade" data-ride="carousel" data-pause="false">#}
+{#                            <div class="carousel-inner" style="box-shadow: none;">#}
+{#                                <div class="item active">#}
+{#                                    <h4 class="header-text">Paso 1. Elige tu producto</h4>#}
+{#                                    <p>#}
+{#                                        With all the apps that users love! Make it easy for users to share, like, post and tweet their favourite things from the app. Be sure to let users know they continue to remain connected while using your app!#}
+{#                                    </p>#}
+{#                                    <a href="#" class="btn btn-info btn-fill">Ver tutorial</a>#}
+{#                                </div>#}
+{#                                <div class="item">#}
+{#                                    <h4 class="header-text">Paso 2. Carga tus fotos</h4>#}
+{#                                    <p>#}
+{#                                        With all the apps that users love! Make it easy for users to share, like, post and tweet their favourite things from the app. Be sure to let users know they continue to remain connected while using your app!#}
+{#                                    </p>#}
+{#                                    <a href="#" class="btn btn-info btn-fill">Ver tutorial</a>#}
+{#                                </div>#}
+{#                                <div class="item">#}
+{#                                    <h4 class="header-text">Paso 3. Realiza el pago</h4>#}
+{#                                    <p>#}
+{#                                        With all the apps that users love! Make it easy for users to share, like, post and tweet their favourite things from the app. Be sure to let users know they continue to remain connected while using your app!#}
+{#                                    </p>#}
+{#                                    <a href="#" class="btn btn-info btn-fill">Ver tutorial</a>#}
+{#                                </div>#}
+{#                            </div>#}
+{#                        </div>#}
+{#                    </div>#}
+{#                </div>#}
+{#                <!--<div class="row">#}
+{#                    <div class="col-md-5 col-md-offset-1">#}
+{#                        <h4 class="header-text">Paso 2. Carga tus imagenes!</h4>#}
+{#                        <p>#}
+{#                            With all the apps that users love! Make it easy for users to share, like, post and tweet their favourite things from the app. Be sure to let users know they continue to remain connected while using your app!#}
+{#                        </p>#}
+{#                        <a href="http://www.creative-tim.com/product/awesome-landing-page" class="btn btn-info btn-fill">Get Free Demo</a>#}
+{#                    </div>#}
+{#                    <div class="col-md-6">#}
+{#                        <div id="description-carousel" class="carousel fade" data-ride="carousel">#}
+{#                            <div class="carousel-inner">#}
+{#                                <div class="item">#}
+{#                                    <img src="media/images/pdpostdata-logo.png" alt="">#}
+{#                                </div>#}
+{#                                <div class="item active">#}
+{#                                    <img src="media/images/postdata-logo.png" alt="">#}
+{#                                </div>#}
+{#                                <div class="item">#}
+{#                                    <img src="media/images/pdpostdata-logo.png" alt="">#}
+{#                                </div>#}
+{#                            </div>#}
+{##}
+{#                            <ol class="carousel-indicators carousel-indicators-blue">#}
+{#                                <li data-target="#description-carousel" data-slide-to="0" class=""></li>#}
+{#                                <li data-target="#description-carousel" data-slide-to="1" class="active"></li>#}
+{#                                <li data-target="#description-carousel" data-slide-to="2" class=""></li>#}
+{#                            </ol>#}
+{#                        </div>#}
+{#                    </div>#}
+{#                </div>-->#}
+{#            </div>#}
+{#        </div>#}
 
         <div class="section section-features">
             <div class="container border-top">

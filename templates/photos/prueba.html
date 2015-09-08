@@ -1,0 +1,195 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load staticfiles %}
+
+{% block head %}
+{{ wizard.form.media }}
+    <link rel='stylesheet' href='{% static "css/dropzone.css" %}' />
+{% endblock %}
+
+{% block content %}
+<p>Step {{ wizard.steps.step1 }} of {{ wizard.steps.count }}</p>
+    <div id="dropzone">
+                    <form action="" class="dropzone" id="myDropzone" method='POST' enctype="multipart/form-data">
+                        <table>
+{{ wizard.management_form }}
+{% if wizard.form.forms %}
+    {{ wizard.form.management_form }}
+    {% for form in wizard.form.forms %}
+        {{ form }}
+    {% endfor %}
+{% else %}
+    {{ wizard.form }}
+{% endif %}
+</table>
+                        {% csrf_token %}
+                        {{ upload_form.temp_hash }}
+                        <div class="dz-message">
+                            Zona de carga<br>
+                            <span class="note">
+                                (Carga tus fotos haciendo clic en el boton de carga
+                                o arrastrandolas aqui)
+                            </span>
+                        </div>
+                        <div class="fallback">
+{#                            <input name="file" type="file" multiple />#}
+                            {{ upload_form.file }}
+                        </div>
+
+                    {% if wizard.steps.prev %}
+<button name="wizard_goto_step" type="submit" value="{{ wizard.steps.first }}">{% trans "first step" %}</button>
+<button name="wizard_goto_step" type="submit" value="{{ wizard.steps.prev }}">{% trans "prev step" %}</button>
+{% endif %}
+<input type="submit" value="{% trans "submit" %}"/>
+                    </form>
+                </div>
+{% endblock %}
+
+{% block wizard-scripts %}
+    <script src="{% static 'js/dropzone.js' %}"></script>
+    <script>
+
+        Dropzone.options.myDropzone = {
+            url: "{% url 'wizard' slug %}", // Set the url
+            parallelUploads: 5,
+            paramName: "file", // Name of our input file tag
+            addRemoveLinks: true,
+            acceptedFiles: "image/*",
+            createImageThumbnails: true,
+            //previewTemplate: previewTemplate,
+            //previewsContainer: "#previews", // Define the container to display the previews
+            //thumbnailWidth: 150,
+            //thumbnailHeight: 150,
+            //clickable: ".fileinput-button", // Define the element that should be used as click trigger to select files.
+            dictMaxFilesExceeded: "No puedes cargar mas imagenes porque has llegado al limite!",
+            dictRemoveFile: "",
+
+            init: function() {
+                var myDropzone = this;
+
+                this.on("success", function(file, responseText) {
+                    // Event thrown when upload event finish upload images on the queue
+                    //console.log(responseText);
+                    //var mydropzone = this;
+                    //myDropzone.emit("thumbnail", file, responseText.photos[0].url);
+                    //file.previewElement.querySelector("img").src = responseText.photos[0].url;
+
+                    // Sets server generated image id to dropzonejs preview image.
+                    //file.previewElement.querySelector("img").id = responseText.file[0].name;
+
+{#                    var editButton = Dropzone.createElement('<div class="pull-left"><a data-toggle="modal" ' +#}
+{#                            'data-target="#cropper-modal" data-image_url="' + responseText.file[0].url + '" href="#">' +#}
+{#                            '<i class="glyphicon glyphicon-edit text-default"></i> Editar</a></div>');#}
+{##}
+{#                    editButton.addEventListener('click', function() {#}
+{#                        $('#cropper').find('img').attr('src', responseText.file[0].url).attr('id', responseText.file[0].name);#}
+{#                    });#}
+{##}
+{#                    // Add the button to the file preview element.#}
+{#                    file.previewElement.appendChild(editButton);#}
+
+                    //$('#dropzone-previews').append('<div class="col-sm-1 col-md-3"><div class="thumbnail"><a><img class="img-responsive" id="' + responseText.photos[0].name + '" data-dz-thumbnail alt="' +responseText.photos[0].name+ '" src="' + responseText.photos[0].url + '"alt=""/></a> </div> <div class="caption"> <h3>Thumbnail label</h3> <p>Some sample text. Some sample text.</p> <p> <a href="#" class="btn btn-primary" role="button"> Button </a> <a href="#" class="btn btn-default" role="button">Button </a> </p> </div> </div>');
+
+{#                    $('#'+responseText.file[0].name).popover({#}
+{#                        html: true,#}
+{#                        trigger: 'focus',#}
+{#                        container: '#dropzone-previews',#}
+{#                        placement: 'bottom',#}
+{#                        animation: true,#}
+{#                        content: function () {#}
+{#                            return '<button class="btn btn-success" data-toggle="modal" data-target="#cropmodal" ' +#}
+{#                                    'data-image_url="' + responseText.file[0].url + '" >Open image </button>'#}
+{#                        },#}
+{#                    });#}
+
+                    // Keep count of uploaded files
+
+                    var fileCount = myDropzone.getAcceptedFiles().length;
+                    $("#image-count").html(fileCount);
+
+
+                });
+
+                this.on("complete", function() {
+                    //this.removeAllFiles();
+                });
+
+                this.on("addedfile", function(file) {
+                    var removeButton = Dropzone.createElement('<div class="pull-right"><a href="#"><i class="glyphicon glyphicon-trash text-danger"></i></a></div>');
+                    var _this = this;
+
+                    // Listen to the click event
+                    removeButton.addEventListener("click", function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+
+                        if (file.accepted == true) {
+
+                            $.ajax({
+                                type: "POST",
+                                url: "{% url 'delete_uploaded_image' %}",
+                                data: { 'photo_id': this.parentNode.firstChild.nextSibling.firstChild.id },
+                                success: function(data){
+                                },
+                                error: function(data){
+                                    alert('Error, no se pudo eliminar la imagen!');
+                                },
+                            });
+                        }
+
+                        _this.removeFile(file);
+                        var fileCount = myDropzone.getAcceptedFiles().length;
+                        $("#image-count").html(fileCount);
+                    });
+
+                    // Add the button to the file preview element.
+                    //file.previewElement.appendChild(removeButton);
+                    //image_count++
+                    //$("#image-count").html(image_count);
+
+                    //var fileCount = myDropzone.files.length;
+                });
+
+                this.on("maxfilesexceeded", function(file){
+                    $('#messages-container').html('<div class="alert alert-danger alert-dismissible" role="alert"><button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>Limite de fotos cargadas alcanzado! Por favor, elimina alguna de las imagenes antes de cargas otras</div>');
+                    //this.removeFile(file);
+                });
+
+                // Update the total progress bar
+                this.on("totaluploadprogress", function(progress) {
+                  //document.querySelector("#total-progress .progress-bar").style.width = progress + "%";
+                });
+
+                this.on("sending", function(file) {
+                  // Show the total progress bar when upload starts
+                  //document.querySelector("#total-progress").style.opacity = "1";
+                  // And disable the start button
+                });
+
+                // Hide the total progress bar when nothing's uploading anymore
+                this.on("queuecomplete", function(progress) {
+                  //document.querySelector("#total-progress").style.opacity = "0";
+                });
+
+                this.on("removedfile", function(file) {
+                    if (file.accepted == true) {
+
+                        $.ajax({
+                            type: "POST",
+                            url: "{% url 'delete_uploaded_image' %}",
+                            data: { 'photo_id': file.previewElement.firstElementChild.firstElementChild.id },
+                            success: function(data){
+                                var fileCount = myDropzone.getAcceptedFiles().length;
+                                $("#image-count").html(fileCount);
+                            },
+                            error: function(data){
+                                alert('Error, no se pudo eliminar la imagen!');
+                            },
+                        });
+                    }
+                });
+            }
+        };
+
+    </script>
+{% endblock %}

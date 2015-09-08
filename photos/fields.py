@@ -1,3 +1,5 @@
+from django.core.exceptions import ValidationError
+
 __author__ = 'oswaldomaestra'
 
 from django.utils.translation import ugettext_lazy as _
@@ -7,6 +9,8 @@ from django import forms
 class MultiFileInput(forms.FileInput):
     def render(self, name, value, attrs={}):
         attrs['multiple'] = 'multiple'
+        attrs['class'] = 'dz-hidden-input'
+        attrs['accept'] = 'image/*'
         return super(MultiFileInput, self).render(name, None, attrs=attrs)
 
     def value_from_datadict(self, data, files, name):
@@ -49,3 +53,35 @@ class MultiFileField(forms.FileField):
         for uploaded_file in data:
             if uploaded_file.size > self.maximum_file_size:
                 raise ValidationError(self.error_messages['file_size'] % {'uploaded_file_name': uploaded_file.name})
+
+
+from django.core.exceptions import ValidationError
+from django.forms.fields import Field
+import json
+from json import JSONDecoder
+from django.utils.translation import ugettext
+
+
+from photos.widgets import ImageEditWidget
+from photos.utils import apply_filters_to_image
+
+
+class ImageEditFormField(Field):
+    widget = ImageEditWidget
+    operations = []
+
+    def __init__(self, *args, **kwargs):
+        super(ImageEditFormField, self).__init__(*args, **kwargs)
+
+    def apply_to_image(self, image_name):
+        return apply_filters_to_image(image_name, self.operations)
+
+    def clean(self, value):
+        try:
+            data = json.loads(value)
+            self.operations = data.get('operations')
+            value = self.apply_to_image(data.get('image'))
+        except Exception:
+            raise ValidationError(ugettext('Image edit data is not valid'))
+
+        return super(ImageEditFormField, self).clean(value)

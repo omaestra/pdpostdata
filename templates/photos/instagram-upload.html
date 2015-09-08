@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% load staticfiles %}
+
+{% block instagram-upload-styles %}
+{% endblock %}
+
+{% block content %}
+    <div class="wrapper">
+        <div class="section section-products">
+            <div class="container-fluid">
+                <h3 class="header-text text-center">Carga tus fotos desde Instagram</h3>
+                {% if user and not user.is_anonymous %}
+                    <a href="{% url 'social:begin' 'instagram' %}?next={% url 'instamake' %}"
+                       class="fileinput-button btn btn-info btn-fill" role="button">  Cargar fotos desde Instagram
+                        <span class="fa fa-instagram"></span>
+                    </a>
+                {% else %}
+                    <div class="row">
+
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block instagram-upload-scripts %}
+{% endblock %}

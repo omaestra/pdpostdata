@@ -1,0 +1,22 @@
+<div class="row form-group">
+    <div class="col-xs-12">
+        <ul class="nav nav-pills nav-justified thumbnail setup-panel">
+            {% for step in wizard.steps.all %}
+                <li class="{% if wizard.steps.current == step %}active{% else %}{% endif %}">
+                    <a href="#">
+                        {% if step == '0' %}
+                            <h2 class="list-group-item-heading"><span class="fa fa-cloud-upload"></span></h2>
+                            <p class="list-group-item-text">Carga y edita tus imágenes</p>
+                        {% elif step == '1' %}
+                            <h2 class="list-group-item-heading"><span class="fa fa-sort-amount-asc"></span></h2>
+                            <p class="list-group-item-text">Ordena tus imágenes como quieras</p>
+                        {% elif step == '2' %}
+                            <h2 class="list-group-item-heading"><span class="fa fa-check-square"></span></h2>
+                            <p class="list-group-item-text">Revisa tus imágenes</p>
+                        {% endif %}
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>

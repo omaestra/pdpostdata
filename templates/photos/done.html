@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load staticfiles %}
+
+{% block head %}
+{{ wizard.form.media }}
+{% endblock %}
+
+{% block content %}
+    <div class="row form-group">
+        <div class="col-xs-12">
+            <ul class="nav nav-pills nav-justified thumbnail setup-panel">
+                {% for step in wizard.steps.all %}
+                    <li class="{% if wizard.steps.current == step %}active{% else %}{% endif %}">
+                        <a href="#">
+                            <h4 class="list-group-item-heading">Paso {{ step }}</h4>
+                            <p class="list-group-item-text">Descripcion del paso {{ step }}</p>
+                        </a>
+                    </li>
+                {% endfor %}
+                    <li class="active">
+                        <a href="#">
+                            <h4 class="list-group-item-heading">Paso 3</h4>
+                            <p class="list-group-item-text">Resumen de tus imagenes</p>
+                        </a>
+                    </li>
+            </ul>
+        </div>
+	</div>
+    <div class="container-fluid">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <div class="row">
+                    <div class="col-lg-8">
+
+                    </div>
+                    <div class="col-lg-3 pull-right">
+
+                    </div>
+                </div>
+            </div>
+            <div class="panel-body">
+                {{ form_data }}
+            </div>
+            <div class="panel-footer">
+                        <div class="row">
+                            <div class="col-xs-10">
+                                <i class="glyphicon glyphicon-info-sign"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+{% endblock %}

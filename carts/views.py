@@ -1,3 +1,4 @@
+from django.http import Http404
 from django.shortcuts import render, HttpResponseRedirect, get_object_or_404
 from django.core.urlresolvers import reverse
 from django.contrib import messages
@@ -85,13 +86,19 @@ def add_to_cart(request, slug):
                 pass
 
         photos = Photo.objects.filter(temp_hash=request.POST.get('temp_hash'))
-        cart_item = CartItem.objects.create(cart=cart, product=product)
-        cart_item.photo_set = photos
-        if len(product_var) > 0:
-            cart_item.variations.add(*product_var)
-        cart_item.quantity = qty
-        cart_item.save()
-        # success message
-        return HttpResponseRedirect(reverse("cart"))
+
+        if photos.count() == product.image_total:
+
+            cart_item = CartItem.objects.create(cart=cart, product=product)
+            cart_item.photo_set = photos
+            if len(product_var) > 0:
+                cart_item.variations.add(*product_var)
+            cart_item.quantity = qty
+            cart_item.save()
+            # success message
+            return HttpResponseRedirect(reverse("cart"))
+
+        else:
+            raise Http404
     # error message
     return HttpResponseRedirect(reverse("cart"))

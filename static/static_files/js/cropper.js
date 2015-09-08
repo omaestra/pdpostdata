@@ -1391,8 +1391,8 @@
 
       if (this.built && this.cropped) {
         data = {
-          left: cropBox.left,
-          top: cropBox.top,
+          x: cropBox.left,
+          y: cropBox.top,
           width: cropBox.width,
           height: cropBox.height
         };

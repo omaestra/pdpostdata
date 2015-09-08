@@ -20,6 +20,10 @@ footer > * { max-width: 720px; margin-left: auto; margin-right: auto; }
 footer .logo { margin: 2.8rem 0; width: 270px; }
 */
 
+.navbar {
+    margin: 0;
+}
+
 .navbar-default .navbar-nav > .active > a, .navbar-default .navbar-nav > .active > a:hover, .navbar-default .navbar-nav > .active > a:focus {
     background-color: #109cff;
     color: white;
@@ -31,4 +35,199 @@ footer .logo { margin: 2.8rem 0; width: 270px; }
 
 .img-product img {
     margin: 0 auto;;
+}
+
+.glyphicon-lg{font-size:8em}
+.blockquote-box{border-right:5px solid #F15962;}
+.blockquote-box .square{width:30%;margin-right:22px;text-align:center!important;background-color:#E6E6E6;padding:10% 0}
+.blockquote-box.blockquote-primary{border-color:#F15962}
+.blockquote-box.blockquote-primary .square{background-color:#F15962;color:#FFF}
+.blockquote-box.blockquote-success{border-color:#4CAE4C}
+.blockquote-box.blockquote-success .square{background-color:#5CB85C;color:#FFF}
+.blockquote-box.blockquote-info{border-color:#46B8DA}
+.blockquote-box.blockquote-info .square{background-color:#5BC0DE;color:#FFF}
+.blockquote-box.blockquote-warning{border-color:#EEA236}
+.blockquote-box.blockquote-warning .square{background-color:#F0AD4E;color:#FFF}
+.blockquote-box.blockquote-danger{border-color:#D43F3A}
+.blockquote-box.blockquote-danger .square{background-color:#D9534F;color:#FFF}
+.blockquote-box .message {padding: 8% 0;}
+.blockquote-box.blockquote-primary span{width: auto;}
+
+/* responsive text queries */
+@media screen and (max-width: 992px) {
+  .blockquote-box.blockquote-primary h1 {
+    font-size: 32px;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .blockquote-box.blockquote-primary h1 {
+    font-size: 22px;
+  }
+
+}
+
+.box {
+    width: 20%;
+    padding-bottom: 20%;
+    position: relative;
+    float: left;
+    background-color: #F15962;
+}
+
+.box-lg {
+    width: 30%;
+    min-height: 300px;
+}
+
+.box-lg .boxInner {
+   position: absolute;
+   left: 0px;
+   right: 0px;
+   top: 0px;
+   bottom: 0px;
+   overflow: hidden;
+}
+
+.box h3 {
+    text-align: center;
+    color: #FFF;
+}
+.boxInner {
+   position: absolute;
+   left: 0px;
+   right: 0px;
+   top: 0px;
+   bottom: 0px;
+   overflow: hidden;
+}
+.boxInner img {
+   width: 100%;
+}
+.boxInner .titleBox {
+   position: absolute;
+   bottom: 0;
+   left: 0;
+   right: 0;
+   margin-bottom: -100px;
+   background: #292C2F;
+   color: #D5D4D4;
+   padding: 10px;
+   text-align: center;
+   -webkit-transition: all 0.3s ease-out;
+   -moz-transition: all 0.3s ease-out;
+   -o-transition: all 0.3s ease-out;
+   transition: all 0.3s ease-out;
+    z-index: 2;
+}
+
+.btn-product {
+    color: #fff;
+    border-color: #F15962;
+}
+
+.btn-product-fill {
+    color: #fff;
+    background-color: #F15962;
+    border-color: #F15962;
+}
+
+.btn-product:hover,
+.btn-product:focus,
+.btn-product.focus,
+.btn-product:active,
+.btn-product.active {
+  color: #fff;
+  border-color: #e95a63;
+}
+
+.btn-product-fill:hover,
+.btn-product-fill:focus,
+.btn-product-fill.focus,
+.btn-product-fill:active,
+.btn-product-fill.active {
+  color: #fff;
+  border-color: #e95a63;
+    background-color: #e95a63;
+}
+
+.boxInner:hover .titleBox {
+    margin-bottom: 0;
+}
+
+.row-products:before, .row-products:after {
+    display: table;
+    content: " ";
+}
+
+.banner {
+    background: url(../../media/images/pdheader.png) center center no-repeat;
+    background-size: cover;
+    height: 300px;
+}
+
+.btn-sq-lg {
+  width: 115px !important;
+  height: 115px !important;
+    white-space:normal !important;
+    max-width:200px;
+    font-size: 16px;
+}
+
+.btn-sq {
+    width: 80px !important;
+    height: 80px !important;
+    white-space:normal !important;
+    max-width:200px;
+}
+
+.btn-sq-sm {
+  width: 50px !important;
+  height: 50px !important;
+  font-size: 10px;
+}
+
+.btn-sq-xs {
+  width: 25px !important;
+  height: 25px !important;
+  padding:2px;
+}
+
+.avatar-btns {
+    margin-top: 1em;
+}
+
+@media only screen and (max-width : 480px) {
+   /* Smartphone view: 1 tile */
+   .box {
+      width: 100%;
+      padding-bottom: 100%;
+   }
+}
+@media only screen and (max-width : 650px) and (min-width : 481px) {
+   /* Tablet view: 2 tiles */
+   .box {
+      width: 50%;
+      padding-bottom: 50%;
+   }
+}
+@media only screen and (max-width : 1050px) and (min-width : 651px) {
+   /* Small desktop / ipad view: 3 tiles */
+   .box {
+      width: 33.3%;
+      padding-bottom: 33.3%;
+   }
+}
+@media only screen and (max-width : 1290px) and (min-width : 1051px) {
+   /* Medium desktop: 4 tiles */
+   .box {
+      width: 25%;
+      padding-bottom: 25%;
+   }
+}
+
+@media (min-width: 992px) {
+  .modal-lg {
+    width: 80%;
+  }
 }

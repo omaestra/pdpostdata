@@ -638,6 +638,31 @@ a:focus, a:active {
   opacity: 1;
 }
 
+.btn-google {
+  border-color: #DD4B39;
+  color: #DD4B39;
+}
+.btn-google:hover, .btn-google:focus, .btn-google:active, .btn-google.active, .open > .btn-google.dropdown-toggle {
+  background-color: transparent;
+  color: #DD4B39;
+  border-color: #DD4B39;
+  opacity: 1;
+}
+.btn-google:disabled, .btn-google[disabled], .btn-google.disabled {
+  background-color: transparent;
+  border-color: #DD4B39;
+}
+.btn-google.btn-fill {
+  color: white;
+  background-color: #DD4B39;
+  opacity: 0.9;
+}
+.btn-google.btn-fill:hover, .btn-google.btn-fill:focus, .btn-google.btn-fill:active, .btn-google.btn-fill.active, .open > .btn-google.btn-fill.dropdown-toggle {
+  background-color: #DD4B39;
+  color: white;
+  opacity: 1;
+}
+
 .btn-twitter {
   border-color: #55acee;
   color: #55acee;
@@ -740,7 +765,7 @@ a:focus, a:active {
 .landing-page .social-line {
   border-bottom: 1px solid #dddddd;
 }
-.landing-page .carousel-indicators {
+.landing-page #tutorial-carousel .carousel-indicators {
   bottom: -50px;
 }
 .landing-page .carousel-indicators li {

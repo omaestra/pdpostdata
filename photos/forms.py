@@ -13,20 +13,80 @@ from photos.fields import MultiFileField
 # BROWSER_WIDTH = 800
 
 # UPLOAD_IMG_ID = "new-img-file"
-from photos.models import Photo
+from photos.models import Photo, Cropped
+from carts.models import CartItem
 
 
-class PhotoForm(forms.ModelForm):
-    file = MultiFileField(max_num=10, min_num=1, maximum_file_size=1024*1024*5)
+default_errors = {
+    'required': 'Este campo es obligatorio!',
+    'invalid': 'Por favor, ingresa un valor valido!',
+    'min-length': '',
+}
+
+
+class PhotoSortForm(forms.Form):
+    photo_sort_list = forms.CharField(widget=forms.HiddenInput())
+
+
+class CartItemForm(forms.ModelForm):
+    class Meta:
+        model = CartItem
+        fields = ['cart', 'quantity', 'line_total', ]
+        widgets = {'cart': forms.HiddenInput(), 'quantity': forms.HiddenInput(), 'line_total': forms.HiddenInput(), }
+
+    # quantity = forms.IntegerField(widget=forms.TextInput(
+    #     attrs={'size': '2', 'value': '1', 'class': 'quantity'}),
+    #     error_messages={'invalid': 'Por favor, ingresa una cantidad valida.'},
+    #     min_value=1
+    # )
+    # product_slug = forms.CharField(widget=forms.HiddenInput())
+
+    def __init__(self, *args, **kwargs):
+        super(CartItemForm, self).__init__(*args, **kwargs)
+        self.fields['quantity'].widget.attrs['size'] = '2'
+        self.fields['quantity'].widget.attrs['value'] = '1'
+        self.fields['quantity'].widget.attrs['class'] = 'quantity'
+
+
+class PhotoUploadForm(forms.ModelForm):
+    # file = MultiFileField(max_num=10, min_num=1, maximum_file_size=1024*1024*5)
+    uploaded_photo_count = forms.IntegerField(error_messages=default_errors, widget=forms.HiddenInput())
 
     class Meta:
         model = Photo
         fields = ['temp_hash', ]
 
     def __init__(self, *args, **kwargs):
-        super(PhotoForm, self).__init__(*args, **kwargs)
+        super(PhotoUploadForm, self).__init__(*args, **kwargs)
         self.fields['temp_hash'] = forms.CharField(max_length='255', widget=forms.HiddenInput())
         self.fields['temp_hash'].initial = uuid.uuid1()
+
+
+class CropForm(ModelForm):
+    class Meta:
+        model = Cropped
+        fields = '__all__'
+        widgets = {
+            'x': forms.HiddenInput(),
+            'y': forms.HiddenInput(),
+            'h': forms.HiddenInput(),
+            'w': forms.HiddenInput(),
+        }
+
+    def _clean(self):
+        if not ('x' in self.data and 'y' in self.data):
+            self._errors.clear()
+            raise ValidationError("Missing crop values")
+
+        if int(self.data['x']) < 0 or int(self.data['y']) < 0:
+            self._errors.clear()
+            raise ValidationError("Crop positions must be non-negative")
+
+        if int(self.data['w']) < 1 or int(self.data['h']) < 1:
+            self._errors.clear()
+            raise ValidationError("Crop must have a height and width of at least one pixel")
+
+        return self.cleaned_data
 
 # TODO: Se encontro un problema con este formulario porque no actualiza el uuid al refrescar la pagina.
 # class PhotoForm(forms.Form):

@@ -17,10 +17,14 @@ from django.conf.urls import include, url
 from django.contrib import admin
 from django.conf import settings
 from django.conf.urls.static import static
-from photos.views import UploadView
+from photos.forms import PhotoSortForm, CartItemForm, PhotoUploadForm
+from photos.views import UploadPhotosWizard
+from dashboards.views import AnalyticsIndexView
 
+from django.contrib.admin.views.decorators import staff_member_required
 
 urlpatterns = [
+    url(r'^wizard/(?P<slug>[\w-]+)/$', UploadPhotosWizard.as_view([PhotoUploadForm, PhotoSortForm, CartItemForm]), name='wizard'),
     url(r'^admin/', include(admin.site.urls)),
 
     url(r'^accounts/password_change/$', 'django.contrib.auth.views.password_change',
@@ -41,7 +45,7 @@ urlpatterns = [
     url(r'^checkout/$', 'orders.views.checkout', name='checkout'),
     url(r'^orders/$', 'orders.views.orders', name='user_orders'),
     url(r'^ajax/rate_order/$', 'orders.views.rate_order', name='ajax_rate_order'),
-    url(r'^orders/(?P<order_id>[\w-]+)/$', 'orders.views.order_details', name='order_details'),
+    # url(r'^orders/(?P<order_id>[\w-]+)/$', 'orders.views.order_details', name='order_details'),
 
     url(r'^ajax/dismiss_marketing_message/$', 'marketing.views.dismiss_marketing_message',
         name='dismiss_marketing_message'),
@@ -61,11 +65,16 @@ urlpatterns = [
     url(r'^make/(?P<slug>[\w-]+)/$', 'photos.views.make', name='make'),
     url(r'^crop/$', 'photos.views.crop_image', name='cropper'),
     url(r'^sort/$', 'photos.views.sort_photos', name='sort_photos'),
+    url(r'^delete_uploaded_image/$', 'photos.views.delete_uploaded_image', name='delete_uploaded_image'),
 
-    url(r'^dashboard/$', 'dashboards.views.dashboard', name='dashboard'),
+    url(r'^dashboard/$', staff_member_required(AnalyticsIndexView.as_view()), name='dashboard'),
     url(r'^dashboard/orders/$', 'dashboards.views.orders', name='dashboard_orders'),
     url(r'^dashboard/orders/(?P<order_id>[\w-]+)/download/$', 'dashboards.views.send_zipfile', name='send_zipfile'),
     url(r'^dashboard/users/$', 'dashboards.views.users', name='dashboard_users'),
+
+
+    url('', include('social.apps.django_app.urls', namespace='social')),
+    url(r'^upload_from_instagram/(?P<product_slug>[\w-]+)/$', 'photos.views.upload_instagram_images', name='upload_instagram_images'),
 ]
 
 if settings.DEBUG:

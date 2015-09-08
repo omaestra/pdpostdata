@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/1.8/ref/settings/
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
+from config import *
+from django.conf import settings
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -39,6 +41,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'formtools',
     'navigation',
     'accounts',
     'carts',
@@ -46,6 +49,8 @@ INSTALLED_APPS = (
     'orders',
     'products',
     'photos',
+    'social.apps.django_app.default',
+    'imagekit',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -74,12 +79,41 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'social.apps.django_app.context_processors.backends',
+                'social.apps.django_app.context_processors.login_redirect',
             ],
         },
     },
 ]
 
 WSGI_APPLICATION = 'pdpostdata.wsgi.application'
+
+
+AUTHENTICATION_BACKENDS = (
+    'accounts.backends.EmailBackend',
+    'social.backends.google.GoogleOAuth2',
+    'social.backends.instagram.InstagramOAuth2',
+    'social.backends.facebook.FacebookOAuth2',
+    'django.contrib.auth.backends.ModelBackend',
+)
+
+
+SOCIAL_AUTH_PIPELINE = (
+    'social.pipeline.social_auth.social_details',
+    'social.pipeline.social_auth.social_uid',
+    'social.pipeline.social_auth.auth_allowed',
+    'social.pipeline.social_auth.social_user',
+    'social.pipeline.user.get_username',
+    'social.pipeline.mail.mail_validation',
+    'social.pipeline.user.create_user',
+    'social.pipeline.social_auth.associate_user',
+    'social.pipeline.debug.debug',
+    'social.pipeline.social_auth.load_extra_data',
+    'social.pipeline.user.user_details',
+    'social.pipeline.debug.debug',
+
+    'accounts.pipeline.update_user_social_data',
+)
 
 
 # Database
@@ -108,7 +142,7 @@ USE_TZ = False
 
 MARKETING_HOURS_OFFSET = 3
 MARKETING_SECONDS_OFFSET = 0
-DEFAULT_TAX_RATE = 0.08 # 8%
+DEFAULT_TAX_RATE = 0.08  # 8%
 
 
 # Static files (CSS, JavaScript, Images)
@@ -129,3 +163,28 @@ STATICFILES_DIRS = (
 TEMPLATE_DIRS = (
     os.path.join(BASE_DIR,  'templates'),
 )
+
+EDITED_PREVIEWS_ROOT = getattr(settings, 'EDITED_PREVIEWS_ROOT', os.path.join('image_editor', 'previews'))
+
+IMAGE_EDITOR_FILTERS = getattr(settings, 'IMAGE_EDITOR_FILTERS', {
+    'crop': 'photos.filters.crop.ImageCropTool',
+    'sepia': 'photos.filters.sepia.ImageSepiaFilter',
+    'blur': 'photos.filters.blur.ImageBlurFilter',
+    'sharpen': 'photos.filters.sharpen.ImageSharpenFilter',
+    'contour': 'photos.filters.contour.ImageContourFilter',
+    'edge_enhance': 'photos.filters.edge_enhance.ImageEdgeEnhanceFilter',
+    'detail': 'photos.filters.detail.ImageDetailFilter',
+    'grayscale': 'photos.filters.grayscale.ImageGrayscaleFilter'
+})
+
+IMAGE_EDITOR_OPTIONS = getattr(settings, 'IMAGE_EDITOR_OPTIONS', {})
+
+FILTER_CLASSES = {}
+for name, image_filter in IMAGE_EDITOR_FILTERS.items():
+    chain = image_filter.split('.')
+    class_object = getattr(__import__('.'.join(chain[:-1]), globals(), locals(), [chain[-1]]), chain[-1])
+    options = IMAGE_EDITOR_OPTIONS.get(name, {})
+    FILTER_CLASSES[name] = class_object(name, options)
+
+MAX_WIDTH = getattr(settings, 'CROPPER_MAX_WIDTH', 300)
+MAX_HEIGHT = getattr(settings, 'CROPPER_MAX_HEIGHT', 300)
