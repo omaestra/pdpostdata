@@ -5,6 +5,7 @@ from django.db import models, migrations
 import datetime
 import accounts.models
 from django.conf import settings
+import django.core.validators
 
 
 class Migration(migrations.Migration):
@@ -37,13 +38,16 @@ class Migration(migrations.Migration):
             name='UserAddress',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('first_name', models.CharField(max_length=50, null=True, blank=True)),
+                ('last_name', models.CharField(max_length=50, null=True, blank=True)),
+                ('personal_dni', models.PositiveIntegerField()),
                 ('address', models.CharField(max_length=120)),
                 ('address2', models.CharField(max_length=120, null=True, blank=True)),
                 ('city', models.CharField(max_length=120)),
                 ('state', models.CharField(max_length=120, null=True, blank=True)),
                 ('country', models.CharField(max_length=120)),
                 ('zipcode', models.CharField(max_length=25)),
-                ('phone', models.CharField(max_length=120)),
+                ('phone_number', models.CharField(blank=True, max_length=15, validators=[django.core.validators.RegexValidator(regex=b'^\\+?1?\\d{9,15}$', message=b"El n\xc3\xbamero de tel\xc3\xa9fono debe tener el siguiente formato: '+999999999'. Se permiten un m\xc3\xa1ximo de 15 digitos")])),
                 ('shipping', models.BooleanField(default=True)),
                 ('billing', models.BooleanField(default=False)),
                 ('timestamp', models.DateTimeField(auto_now_add=True)),

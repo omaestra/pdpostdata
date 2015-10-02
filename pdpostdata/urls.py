@@ -20,11 +20,36 @@ from django.conf.urls.static import static
 from photos.forms import PhotoSortForm, CartItemForm, PhotoUploadForm
 from photos.views import UploadPhotosWizard
 from dashboards.views import AnalyticsIndexView
+from products import views
 
 from django.contrib.admin.views.decorators import staff_member_required
 
+from django.contrib.auth.models import User
+from rest_framework import routers, serializers, viewsets
+
+
+# Serializers define the API representation.
+class UserSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = User
+        fields = ('url', 'username', 'email', 'is_staff')
+
+
+# ViewSets define the view behavior.
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+# Routers provide an easy way of automatically determining the URL conf.
+router = routers.DefaultRouter()
+router.register(r'users', UserViewSet)
+router.register(r'products', views.ProductViewSet)
+
 urlpatterns = [
+    url(r'^api/', include(router.urls)),
+    url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     url(r'^wizard/(?P<slug>[\w-]+)/$', UploadPhotosWizard.as_view([PhotoUploadForm, PhotoSortForm, CartItemForm]), name='wizard'),
+    url(r'^wizard/edit/(?P<cart_item_id>\d+)/$', 'photos.views.edit_wizard', name='edit_wizard'),
     url(r'^admin/', include(admin.site.urls)),
 
     url(r'^accounts/password_change/$', 'django.contrib.auth.views.password_change',
@@ -59,6 +84,7 @@ urlpatterns = [
     url(r'^accounts/activate/(?P<activation_key>\w+)/$', 'accounts.views.activation_view', name='activation_view'),
     url(r'^accounts/profile/$', 'accounts.views.user_profile', name='user_profile'),
     url(r'^address/delete/(?P<address_id>\d+)/$', 'accounts.views.delete_user_address', name='delete_user_address'),
+    url(r'^helpticket/send_helpticket/$', 'helptickets.views.send_helpticket', name='send_helpticket'),
 
     url(r'^photos/upload/$', 'photos.views.upload', name='upload'),
     url(r'^upload2/(?P<slug>[\w-]+)/$', 'photos.views.make', name='upload2'),
@@ -71,6 +97,9 @@ urlpatterns = [
     url(r'^dashboard/orders/$', 'dashboards.views.orders', name='dashboard_orders'),
     url(r'^dashboard/orders/(?P<order_id>[\w-]+)/download/$', 'dashboards.views.send_zipfile', name='send_zipfile'),
     url(r'^dashboard/users/$', 'dashboards.views.users', name='dashboard_users'),
+    url(r'^dashboard/reports/$', 'dashboards.views.reports', name='dashboard_reports'),
+    url(r'^dashboard/helptickets/$', 'dashboards.views.helptickets', name='dashboard_helptickets'),
+    url(r'^dashboard/helptickets/answer/$', 'dashboards.views.answer_help_ticket', name='dashboard_answer_help_ticket'),
 
 
     url('', include('social.apps.django_app.urls', namespace='social')),

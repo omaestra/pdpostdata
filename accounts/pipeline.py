@@ -55,9 +55,9 @@ def update_user_social_data(strategy, response, *args, **kwargs):
         )
     elif isinstance(backend, InstagramOAuth2):
 
-        if kwargs['response']['data'].get('profile_picture'):
+        if response['data'].get('profile_picture'):
             image_name = 'instagram_avatar_%s.jpg' % user.username
-            image_url = kwargs['response']['data'].get('profile_picture')
+            image_url = response['data'].get('profile_picture')
             image_stream = urlopen(image_url)
 
             user.userprofile.avatar.save(

@@ -10,7 +10,7 @@
 	.sortable {
 		margin: auto;
 		padding: 0;
-		width: 700px;
+{#		width: 700px;#}
 		-webkit-touch-callout: none;
 		-webkit-user-select: none;
 		-khtml-user-select: none;
@@ -34,7 +34,8 @@
 		border-radius: 4px;
 		margin: 5px;
 		padding: 0px;
-		height: 22px;
+        width: 200px;
+		height: 200px;
 	}
 	.sortable li {
 		border: 1px solid #d97815;
@@ -43,6 +44,11 @@
 		text-shadow: 0 1px 1px #ac4e00;
 		box-shadow: inset 0 1px 1px rgba(255,255,255,0.7);
 	}
+    .sortable img {
+		border-radius: 4px;
+		padding: 0px;
+		height: 22px;
+    }
 	.grid li {
 		line-height: 80px;
 		float: left;
@@ -61,6 +67,23 @@
 	.disabled {
 		opacity: 0.5;
 	}
+    .pdstrip {
+        box-shadow: 0px 0px 10px 1px;
+        margin: 10px;
+        float: left;
+    }
+
+    .pdstrip .item {
+        margin: 20px;
+    }
+
+    .pdposter {
+        box-shadow: 0px 0px 10px 1px;
+        margin: 10px;
+    }
+    .pdposter .item {
+        margin: 20px;
+    }
 
     .sortable_exclude_dynamic {
 		margin: auto;
@@ -96,24 +119,29 @@
 {% endblock %}
 
 {% block content %}
-    {% include 'photos/wizard-step-bar.html' %}
 {#<p>Step {{ wizard.steps.step1 }} of {{ wizard.steps.count }}</p>#}
     <div class="container-fluid">
+    {% include 'photos/wizard-step-bar.html' %}
         <div class="panel panel-default">
             <div class="panel-body">
                 <div class="container-fluid">
                     <div class="row">
-                        <ul class="sortable grid list-group">
-                            {% for photo in photo_list %}
-                                <li id="{{ photo.id }}" class="list-group-item">
-                                {% if photo.cropped %}
-                                    <img class="img-responsive" draggable="false" src="{{ photo.cropped.image_cropped.url }}" style="width:160px; height: 160px; max-height: 100%"/>
-                                {% else %}
-                                    <img class="img-responsive" draggable="false" src="{{ photo.image.url }}" style="width:160px; height: 160px; max-height: 100%"/>
-                                {% endif %}
-                                </li>
-                            {% endfor %}
-                        </ul>
+                        <div class="text-center">
+                            <h3>{{ product.title }}</h3>
+                            <span>De esta forma quedaría tu pedido al momento de imprimirlo!</span>
+                        </div>
+                        {% include product_template %}
+{#                        <ul class="sortable grid list-group">#}
+{#                            {% for photo in photo_list %}#}
+{#                                <li id="{{ photo.id }}" class="list-group-item">#}
+{#                                {% if photo.cropped %}#}
+{#                                    <img class="img-responsive" draggable="false" src="{{ photo.cropped.image_cropped.url }}" style="width:160px; height: 160px; max-height: 100%"/>#}
+{#                                {% else %}#}
+{#                                    <img class="img-responsive" draggable="false" src="{{ photo.smart.url }}" style="width:160px; height: 160px; max-height: 100%"/>#}
+{#                                {% endif %}#}
+{#                                </li>#}
+{#                            {% endfor %}#}
+{#                        </ul>#}
                     </div>
                 </div>
                 <form action="" method='POST' enctype="multipart/form-data">

@@ -1,0 +1,227 @@
+{% extends 'dashboards/base_dashboard.html' %}
+{% load staticfiles %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+            <h1 class="page-header">Dashboard / Reportes</h1>
+            <h4>Conectado como @{{ user.username }}</h4>
+
+            <h2 class="sub-header">Informacion relevante</h2>
+            <div class="row">
+                <div class="col-lg-7">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <i class="fa fa-bar-chart-o fa-fw"></i> Ventas por mes
+                            <div class="pull-right">
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">
+                                        Actions
+                                        <span class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu pull-right" role="menu">
+                                        <li><a href="#">Action</a></li>
+                                        <li><a href="#">Another action</a></li>
+                                        <li><a href="#">Something else here</a></li>
+                                        <li class="divider"></li>
+                                        <li><a href="#">Separated link</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div> <!-- /.panel-heading -->
+                        <div class="panel-body">
+                            <div class="canvas-holder">
+                                <canvas id="monthlySalesChart" height="200"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /. panel -->
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <i class="fa fa-bar-chart-o fa-fw"></i> Producto más vendido
+                            <div class="pull-right">
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">
+                                        Actions
+                                        <span class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu pull-right" role="menu">
+                                        <li><a href="#">Action</a></li>
+                                        <li><a href="#">Another action</a></li>
+                                        <li><a href="#">Something else here</a></li>
+                                        <li class="divider"></li>
+                                        <li><a href="#">Separated link</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div> <!-- /.panel-heading -->
+                        <div class="panel-body">
+                            <div class="canvas-holder">
+                                <canvas id="monthlyFavoriteProductChart" height="200"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- /.col-lg-7 -->
+                <div class="col-lg-5">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <i class="fa fa-bar-chart-o fa-fw"></i> Usuario registrados por mes
+                            <div class="pull-right">
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">
+                                        Actions
+                                        <span class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu pull-right" role="menu">
+                                        <li><a href="#">Action</a></li>
+                                        <li><a href="#">Another action</a></li>
+                                        <li><a href="#">Something else here</a></li>
+                                        <li class="divider"></li>
+                                        <li><a href="#">Separated link</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- /.panel-heading -->
+                        <div class="panel-body">
+                            <div class="canvas-holder">
+                                <canvas id="registeredUsersChart" height="200"></canvas>
+                            </div>
+                        </div> <!-- /.panel-body -->
+                    </div> <!-- /.panel -->
+
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <i class="fa fa-bar-chart-o fa-fw"></i> Pedidos por estado
+                            <div class="pull-right">
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">
+                                        Actions
+                                        <span class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu pull-right" role="menu">
+                                        <li><a href="#">Action</a></li>
+                                        <li><a href="#">Another action</a></li>
+                                        <li><a href="#">Something else here</a></li>
+                                        <li class="divider"></li>
+                                        <li><a href="#">Separated link</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div> <!-- /.panel-heading -->
+                        <div class="panel-body">
+                            <div class="canvas-holder">
+                                <canvas id="orderStatusChart" height="200"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- /.col-lg-5 -->
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block chart-scripts %}
+    <script src="{% static 'js/chart.js' %}"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="{% static 'js/ie10-viewport-bug-workaround.js' %}"></script>
+    <script type="text/javascript">
+    $( document ).ready(function() {
+        Chart.defaults.global.responsive = true;
+        var data = {
+            labels: ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"],
+            datasets: [
+                {
+                    label: "Usuarios registrados por mes",
+                    fillColor: "rgba(37,119,181,0.8)",
+                    strokeColor: "rgba(220,220,220,1)",
+                    pointColor: "rgba(220,220,220,1)",
+                    pointStrokeColor: "#fff",
+                    pointHighlightFill: "#fff",
+                    pointHighlightStroke: "rgba(220,220,220,1)",
+                    data: {{ monthly_registrations }}
+                }
+            ]
+        };
+        // Get context with jQuery - using jQuery's .get() method.
+        var ctx = document.getElementById("registeredUsersChart").getContext("2d");
+        // This will get the first returned node in the jQuery collection.
+        var lineChart = new Chart(ctx).Line(data, {});
+
+        var data_sales = {
+            labels: ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"],
+            datasets: [
+                {
+                    label: "Ventas por mes",
+                    fillColor: "rgba(37,119,181,0.8)",
+                    strokeColor: "rgba(220,220,220,1)",
+                    pointColor: "rgba(220,220,220,1)",
+                    pointStrokeColor: "#fff",
+                    pointHighlightFill: "#fff",
+                    pointHighlightStroke: "rgba(220,220,220,1)",
+                    data: {{ monthly_sales }}
+                }
+            ]
+        };
+        // Get context with jQuery - using jQuery's .get() method.
+        var ctx = document.getElementById("monthlySalesChart").getContext("2d");
+        // This will get the first returned node in the jQuery collection.
+        var lineChart2 = new Chart(ctx).Line(data_sales, {});
+
+        var order_status_data = [
+            {
+                value: {{ orders_by_status.Pendiente }},
+                color: "#FFA17F",
+                highlight: "#ff967f",
+                label: "Pendiente"
+            },
+            {
+                value: {{ orders_by_status.Iniciado }},
+                color: "#46BFBD",
+                highlight: "#5AD3D1",
+                label: "Iniciado"
+            },
+            {
+                value: {{ orders_by_status.Rechazado }},
+                color:"#C91420",
+                highlight: "#E01724",
+                label: "Rechazado"
+            },
+            {
+                value: {{ orders_by_status.Imprimiendo }},
+                color: "#3472f7",
+                highlight: "#1d62f0",
+                label: "Imprimiendo"
+            },
+            {
+                value: {{ orders_by_status.Enviado }},
+                color: "#3ABE41",
+                highlight: "#34aa3a",
+                label: "Enviado"
+            }
+        ];
+
+        var ctx = document.getElementById("orderStatusChart").getContext("2d");
+        var pieChart = new Chart(ctx).Pie(order_status_data,{});
+
+        var favorite_product_data = {
+            labels: ["PDStrips", "PDGrams", "PDPolaroids", "PDPosters", "PDFrames"],
+            datasets: [
+                {
+                    label: "Productos mas vendido",
+                    fillColor: "rgba(220,220,220,0.5)",
+                    strokeColor: "rgba(220,220,220,0.8)",
+                    highlightFill: "rgba(220,220,220,0.75)",
+                    highlightStroke: "rgba(220,220,220,1)",
+                    data: {{ favorite_products }}
+                }
+            ]
+        };
+
+        var ctx = document.getElementById("monthlyFavoriteProductChart").getContext("2d");
+        var barChart = new Chart(ctx).Bar(favorite_product_data,{});
+    });
+    </script>
+{% endblock %}

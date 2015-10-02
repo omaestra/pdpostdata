@@ -3,19 +3,19 @@
 {% block content %}
     <div class="row">
         <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-            <h1 class="page-header">Dashboard / Pedidos</h1>
+            <h1 class="page-header">Dashboard / Tickets de ayuda</h1>
             <h4>Conectado como @{{ user.username }}</h4>
             <div class="row">
                 <div class="col-lg-3 col-md-6">
-                    <div class="panel panel-yellow">
-                        <div class="panel-heading" data-toggle="tooltip" data-placement="top" title="Cantidad de Pedidos pendientes">
+                    <div class="panel panel-red">
+                        <div class="panel-heading">
                             <div class="row">
                                 <div class="col-xs-3">
-                                    <i class="fa fa-shopping-cart fa-5x"></i>
+                                    <i class="fa fa-support fa-5x"></i>
                                 </div>
                                 <div class="col-xs-9 text-right">
-                                    <div class="huge">{{ pending_orders.count }}</div>
-                                    <div>Nuevos Pedidos!</div>
+                                    <div class="huge">{{ help_ticket_list.count }}</div>
+                                    <div>Tickets de Ayuda!</div>
                                 </div>
                             </div>
                         </div>
@@ -34,7 +34,7 @@
             <div class="row">
                 <div class="panel panel-default">
                     <div class="panel-heading">
-                        <i class="fa fa-shopping-cart fa-fw"></i> Pedidos
+                        <i class="fa fa-shopping-cart fa-fw"></i> Tickets de ayuda
                         <div class="pull-right">
                             <div class="btn-group">
                                 <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">
@@ -57,89 +57,48 @@
                             <thead>
                             <tr>
                                 <th>#</th>
-                                <th>Estatus</th>
-                                <th>Total</th>
+                                <th>Asunto</th>
+                                <th>Usuario</th>
+                                <th>Status</th>
                                 <th>Fecha creacion</th>
-                                <th>Carrito</th>
                                 <th></th>
                             </tr>
                             </thead>
                             <tbody>
-                            {% for order in pending_orders %}
+                            {% for help_ticket in help_ticket_list %}
                                 <tr>
                                     <td>
                                         <a class="btn btn-primary btn-xs" role="button" data-toggle="collapse"
-                                           href="#{{ order.order_id }}" aria-expanded="false"
-                                           aria-controls="collapseExample">{{ order.order_id }}
+                                           href="#{{ help_ticket.id }}" aria-expanded="false"
+                                           aria-controls="collapseExample">{{ help_ticket.help_ticket_id }}
                                         </a>
                                     </td>
+                                    <td>{{ help_ticket.subject }}</td>
+                                    <td>{{ help_ticket.user.username }}</td>
+                                    <td>{{ help_ticket.status }}</td>
+                                    <td>{{ help_ticket.timestamp }}</td>
                                     <td>
-                                        <form method="POST" id="order_status_form">{% csrf_token %}
-                                            <select name="status" class="btn btn-default dropdown" onchange="this.form.submit()">
-                                                <option value="{{ order.status }}" selected>{{ order.status }}</option>
-                                                {% for choice in order_status_choices %}
-                                                    <option value="{{ choice.0 }}">{{ choice.1 }}</option>
-                                                {% endfor %}
-                                            </select>
-                                            <input type="hidden" value="{{ order.order_id }}" name="order_id">
-                                        </form>
-                                    </td>
-                                    <td>Bs.F {{ order.final_total }}</td>
-                                    <td>{{ order.timestamp }}</td>
-                                    <td>
-                                        <span class="badge">{{ order.cart.cartitem_set.count }}</span>
-                                    </td>
-                                    <td>
-                                        <a href="{% url 'send_zipfile' order.order_id %}">
-                                            <span class="fa fa-download fa-fw"></span>
+                                        <a href="" data-toggle="modal" data-target="#sendHelpTicketAnswerModal"
+                                           data-user-email="{{ help_ticket.user.email }}" data-help-ticket-id="{{ help_ticket.help_ticket_id }}">
+                                            <span class="fa fa-reply"></span>
                                         </a>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td colspan="6" class="hiddenRow">
-                                        <div class="collapse" id="{{ order.order_id }}">
+                                        <div class="collapse" id="{{ help_ticket.id }}">
                                             <table class="table table-hover">
                                                 <thead>
                                                 <tr>
-                                                    <th>Usuario</th>
-                                                    <th>Email</th>
-                                                    <th>Dirección</th>
-                                                    <th>Teléfono</th>
+                                                    <th>Mensaje</th>
                                                 </tr>
                                                 </thead>
                                                 <tbody>
                                                 <tr>
-                                                    <td>{{ order.user.username }}</td>
-                                                    <td>{{ order.user.email }}</td>
-                                                    <td>{{ order.shipping_address.get_address }}</td>
-                                                    <td>{{ order.shipping_address.phone_number }}</td>
+                                                    <td>
+                                                        <p>{{ help_ticket.message }}</p>
+                                                    </td>
                                                 </tr>
-                                                </tbody>
-                                            </table>
-                                            <table class="table table-hover"style="color: #000;">
-                                                <thead>
-                                                <tr>
-                                                    <th>Producto</th>
-                                                    <th>Cantidad</th>
-                                                    <th>Total</th>
-                                                    <th>Notas</th>
-                                                    <th>Imagenes</th>
-                                                </tr>
-                                                </thead>
-                                                <tbody>
-                                                {% for item in order.cart.cartitem_set.all %}
-                                                    <tr>
-                                                        <td>{{ item.product.title }}</td>
-                                                        <td>{{ item.quantity }}</td>
-                                                        <td>Bs.F {{ item.line_total }}</td>
-                                                        <td>{{ item.notes }}</td>
-                                                        <td>
-                                                            <span class="badge blu">
-                                                                {{ item.photo_set.count }} / {{ item.product.image_total }}
-                                                            </span>
-                                                        </td>
-                                                    </tr>
-                                                {% endfor %}
                                                 </tbody>
                                             </table>
                                         </div>
@@ -302,4 +261,62 @@
                 </div>
                 <!-- /.panel -->
             </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id='sendHelpTicketAnswerModal'>
+        <form id="helpTicketForm" method='POST' action="{% url 'dashboard_answer_help_ticket' %}">{% csrf_token %}
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                        <h4 class="modal-title">Enviar una respuesta</h4>
+                        <label id="help-ticket-label"></label>
+                        {% if answer_help_ticket_form.errors %}
+                            {% for field in answer_help_ticket_form %}
+                                {% for error in field.errors %}
+                                    <div class="alert alert-error">
+                                        <strong>{{ error|escape }}</strong>
+                                    </div>
+                                {% endfor %}
+                            {% endfor %}
+                            {% for error in answer_help_ticket_form.non_field_errors %}
+                                <div class="alert alert-error">
+                                    <strong>{{ error|escape }}</strong>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                    <div class="modal-body">
+                        <label id="user-email"></label>
+                        <fieldset>
+                            <legend>Mensaje</legend>
+                            <div class="form-group">
+                                {{ answer_help_ticket_form }}
+                            </div>
+                        </fieldset>
+                    </div>
+                    <div class="modal-footer">
+                        <input type='submit' class='btn btn-primary btn-fill' value='Enviar'/>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </form>
+    </div><!-- /.modal -->
+{% endblock %}
+
+{% block scripts %}
+    <script>
+
+        $('#sendHelpTicketAnswerModal').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget); // Button that triggered the modal
+            var user_email = button.data('user-email'); // Extract info from data-* attributes
+            var help_ticket_id = button.data('help-ticket-id'); // Extract info from data-* attributes
+
+            var modal = $(this);
+            modal.find('#user-email').text('Enviar a: ' + user_email);
+            modal.find('.modal-header #help-ticket-label').text('Ticket Nro. #' + help_ticket_id);
+            modal.find('#id_help_ticket_id').val(help_ticket_id);
+        });
+    </script>
 {% endblock %}

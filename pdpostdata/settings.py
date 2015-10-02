@@ -27,7 +27,18 @@ SECRET_KEY = 'b-zsforqd)bxof+2+_nmkip8@qfjw+yxb68r9w0@9083xc7w-%'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['http://pdpostdata.net', ]
+
+try:
+    # from .email_settings import host, user, password
+
+    EMAIL_HOST = 'smtp.gmail.com'  # smtp.gmail.com smtp.sendgrid.net
+    EMAIL_HOST_USER = 'omaestra@gmail.com'  # "email@gmail.com"
+    EMAIL_HOST_PASSWORD = 'omaestra192ex8'  # "password"
+    EMAIL_PORT = 587
+    EMAIL_USE_TLS = True
+except:
+    pass
 
 SITE_URL = 'http://127.0.0.1:8000'
 
@@ -49,8 +60,10 @@ INSTALLED_APPS = (
     'orders',
     'products',
     'photos',
+    'helptickets',
     'social.apps.django_app.default',
     'imagekit',
+    'rest_framework',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -142,7 +155,7 @@ USE_TZ = False
 
 MARKETING_HOURS_OFFSET = 3
 MARKETING_SECONDS_OFFSET = 0
-DEFAULT_TAX_RATE = 0.08  # 8%
+DEFAULT_TAX_RATE = 0.12  # 12%
 
 
 # Static files (CSS, JavaScript, Images)
@@ -188,3 +201,11 @@ for name, image_filter in IMAGE_EDITOR_FILTERS.items():
 
 MAX_WIDTH = getattr(settings, 'CROPPER_MAX_WIDTH', 300)
 MAX_HEIGHT = getattr(settings, 'CROPPER_MAX_HEIGHT', 300)
+
+
+REST_FRAMEWORK = {
+    # Use Django's standard `django.contrib.auth` permissions,
+    # or allow read-only access for unauthenticated users.
+    'DEFAULT_PERMISSION_CLASSES': ('rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly',),
+    'PAGE_SIZE': 10
+}

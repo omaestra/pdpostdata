@@ -3,25 +3,35 @@
 {% load staticfiles %}
 
 {% block head %}
-{{ wizard.form.media }}
-    <link rel="stylesheet" href="{% static 'css/dropzone.css' %}">
-    <link rel="stylesheet" href="{% static 'css/pdpostdata.css' %}">
-    <link rel="stylesheet" href="{% static 'css/cropper.css' %}">
+    {{ wizard.form.media }}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/dropzone.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/pdpostdata.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/cropper.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'css/image-picker.css' %} ">
     <style>
+        .modal-picker.modal-body{
+            height: 500px;
+            overflow-y: auto;
+        }
         .img-preview {
-          overflow: hidden;
-          width: 550px;
-          height: 550px;
+            overflow: hidden;
+            width: 550px;
+            height: 550px;
             margin: 0 auto;
         }
+    .img-container img {
+    width: 600px;
+    height: auto;
+}
     </style>
 {% endblock %}
 
 {% block dropzonejs-uploader %}
-    {% include 'photos/wizard-step-bar.html' %}
+
 {#<p>Step {{ wizard.steps.step1 }} of {{ wizard.steps.count }}</p>#}
     <div id="dropzone-container" class="container-fluid">
+    {% include 'photos/wizard-step-bar.html' %}
+    {% include 'wait-dialog.html' %}
         <h2> {{ product.title }} </h2>
         <div class="panel panel-default">
             <div class="panel-heading">
@@ -67,15 +77,18 @@
                     </form>
                 </div>
                 <div class="row">
-                    <div class="col-md-2">
+                    <div class="col-md-6 text-left">
                         <a href="#" class="fileinput-button btn btn-primary" role="button">  Cargar fotos desde mi PC
                             <span class="glyphicon glyphicon-cloud-upload"></span>
                         </a>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-6 text-right">
                         {% if user and not user.is_anonymous %}
-                            <button type="button" class="btn btn-info" data-toggle="modal" data-target="#imagePickerModal"> Cargar fotos desde Instagram
+                            <button type="button" class="btn btn-info btn-instagram btn-fill" data-toggle="modal" data-target="#imagePickerModal"> Cargar fotos desde Instagram
                                 <span class="fa fa-instagram"></span>
+                            </button>
+                            <button type="button" class="btn btn-info btn-facebook btn-fill" data-toggle="modal" data-target="#imagePickerModal"> Cargar fotos desde Facebook
+                                <span class="fa fa-facebook"></span>
                             </button>
                         {% else %}
                             <a href="{% url 'social:begin' 'instagram' %}?next={{ request.path }}"
@@ -114,7 +127,6 @@
 
 {% block content %}
     <!-- Cropper Modal -->
-    <div id="crop-container" class="container-fluid">
     <div class="modal fade" id="cropper-modal">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
@@ -179,7 +191,7 @@
             </div>
         </div>
     </div>
-    </div>
+
     <!-- Image Picker Modal -->
     <div id="imagePickerModal" class="modal fade" role="dialog">
         <div class="modal-dialog modal-lg">
@@ -187,20 +199,26 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
-                    <h4 class="modal-title">
-                        <span class="fa fa-instagram 4x"></span> Fotos de Instagram
-                    </h4>
-                    <span class="modal-title">Conectado a Instagram como: @{{ user.username }}</span>
+                    <div class="row">
+                        <div class="col-md-6 col-sm-6 col-xs-6">
+                            <h4 class="modal-title"><span class="fa fa-instagram fa-4x"></span></h4>
+                            <span class="modal-title">Conectado a Instagram como: @{{ user.username }}</span>
+                        </div>
+
+                        <div class="col-md-6 col-sm-6 col-xs-6">
+                            <p class="text-right">Fotos cargadas: <span id='selected_images'>0</span> / {{ product.image_total }}</p>
+                        </div>
+                    </div>
                 </div>
-                <div class="modal-body">
+                <div class="modal-picker modal-body">
                     <div class="picker">
                         <form id="instagramImagePickerForm" action="" method="post">
                             {% csrf_token %}
                             <input class="selected_images" name="selected_images[]" type="hidden">
-                            <select id="multiselect" class="image-picker limit_callback" data-limit="8" multiple="multiple">
-                                {%for image in images %}
-                                    <option data-img-src="{{image.url}}" value="{{ forloop.counter }}">{{image.url}}</option>
-                                {% endfor %}
+                            <select id="multiselect" class="image-picker limit_callback" multiple="multiple">
+{#                                {%for image in images %}#}
+{#                                    <option data-img-src="{{image.url}}" value="{{ forloop.counter }}">{{image.url}}</option>#}
+{#                                {% endfor %}#}
                             </select>
                             <input class="btn btn-primary btn-fill" type="button" value="Cargar imagenes" id="savebutton">
                         </form>
@@ -225,7 +243,7 @@
 
         Dropzone.options.myDropzone = {
             url: "{% url 'wizard' product.slug %}", // Set the url
-            parallelUploads: 5,
+            parallelUploads: 1,
             paramName: "file", // Name of our input file tag
             addRemoveLinks: true,
             acceptedFiles: "image/*",
@@ -233,9 +251,8 @@
             maxFiles: {{ product.image_total }},
             //previewTemplate: previewTemplate,
             //previewsContainer: "#previews", // Define the container to display the previews
-            //thumbnailWidth: 150,
-            //thumbnailHeight: 150,
-            //clickable: ".fileinput-button", // Define the element that should be used as click trigger to select files.
+            thumbnailWidth: 150,
+            thumbnailHeight: 150,
             clickable: ".fileinput-button", // Define the element that should be used as click trigger to select files.
             dictMaxFilesExceeded: "No puedes cargar mas imagenes porque has alcanzado el limite!",
             dictRemoveFile: "",
@@ -283,13 +300,19 @@
                             '<i class="glyphicon glyphicon-edit text-default"></i> Editar</a></div>');
 
                         editButton.addEventListener('click', function() {
-                            $('#cropper').find('img').attr('src', '{{ photo.smart.url }}').attr('id', '{{ photo.id }}');
+                            {% if photo.cropped %}
+                                $('#cropper').find('img').attr('src', '{{ photo.smart.url }}').attr('id', '{{ photo.id }}');
+                            {% else %}
+                                $('#cropper').find('img').attr('src', '{{ photo.smart.url }}').attr('id', '{{ photo.id }}');
+                            {% endif %}
                         });
 
                         // Add the button to the file preview element.
                         $(mockFile.previewElement.appendChild(editButton));
 
                     {% endfor %}
+
+                    $("#id_0-uploaded_photo_count").val({{ photo_list.count }});
                 {% endif %}
 
                 this.on("success", function(file, responseText) {
@@ -311,12 +334,14 @@
 
                     // Sets server generated image id to dropzonejs preview image.
                     file.previewElement.querySelector("img").id = responseText.file[0].id;
+                    file.previewElement.querySelector("img").src = responseText.file[0]['thumbnailUrl'];
 
                     var editButton = Dropzone.createElement('<div class="pull-left"><a data-toggle="modal" ' +
                             'data-target="#cropper-modal"  href="#">' +
                             '<i class="glyphicon glyphicon-edit text-default"></i> Editar</a></div>');
 
-                    editButton.addEventListener('click', function() {
+                    editButton.addEventListener('click', function(e) {
+                        e.preventDefault();
                         $('#cropper').find('img').attr('src', responseText.file[0].url).attr('id', responseText.file[0].id);
                     });
 
@@ -432,7 +457,7 @@
 
     <script>
     $(document).ready(function (e) {
-        var $image = $('#cropper').find('img'), cropBoxData, canvasData;
+        var $image = $("#cropper").find("img"), cropBoxData, canvasData;
         var $reset      = $('#resetbtn');
         var $brightness = $('#brightnessbtn');
         var $sepia      = $('#sepiabtn');
@@ -556,12 +581,16 @@
                 autoCropArea: 0.8,
                 aspectRatio: 1,
                 zoomable: false,
-                movable: false,
+                movable: true,
+                strict: false,
+                modal: true,
                 preview: ".img-preview",
+
                 built: function () {
                     // Strict mode: set crop box data first
                     $image.cropper('setCropBoxData', cropBoxData);
                     $image.cropper('setCanvasData', canvasData);
+
                     $(".cropper-view-box").find("img").each(function() {
                         $(this).vintage(options, effect);
                     });
@@ -592,6 +621,7 @@
                     $('.image_id').val($image.attr('id'));
                   }
             });
+
 
         }).on('hidden.bs.modal', function () {
             while(filter_array.length) {
@@ -682,20 +712,6 @@
 
     <script type="text/javascript">
 
-        jQuery("select.image-picker").imagepicker({
-          hide_select:  true
-        });
-
-        jQuery('select.image-picker.show-labels').imagepicker({
-          hide_select:  true,
-          show_label:   true
-        });
-
-        jQuery("select.image-picker.limit_callback").imagepicker({
-          limit_reached:  function(){alert('We are full!')},
-          hide_select:    true
-        });
-
 {#    var container = jQuery("select.image-picker.masonry").next("ul.thumbnails");#}
 {#    container.imagesLoaded(function(){#}
 {#      container.masonry({#}
@@ -703,46 +719,93 @@
 {#      });#}
 {#    });#}
 
+        function dataURItoBlob(dataURI) {
+            'use strict';
+            var byteString, mimestring;
+
+            if(dataURI.split(',')[0].indexOf('base64') !== -1 ) {
+                byteString = atob(dataURI.split(',')[1])
+            } else {
+                byteString = decodeURI(dataURI.split(',')[1])
+            }
+
+            mimestring = dataURI.split(',')[0].split(':')[1].split(';')[0]
+
+            var content = [];
+            for (var i = 0; i < byteString.length; i++) {
+                content[i] = byteString.charCodeAt(i)
+            }
+
+            return new Blob([new Uint8Array(content)], {type: mimestring});
+        }
+
+        function convertImgToBase64(url, callback, outputFormat){
+            var img = new Image();
+            img.crossOrigin = 'Anonymous';
+            img.onload = function(){
+                var canvas = document.createElement('CANVAS');
+                var ctx = canvas.getContext('2d');
+                canvas.height = this.height;
+                canvas.width = this.width;
+                ctx.drawImage(this,0,0);
+                var dataURL = canvas.toDataURL(outputFormat || 'image/png');
+                callback(dataURL);
+                canvas = null;
+            };
+            img.src = url;
+        }
+
         $('#savebutton').click(function(e){
+            waitingDialog.show('Subiendo tus fotos...', {dialogSize: 'm', progressType: 'warning'});
             var myDropzone = Dropzone.forElement("#myDropzone");
 
             var files_to_upload = []
             $('#multiselect :selected').each(function(i, selected) {
-                var instagram_image = { name: $(selected).text(), size: 12345, type: "image/jpeg"}
+                var instagram_image = { name: $(selected).attr('data-img-src'), size: 12345, type: "image/jpeg"}
                 files_to_upload.push(instagram_image);
+
+                convertImgToBase64(instagram_image.name, function(base64Img){
+
+                    var blob = dataURItoBlob(base64Img);
+                    myDropzone.addFile(blob);
+
+                });
             });
 
-            for (var i=0; i < files_to_upload.length; i++) {
-                // Simulate a call to  service that can
-                // return an image as an ;ArrayBuffer.
-                var xhr = new XMLHttpRequest();
+            setTimeout(function () {waitingDialog.hide();}, 500);
 
-                // Use JSFiddle logo as a&nbsp;sample image to avoid complicating
-                // this example with cross-domain&nbsp;issues.
-                xhr.open( "GET", files_to_upload[i].name, true );
 
-                // Ask for the result as ;an ArrayBuffer.
-                xhr.responseType = "arraybuffer";
-
-                xhr.onload = function( e ) {
-                    // Obtain a blob: URL for the image data.
-                    var arrayBufferView = new Uint8Array( this.response );
-                    var blob = new Blob( [ arrayBufferView ], {type: "image/jpeg" } );
-                    var urlCreator = window.URL || window.webkitURL;
-                    var imageUrl = urlCreator.createObjectURL( blob );
-
-                    var parts = [blob, new ArrayBuffer()];
-
-                    file = new File(parts, ".jpg", {
-                        lastModified: new Date(0), // optional&nbsp;- default = now
-                        type:"image/jpeg"
-                    });
-
-                    $("input[accept=\'image/*\']").files = [file];
-                    myDropzone.addFile(file);
-                };
-                xhr.send();
-            }
+{#            for (var i=0; i < files_to_upload.length; i++) {#}
+{#                // Simulate a call to  service that can#}
+{#                // return an image as an ;ArrayBuffer.#}
+{#                var xhr = new XMLHttpRequest();#}
+{##}
+{#                // Use JSFiddle logo as a&nbsp;sample image to avoid complicating#}
+{#                // this example with cross-domain&nbsp;issues.#}
+{#                xhr.open( "GET", files_to_upload[i].name, true );#}
+{##}
+{#                // Ask for the result as ;an ArrayBuffer.#}
+{#                xhr.responseType = "arraybuffer";#}
+{##}
+{#                xhr.onload = function( e ) {#}
+{#                    // Obtain a blob: URL for the image data.#}
+{#                    var arrayBufferView = new Uint8Array( this.response );#}
+{#                    var blob = new Blob( [ arrayBufferView ], {type: "image/jpeg" } );#}
+{#                    var urlCreator = window.URL || window.webkitURL;#}
+{#                    var imageUrl = urlCreator.createObjectURL( blob );#}
+{##}
+{#                    var parts = [blob, new ArrayBuffer()];#}
+{##}
+{#                    file = new File(parts, ".jpg", {#}
+{#                        lastModified: new Date(0), // optional&nbsp;- default = now#}
+{#                        type:"image/jpeg"#}
+{#                    });#}
+{##}
+{#                    $("input[accept=\'image/*\']").files = [file];#}
+{#                    myDropzone.addFile(file);#}
+{#                };#}
+{#                xhr.send();#}
+{#            }#}
 
             $('#imagePickerModal').modal('hide');
 
@@ -791,9 +854,125 @@
                     selectednumbers[i] = $(selected).text();
                 });
                 var selected_images = JSON.stringify(selectednumbers);
-                $('.selected_images').val(selected_images);
-            };
-        })
+                $('#selected_images').html(selectednumbers.length);
+            }
+        });
+
+
+var waitingDialog = waitingDialog || (function ($) {
+    'use strict';
+
+	// Creating modal dialog's DOM
+	var $dialog = $(
+		'<div class="modal fade" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog" aria-hidden="true" style="padding-top:15%; overflow-y:visible;">' +
+		'<div class="modal-dialog">' +
+		'<div class="modal-content">' +
+			'<div class="modal-header"><p style="margin:0;"></p></div>' +
+			'<div class="modal-body">' +
+				'<div class="progress progress-striped active" style="margin-bottom:0;"><div class="progress-bar" style="width: 100%"></div></div>' +
+			'</div>' +
+		'</div></div></div>');
+
+	return {
+		/**
+		 * Opens our dialog
+		 * @param message Custom message
+		 * @param options Custom options:
+		 * 				  options.dialogSize - bootstrap postfix for dialog size, e.g. "sm", "m";
+		 * 				  options.progressType - bootstrap postfix for progress bar type, e.g. "success", "warning".
+		 */
+		show: function (message, options) {
+			// Assigning defaults
+			if (typeof options === 'undefined') {
+				options = {};
+			}
+			if (typeof message === 'undefined') {
+				message = 'Loading';
+			}
+			var settings = $.extend({
+				dialogSize: 'm',
+				progressType: '',
+				onHide: null // This callback runs after the dialog was hidden
+			}, options);
+
+			// Configuring dialog
+			$dialog.find('.modal-dialog').attr('class', 'modal-dialog').addClass('modal-' + settings.dialogSize);
+			$dialog.find('.progress-bar').attr('class', 'progress-bar');
+			if (settings.progressType) {
+				$dialog.find('.progress-bar').addClass('progress-bar-' + settings.progressType);
+			}
+			$dialog.find('p').text(message);
+			// Adding callbacks
+			if (typeof settings.onHide === 'function') {
+				$dialog.off('hidden.bs.modal').on('hidden.bs.modal', function (e) {
+					settings.onHide.call($dialog);
+				});
+			}
+			// Opening dialog
+			$dialog.modal();
+		},
+		/**
+		 * Closes dialog
+		 */
+		hide: function () {
+			$dialog.modal('hide');
+		}
+	};
+
+})(jQuery);
+
+
+    $('#imagePickerModal').on('shown.bs.modal', function () {
+
+
+        $.ajax({
+                url: "{% url 'upload_instagram_images' product.slug %}",
+                type: 'get',
+
+                beforeSend: function () {
+                    waitingDialog.show('Danos un momento mientras buscamos tus fotos de Instagram...', {dialogSize: 'm', progressType: 'warning'});
+                },
+
+                success: function (data) {
+
+                    $('#multiselect').empty();
+                    data.images.forEach(function (instagram_image, index) {
+                        console.log(instagram_image.url);
+                        $('#multiselect').append('<option data-img-src="'+ instagram_image.url +'" value="'+ index +'">' + instagram_image.caption + '</option>')
+                    });
+
+                },
+
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    alert("error");
+                    console.log(XMLHttpRequest);
+                },
+
+                complete: function () {
+                    $("select.image-picker").imagepicker({
+                        hide_select:  true,
+                        limit: 5,
+                        limit_reached:  function(){
+                            alert('Alcanzaste el limite!')
+                        },
+                        show_label: true
+                    });
+                    setTimeout(function () {waitingDialog.hide();}, 500);
+                }
+            });
+
+
+    }).on('hidden.bs.modal', function () {
+        // Syncs the picker with the current selected values on the 'select' element
+        $("select.image-picker").data('picker').sync_picker_with_select();
+        // Destroyes the picker and shows the original 'select' element again
+        $("select.image-picker").data('picker').destroy();
+
+        $('#multiselect :selected').each(function(i, selected) {
+            $(selected).removeClass('selected');
+        });
+
+    });
 
     </script>
 {% endblock %}

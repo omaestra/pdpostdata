@@ -2,12 +2,13 @@
 import time
 import json
 
+from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.contrib import messages
 from django.shortcuts import render, HttpResponseRedirect
-from django.http import HttpResponseBadRequest, JsonResponse
+from django.http import HttpResponseBadRequest, JsonResponse, Http404
 from orders.forms import OrderRatingForm
 
 # Create your views here.
@@ -75,23 +76,27 @@ def checkout(request):
 
     if request.method == "POST":
 
-        billing_a = request.POST['billing_address']
-        shipping_a = request.POST['shipping_address']
-
         try:
-            billing_address_instance = UserAddress.objects.get(id=billing_a)
-        except:
-            billing_address_instance = None
+            shipping_a = request.POST['default_address']
+            # billing_a = request.POST['billing_address']
+        except Exception as e:
+            print(e)
+            shipping_a = request.POST['shipping_address']
+
+        # try:
+        #     billing_address_instance = UserAddress.objects.get(id=billing_a)
+        # except:
+        #     billing_address_instance = None
 
         try:
             shipping_address_instance = UserAddress.objects.get(id=shipping_a)
         except:
             shipping_address_instance = None
 
-        #if charge["captured"]:
+        # if charge["captured"]:
         # new_order.status = "Finished"
         new_order.shipping_address = shipping_address_instance
-        new_order.billing_addresses = billing_address_instance
+        # new_order.billing_addresses = billing_address_instance
         new_order.save()
         del request.session['cart_id']
         del request.session['items_total']
@@ -106,9 +111,12 @@ def checkout(request):
 
         return render(request, "orders/order_details.html", context)
 
+    default_address = UserAddress.objects.get(user=User.objects.get(id=1))
+
     context = {
         "order": new_order,
         "address_form": address_form,
+        "default_address": default_address,
         "current_addresses": current_addresses,
         "billing_addresses": billing_addresses,
     }

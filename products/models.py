@@ -50,7 +50,7 @@ class Product(models.Model):
 
 
 class ProductImage(models.Model):
-    product = models.ForeignKey(Product)
+    product = models.ForeignKey(Product, related_name='product_images')
     image = models.ImageField(upload_to=get_image_path, blank=True, null=True)
     featured = models.BooleanField(default=False)
     thumbnail = models.BooleanField(default=False)

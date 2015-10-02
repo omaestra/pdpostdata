@@ -89,9 +89,10 @@ footer .logo { margin: 2.8rem 0; width: 270px; }
    overflow: hidden;
 }
 
-.box h3 {
+.box .boxInner .text {
     text-align: center;
     color: #FFF;
+    margin: 45% auto;
 }
 .boxInner {
    position: absolute;
@@ -109,7 +110,7 @@ footer .logo { margin: 2.8rem 0; width: 270px; }
    bottom: 0;
    left: 0;
    right: 0;
-   margin-bottom: -100px;
+   margin-bottom: -150px;
    background: #292C2F;
    color: #D5D4D4;
    padding: 10px;
@@ -195,6 +196,13 @@ footer .logo { margin: 2.8rem 0; width: 270px; }
 
 .avatar-btns {
     margin-top: 1em;
+}
+
+.pull-left.address-box {
+    margin-left: 1.5em;
+    margin-top: 0.5em;
+    cursor: pointer;
+    position: relative;
 }
 
 @media only screen and (max-width : 480px) {

@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
       <meta charset="utf-8">
       <meta http-equiv="X-UA-Compatible" content="IE=edge">
       <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -214,53 +214,53 @@
 
       <script>
           $(document).ready(function(){
-            $("#marketing-message-btn").click(function(){
-             $.ajax({
-                  type: "POST",
-                  url: "{% url 'dismiss_marketing_message' %}",
-                  data: {
-                    "dimiss-marketing": true,
-                    "csrfmiddlewaretoken": "{{ csrf_token }}",
-                  },
-                  success: function(data){
-                  },
-                  error: function(){
-                    alert("Error! Something wrong. Please try again later")
-                  },
-               });
-            });
+              $("#marketing-message-btn").click(function(){
+                  $.ajax({
+                      type: "POST",
+                      url: "{% url 'dismiss_marketing_message' %}",
+                      data: {
+                          "dimiss-marketing": true,
+                          "csrfmiddlewaretoken": "{{ csrf_token }}",
+                      },
+                      success: function(data){
 
-            {% if not request.user.is_authenticated and not request.session.email_added_marketing and not "accounts" in request.get_full_path %}
-            function showModal(){
-                $("#marketingModal").modal("show");
-                setTimeout(showModal, 50000);
-            }
-            //showModal()
-            //setTimeout(showModal, 50000);
-            $("#sendMarketingForm").click(function(e){
-              e.preventDefault();
-              var mForm = $("#sendForm").serialize();
-             $.ajax({
-                  type: "POST",
-                  url: "{% url 'ajax_email_signup' %}",
-                  data: mForm,
-                  success: function(data){
-                    // console.log(data)
-                    $("#modalMessage").html("<p>" + data + "</p>");
-                     $("#marketingModal").modal("hide");
-                  },
-                  error: function(data){
-                    // console.log(data)
-                    // console.log(data.responseJSON)
-                    var obj = data.responseJSON;
-                    // console.log(obj)
-                    // console.log(obj.email)
-                    $("#modalMessage").html("<p style='color:red;'>" + obj.email + "</p>")
-                  },
-               });
-            });
-            {% endif %}
+                      },
+                      error: function(){
+                          alert("Error! Something wrong. Please try again later")
+                      }
+                  });
+              });
 
+              {% if not request.user.is_authenticated and not request.session.email_added_marketing and not "accounts" in request.get_full_path %}
+                  function showModal(){
+                      $("#marketingModal").modal("show");
+                      setTimeout(showModal, 50000);
+                  }
+                  //showModal()
+                  // setTimeout(showModal, 50000);
+                  $("#sendMarketingForm").click(function(e){
+                  e.preventDefault();
+                      var mForm = $("#sendForm").serialize();
+                      $.ajax({
+                          type: "POST",
+                          url: "{% url 'ajax_email_signup' %}",
+                          data: mForm,
+                          success: function(data){
+                          // console.log(data)
+                          $("#modalMessage").html("<p>" + data + "</p>");
+                              $("#marketingModal").modal("hide");
+                          },
+                          error: function(data){
+                              console.log(data)
+                              console.log(data.responseJSON)
+                              var obj = data.responseJSON;
+                              // console.log(obj)
+                              // console.log(obj.email)
+                              $("#modalMessage").html("<p style='color:red;'>" + obj.email + "</p>")
+                          },
+                      });
+                  });
+              {% endif %}
           });
       </script>
 
@@ -270,10 +270,10 @@
               {% block jquery %}{% endblock%}
           });
       </script>
-  <script>
-        $('#print-order').on('click', function() {
-            print();
-        })
-    </script>
+      <script>
+          $('#print-order').on('click', function() {
+              print();
+          })
+      </script>
   </body>
 </html>

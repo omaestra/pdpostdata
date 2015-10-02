@@ -7,6 +7,17 @@ from marketing.models import MarketingMessage, Slider
 
 from .models import Product, ProductImage
 
+from rest_framework import viewsets
+from products.serializers import ProductSerializer
+
+
+class ProductViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows users to be viewed or edited.
+    """
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+
 
 def search(request):
     try:

@@ -7,12 +7,13 @@ import random
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from django.shortcuts import render, HttpResponseRedirect, Http404
-from django.http import HttpResponseBadRequest
+from django.http import HttpResponseBadRequest, JsonResponse
 from django.contrib.auth import logout, login, authenticate
 from django.contrib import messages
 from django.core.urlresolvers import reverse
 
 from .forms import LoginForm, RegistrationForm, UserAddressForm, UserProfileForm, UserForm
+from helptickets.forms import HelpTicketForm
 from .models import EmailConfirmed, UserDefaultAddress, UserProfile, UserAddress
 
 
@@ -46,9 +47,10 @@ def user_profile(request):
         profile_form = UserProfileForm(instance=profile)
         user_form = UserForm(instance=request.user)
         address_form = UserAddressForm()
+        helpticket_form = HelpTicketForm()
 
         context = {'user': request.user, 'user_form': user_form, 'profile_form': profile_form,
-                   'address_form': address_form, }
+                   'address_form': address_form, 'helpticket_form': helpticket_form, }
 
         template = "accounts/profile.html"
 
@@ -104,7 +106,6 @@ def registration_view(request):
     btn = "Registrarme"
     if form.is_valid():
         new_user = form.save(commit=False)
-        # new_user.first_name = "Justin" this is where you can do stuff with the model form
         new_user.save()
         messages.success(request, "Has sido registrado con exito! Por favor, confirma tu correo electronico ahora.")
 
@@ -176,7 +177,7 @@ def add_user_address(request):
             new_address.billing = True
             new_address.save()
 
-            messages.success(request, "Direccion de envio agregada con exito!")
+            messages.success(request, "Dirección de envío agregada con éxito!")
 
             is_default = address_form.cleaned_data["default"]
             if is_default:
@@ -185,10 +186,19 @@ def add_user_address(request):
                 default_address.billing = new_address
                 default_address.save()
 
-                messages.success(request, "Direccion de facturacion agregada con exito!")
+                messages.success(request, "Direccion de facturación agregada con éxito!")
 
-            # if next_page is not None:
-            return HttpResponseRedirect(reverse('user_profile'))
+            if next_page is not None:
+                return HttpResponseRedirect(reverse(next_page))
+            else:
+                return JsonResponse({'status': 'success', })
+                # return HttpResponseRedirect(reverse('user_profile'))
+
+        else:
+            if request.is_ajax():
+                return JsonResponse({'status': 'error', 'form_errors': address_form.errors, })
+            else:
+                return render(request, "accounts/profile.html", {"address_form": address_form, })
 
     submit_btn = "Guardar Direccion"
     form_title = "Agregar Nueva Direccion"
@@ -200,11 +210,19 @@ def add_user_address(request):
 
 
 def delete_user_address(request, address_id):
+    try:
+        next_page = request.GET.get("next")
+    except:
+        next_page = None
+
     address = UserAddress.objects.get(id=address_id)
     address.delete()
     # cartitem.carts = None
     # cartitem.save()
 
     messages.success(request, "Direccion eliminada con exito!")
+
+    if next_page:
+        return HttpResponseRedirect(reverse(next_page))
 
     return HttpResponseRedirect(reverse("user_profile"))

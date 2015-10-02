@@ -20,6 +20,7 @@
                 <table class="table table-hover">
                     <thead>
                         <tr>
+                            <th></th>
                             <th>Producto</th>
                             <th class="text-center">Cantidad</th>
                             <th class="text-center">Precio</th>
@@ -30,8 +31,15 @@
                     <tbody>
                     {% for item in cart.cartitem_set.all %}
                         <tr>
+                        <td class="col-md-2">
+                            {% for product_image in item.product.product_images.all %}
+                                {% if product_image.featured %}
+                                    <img src="{{ product_image.image.url }}" class="img-responsive">
+                                {% endif %}
+                            {% endfor %}
+                        </td>
                             <td class="col-sm-8 col-md-6">
-                                <h5><a href="#">{{ item.product }}</a></h5>
+                                <h5><a href="{% url 'edit_wizard' item.id %}">{{ item.product }}</a></h5>
                             </td>
                             <td  style="text-align: center">
                                 <input type="number" class="form-control" id="qty" value="{{ item.quantity }}">
@@ -51,10 +59,12 @@
                             <td></td>
                             <td></td>
                             <td></td>
+                            <td></td>
                             <td><h4>Total</h4></td>
                             <td class="text-right"><h4><strong>Bs.F {{ cart.total }}</strong></h4></td>
                         </tr>
                         <tr>
+                            <td></td>
                             <td></td>
                             <td></td>
                             <td></td>

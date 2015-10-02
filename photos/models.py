@@ -9,7 +9,7 @@ from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 
 from django.db import models
-from pilkit.processors import SmartResize, ResizeToFill, TrimBorderColor
+from pilkit.processors import SmartResize, ResizeToFill, TrimBorderColor, Resize, ResizeToFit, Transpose
 from carts.models import CartItem
 from photos.storage import OverwriteStorage
 
@@ -160,9 +160,9 @@ class Photo(models.Model):
     message = models.TextField(max_length='120', blank=True)
     image = models.ImageField(upload_to=get_image_path, storage=OverwriteStorage())
     smart = ImageSpecField(
-        source='image', processors=[ResizeToFill(600, 600)], format='JPEG', options={'quality': 80})
+        source='image', processors=[Transpose(), ResizeToFit(768, 768)], format='JPEG', options={'quality': 80})
     thumbnail = ImageSpecField(
-        source='image', processors=[ResizeToFill(150, 150)], format='JPEG',
+        source='image', processors=[Transpose(), ResizeToFill(120, 120)], format='JPEG',
         options={'quality': 80})
     sequence = models.PositiveSmallIntegerField(default=0, null=True, blank=True)
     cart_item = models.ForeignKey(CartItem, null=True, blank=True)
@@ -219,6 +219,11 @@ class Cropped(models.Model):
     original = models.OneToOneField(Photo, related_name='cropped', verbose_name=_('Original image'),
                                     on_delete=models.CASCADE)
     image_cropped = models.ImageField(_('Image'), upload_to='uploads/', editable=False)
+    smart = ImageSpecField(
+        source='image_cropped', processors=[Transpose(), ResizeToFit(600, 600)], format='JPEG', options={'quality': 80})
+    thumbnail = ImageSpecField(
+        source='image_cropped', processors=[Transpose(), ResizeToFill(120, 120)], format='JPEG',
+        options={'quality': 80})
     x = models.PositiveIntegerField(_('offset X'), default=0)
     y = models.PositiveIntegerField(_('offset Y'), default=0)
     w = models.PositiveIntegerField(_('cropped area width'), blank=True, null=True)

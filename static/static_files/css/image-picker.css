@@ -1,31 +1,62 @@
 ul.thumbnails.image_picker_selector {
-  overflow: auto;
-  list-style-image: none;
-  list-style-position: outside;
-  list-style-type: none;
-  padding: 0px;
-  margin: 0px; }
-  ul.thumbnails.image_picker_selector ul {
     overflow: auto;
     list-style-image: none;
     list-style-position: outside;
     list-style-type: none;
     padding: 0px;
-    margin: 0px; }
-  ul.thumbnails.image_picker_selector li.group_title {
-    float: none; }
-  ul.thumbnails.image_picker_selector li {
-    margin: 0px 12px 12px 0px;
+    margin: 0px;
+}
+ul.thumbnails.image_picker_selector ul {
+    overflow: auto;
+    list-style-image: none;
+    list-style-position: outside;
+    list-style-type: none;
+    padding: 0px;
+    margin: 0px;
+}
+ul.thumbnails.image_picker_selector li.group_title {
+    float: none;
+}
+ul.thumbnails.image_picker_selector li {
+    margin: 0px 11px 12px 11px;
     float: left;
-    width: 15%; 
-  }
-    ul.thumbnails.image_picker_selector li .thumbnail {
-      padding: 6px;
-      border: 1px solid #dddddd;
-      -webkit-user-select: none;
-      -moz-user-select: none;
-      -ms-user-select: none; }
-      ul.thumbnails.image_picker_selector li .thumbnail img {
-        -webkit-user-drag: none; }
-    ul.thumbnails.image_picker_selector li .thumbnail.selected {
-      background: #0088cc; }
+    width: 18%;
+}
+ul.thumbnails.image_picker_selector li .thumbnail {
+    /*padding: 6px;*/
+    position: relative;
+    /*border: 1px solid #dddddd;*/
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    overflow: hidden;
+}
+ul.thumbnails.image_picker_selector li .thumbnail img {
+    -webkit-user-drag: none;
+}
+
+ul.thumbnails.image_picker_selector li .thumbnail.selected {
+    background: #0088cc;
+}
+
+ul.thumbnails.image_picker_selector li .thumbnail p {
+    font-size: 14px;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin-bottom: -200px;
+    background: #292C2F;
+    color: #D5D4D4;
+    padding: 10px;
+    text-align: center;
+    -webkit-transition: all 0.3s ease-out;
+    -moz-transition: all 0.3s ease-out;
+    -o-transition: all 0.3s ease-out;
+    transition: all 0.3s ease-out;
+    z-index: 2;
+}
+
+ul.thumbnails.image_picker_selector li .thumbnail:hover p {
+    margin-bottom: 0;
+}

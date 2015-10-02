@@ -1,11 +1,14 @@
+# coding=utf-8
 import datetime, os
 
 from django.conf import settings
 from django.core.mail import send_mail
 from django.core.urlresolvers import reverse
+from django.core.validators import RegexValidator
 from django.db import models
 from django.template.loader import render_to_string
 from django.contrib.auth.models import User
+
 
 # Create your models here.
 def get_image_path(instance, filename):
@@ -19,6 +22,7 @@ class UserProfile(models.Model):
 
     def __unicode__(self):
         return self.user.username
+
 
 User.userprofile = property(lambda u: UserProfile.objects.get_or_create(user=u)[0])
 
@@ -39,13 +43,19 @@ class UserAddressManager(models.Manager):
 
 class UserAddress(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL)
+    first_name = models.CharField(max_length=50, null=True, blank=True)
+    last_name = models.CharField(max_length=50, null=True, blank=True)
+    personal_dni = models.PositiveIntegerField()
     address = models.CharField(max_length=120)
     address2 = models.CharField(max_length=120, null=True, blank=True)
     city = models.CharField(max_length=120)
     state = models.CharField(max_length=120, null=True, blank=True)
     country = models.CharField(max_length=120)
     zipcode = models.CharField(max_length=25)
-    phone = models.CharField(max_length=120)
+    phone_regex = RegexValidator(regex=r'^\+?1?\d{9,15}$', message="El número de teléfono debe tener el "
+                                                                   "siguiente formato: '+999999999'. "
+                                                                   "Se permiten un máximo de 15 digitos")
+    phone_number = models.CharField(validators=[phone_regex], max_length=15, blank=True)
     shipping = models.BooleanField(default=True)
     billing = models.BooleanField(default=False)
     timestamp = models.DateTimeField(auto_now_add=True, auto_now=False)

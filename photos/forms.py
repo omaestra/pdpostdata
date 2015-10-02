@@ -59,7 +59,7 @@ class PhotoUploadForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(PhotoUploadForm, self).__init__(*args, **kwargs)
         self.fields['temp_hash'] = forms.CharField(max_length='255', widget=forms.HiddenInput())
-        self.fields['temp_hash'].initial = uuid.uuid1()
+        # self.fields['temp_hash'].initial = uuid.uuid1()
 
 
 class CropForm(ModelForm):

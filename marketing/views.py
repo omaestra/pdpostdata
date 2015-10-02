@@ -11,6 +11,8 @@ from django.contrib import messages
 from accounts.models import EmailMarketingSignUp
 
 from marketing.forms import EmailForm
+
+
 # Create your views here.
 
 

@@ -18,6 +18,8 @@
   function CropAvatar($element) {
     this.$container = $element;
 
+    this.$btn = $('#dropzone-container').find('.avatar-btn');
+
     this.$avatarView = this.$container.find('.avatar-view');
     this.$avatar = this.$avatarView.find('img');
     this.$avatarModal = this.$container.find('#avatar-modal');
@@ -63,6 +65,7 @@
       this.$avatarInput.on('change', $.proxy(this.change, this));
       this.$avatarForm.on('submit', $.proxy(this.submit, this));
       this.$avatarBtns.on('click', $.proxy(this.rotate, this));
+        this.$btn.on('click', $.proxy(this.click, this));
     },
 
     initTooltip: function () {

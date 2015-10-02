@@ -37,54 +37,92 @@ class PhoneInput(TextInput):
 
 
 class UserAddressForm(forms.ModelForm):
-    phone_number = forms.RegexField(regex=r'^\+?1?\d{9,15}$',
-                                    label="Telefono",
-                                    error_message=("Phone number must be entered in the "
-                                                   "format: '+999999999'. Up to 15 digits "
-                                                   "allowed."))
+    # phone_number = forms.RegexField(regex=r'^\+?1?\d{9,15}$',
+    #                                 label="Telefono",
+    #                                 error_message=("Phone number must be entered in the "
+    #                                                "format: '+999999999'. Up to 15 digits "
+    #                                                "allowed."))
     default = forms.BooleanField(label='Direccion por defecto?', required=False)
 
     class Meta:
         model = UserAddress
-        fields = ["address",
-                  "address2",
-                  "city",
-                  "state",
-                  "country",
-                  "zipcode",
-                  ]
+        fields = [
+            "first_name",
+            "last_name",
+            "personal_dni",
+            "address",
+            "address2",
+            "city",
+            "state",
+            "country",
+            "phone_number",
+            "zipcode",
+        ]
         labels = {
+            'first_name': 'Nombre',
+            'last_name': 'Apellido',
+            'personal_dni': 'Cedula de identidad',
             'address': 'Direccion',
-            'address2': 'Direccion 2',
+            'address2': 'Direccion2',
             'city': 'Ciudad',
             'state': 'Estado',
             'country': 'Pais',
-            'zipcode': 'Codigo Postal',
+            'zipcode': 'Codigo zip',
+            'phone_number': 'Numero de telefono',
         }
         help_texts = {
             'address': 'Ej.: Urbanizacion o residencia, Calle, Nro. Apartamento, Piso.',
+            'personal_dni': 'Necesitamos tu número de cedula para que puedas retirar tu pedido.'
         }
         error_messages = {
+            'first_name': {
+                'max_length': "Tu nombre es muy largo!",
+                'required': "Este campo es obligatorio.",
+            },
+            'last_name': {
+                'max_length': "Tu apellido es muy largo!",
+                'required': "Este campo es obligatorio.",
+            },
+            'personal_dni': {
+                'max_length': "Tu cedula de identidad es muy larga!",
+                'required': "Este campo es obligatorio.",
+            },
             'address': {
                 'max_length': "La direccion es muy larga.",
-                'required': "Este campo es necesario.",
+                'required': "Este campo es obligatorio.",
             },
             'city': {
-                'required': "Este campo es necesario.",
+                'required': "Este campo es obligatorio.",
             },
             'country': {
-                'required': "Este campo es necesario.",
+                'required': "Este campo es obligatorio.",
             },
             'zipcode': {
-                'required': "Este campo es necesario.",
+                'required': "Este campo es obligatorio.",
             },
             'phone_number': {
-                'required': "Este campo es necesario.",
+                'required': "Este campo es obligatorio.",
             },
+        }
+        widgets = {
+            'first_name': forms.TextInput(attrs={'placeholder': 'Nombre'}),
+            'last_name': forms.TextInput(attrs={'placeholder': 'Apellido'}),
+            'personal_dni': forms.TextInput(attrs={'placeholder': 'Cedula de identidad'}),
+            'address': forms.TextInput(attrs={'placeholder': 'Direccion'}),
+            'address2': forms.TextInput(attrs={'placeholder': 'Direccion2'}),
+            'city': forms.TextInput(attrs={'placeholder': 'Ciudad'}),
+            'state': forms.TextInput(attrs={'placeholder': 'Estado'}),
+            'country': forms.TextInput(attrs={'placeholder': 'Pais'}),
+            'zipcode': forms.TextInput(attrs={'placeholder': 'Codigo zip'}),
+            'phone_number': forms.TextInput(attrs={'placeholder': 'Numero de telefono'}),
+
         }
 
     def __init__(self, *args, **kwargs):
         super(UserAddressForm, self).__init__(*args, **kwargs)
+        self.fields['first_name'].widget.attrs['class'] = 'form-control'
+        self.fields['last_name'].widget.attrs['class'] = 'form-control'
+        self.fields['personal_dni'].widget.attrs['class'] = 'form-control'
         self.fields['address'].widget.attrs['class'] = 'form-control'
         self.fields['address2'].widget.attrs['class'] = 'form-control'
         self.fields['city'].widget.attrs['class'] = 'form-control'
@@ -92,7 +130,7 @@ class UserAddressForm(forms.ModelForm):
         self.fields['country'].widget.attrs['class'] = 'form-control'
         self.fields['zipcode'].widget.attrs['class'] = 'form-control'
         self.fields['phone_number'].widget.attrs['class'] = 'form-control'
-        self.fields['phone_number'].widget = PhoneInput()
+        # self.fields['phone_number'].widget = PhoneInput()
 
 
 class LoginForm(forms.Form):

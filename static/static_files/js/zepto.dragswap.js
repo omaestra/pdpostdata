@@ -48,10 +48,12 @@
         function onAnimEnd(elem) {
             var $elem = $(elem);
             $elem.addClass(settings.dropClass);
+            $elem.find('img').addClass(settings.dropClass);
             // add an event for when the animation has finished
             $elem.on(settings.prefix + 'End', function () {
                 // remove the class now that the animation is done
                 $elem.removeClass(settings.dropClass);
+                $elem.find('img').removeClass(settings.dropClass);
             }, false);
         }
 
@@ -62,6 +64,7 @@
                 return false;
             }
             $(this).addClass(settings.moveClass);
+            $(this).find('img').addClass(settings.moveClass);
             // get the dragging element
             dragSrcEl = this;
             // it is moving
@@ -82,10 +85,12 @@
         function handleDragEnter(e) {
             // this / e.target is the current hover target.
             $(this).addClass(settings.overClass);
+            $(this).find('img').addClass(settings.overClass);
         }
 
         function handleDragLeave(e) {
             $(this).removeClass(settings.overClass); // this / e.target is previous target element.
+            $(this).find('img').removeClass(settings.overClass);
         }
 
         function handleDragOver(e) {
@@ -199,6 +204,7 @@
 
             function handleDragEnd(e) {
                 $this.removeClass(settings.moveClass);
+                $this.find('img').removeClass(settings.moveClass);
                 // this/e.target is the source node.
                 //console.log('handleDragEnd');
                 $elem = $this.find(settings.element);
@@ -206,6 +212,8 @@
                     // console.log(item);
                     $(item).removeClass(settings.overClass);
                     $(item).removeClass(settings.moveClass);
+                    $this.find('img').removeClass(settings.overClass);
+                    $this.find('img').removeClass(settings.moveClass);
                 });
             }
             // set the items to draggable

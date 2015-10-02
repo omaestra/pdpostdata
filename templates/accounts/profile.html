@@ -57,7 +57,7 @@
                                         {% for useraddress in user.useraddress_set.all %}
                                             <tr>
                                                 <td>{{ useraddress.get_address }}</td>
-                                                <td>{{ useraddress.phone }}</td>
+                                                <td>{{ useraddress.phone_number }}</td>
                                                 <td>
                                                     <a href="#">
                                                         <span class="glyphicon glyphicon-edit"></span>
@@ -106,7 +106,7 @@
                                             </div>
                                         {% endfor %}
                                     {% endif %}
-                                    <form method="POST" action="{% url 'add_user_address' %}" class="form-horizontal" role="form">
+                                    <form method="POST" action="{% url 'add_user_address' %}?next=user_profile" class="form-horizontal" role="form">
                                         {% csrf_token %}
                                         <div class="panel-body table-responsive">
                                             <table class="table table-hover">
@@ -160,7 +160,7 @@
                                                                 data-order_id="{{ order.id }}">Que tal estuvo?
                                                             </a>
                                                         </td>
-                                                    {% elif order.status = 'Enviado' and order.orderrating %}
+                                                    {% elif order.status == 'Enviado' and order.orderrating %}
                                                         <td>
                                                             <span class="fa fa-check-square-o"></span> Listo!
                                                         </td>
@@ -213,6 +213,9 @@
                         <div class="tab-pane" id="help">
                             <div class="panel panel-primary">
                                 <div class="panel-heading">Ayuda</div>
+                                <div class="panel-body">
+                                    {% include 'helptickets/help_ticket_form.html' %}
+                                </div>
                             </div>
                         </div>
                         <div class="tab-pane" id="order">

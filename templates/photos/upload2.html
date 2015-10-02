@@ -120,14 +120,14 @@
                                 <span class="fa fa-instagram"></span>
                             </button>
                         {% else %}
-                            <a href="{% url 'social:begin' 'instagram' %}?next={{ request.path }}"
-                               class="btn btn-info btn-fill" role="button">  Iniciar sesion desde Instagram
-                                <span class="fa fa-instagram"></span>
-                            </a>
-{#                            <a href="{% url 'upload_instagram_images' product.slug %}?next={{ request.path }}"#}
+{#                            <a href="{% url 'social:begin' 'instagram' %}?next={{ request.path }}"#}
 {#                               class="btn btn-info btn-fill" role="button">  Iniciar sesion desde Instagram#}
 {#                                <span class="fa fa-instagram"></span>#}
 {#                            </a>#}
+                            <a href="{% url 'upload_instagram_images' product.slug %}?next={{ request.path }}"
+                               class="btn btn-info btn-fill" role="button">  Iniciar sesion desde Instagram
+                                <span class="fa fa-instagram"></span>
+                            </a>
                         {% endif %}
                     </div>
                     <div class="col-md-6">

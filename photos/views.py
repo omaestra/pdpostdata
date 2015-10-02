@@ -1,6 +1,7 @@
 import StringIO
 import urllib2
 import datetime
+import uuid
 from django.core.files import File
 from django.core.files.storage import FileSystemStorage
 from django.core.files.temp import NamedTemporaryFile
@@ -25,8 +26,11 @@ from django.forms import ValidationError
 from django.contrib.auth.decorators import login_required
 
 from .forms import PhotoUploadForm, PhotoSortForm, CartItemForm, CropForm
+from photos.forms import PhotoSortForm, CartItemForm, PhotoUploadForm
 from .models import Photo, Cropped
+from orders.models import Order
 from pdpostdata import settings
+from photos.utils import apply_filters_to_image
 from products.models import Product
 
 # Create your views here.
@@ -73,6 +77,28 @@ class UploadPhotosWizard(SessionWizardView):
                             "deleteType": 'DELETE'
                         })
 
+                        # Get the minimum image dimension for square crop
+                        if new_image.smart.width >= new_image.smart.height:
+                            image_dimension = new_image.smart.height
+                        else:
+                            image_dimension = new_image.smart.width
+
+                        # Simulate initial crop with dummy coordinates.
+                        filter_data = [{
+                            'name': 'crop',
+                            'params':
+                                {'x': 0,
+                                 'y': 0,
+                                 'width': image_dimension,
+                                 'height': image_dimension,
+                                 'rotate': 0,
+                                 }
+                        }]
+                        # Crop and create the new Cropped object
+                        result_image = apply_filters_to_image(new_image.smart.name, filter_data)
+                        new_cropped_file, created = Cropped.objects.get_or_create(original=new_image)
+                        new_cropped_file.image_cropped.save(new_image.get_name("crop_"), result_image)
+
                         return JsonResponse(response)
 
                     else:
@@ -100,25 +126,25 @@ class UploadPhotosWizard(SessionWizardView):
                 print("AQUI2", e)
                 pass
 
-        # elif self.steps.current == '2':
-        #     if not self.request.POST.get('wizard_goto_step'):
-        #         product = Product.objects.get(slug=self.kwargs.get('slug', None))
-        #         qty = self.request.POST['2-quantity']
-        #         cart_id = self.request.POST.get('2-cart')
-        #
-        #         prev_data = self.storage.get_step_data('0')
-        #         if prev_data:
-        #             temp_hash = prev_data.get('0-temp_hash', None)
-        #
-        #         cart = Cart.objects.get(id=cart_id)
-        #
-        #         photos = Photo.objects.filter(temp_hash=temp_hash)
-        #
-        #         cart_item = CartItem.objects.create(cart=cart, product=product)
-        #         cart_item.photo_set = photos
-        #         cart_item.quantity = qty
-        #         cart_item.line_total = product.price
-        #         cart_item.save()
+                # elif self.steps.current == '2':
+                #     if not self.request.POST.get('wizard_goto_step'):
+                #         product = Product.objects.get(slug=self.kwargs.get('slug', None))
+                #         qty = self.request.POST['2-quantity']
+                #         cart_id = self.request.POST.get('2-cart')
+                #
+                #         prev_data = self.storage.get_step_data('0')
+                #         if prev_data:
+                #             temp_hash = prev_data.get('0-temp_hash', None)
+                #
+                #         cart = Cart.objects.get(id=cart_id)
+                #
+                #         photos = Photo.objects.filter(temp_hash=temp_hash)
+                #
+                #         cart_item = CartItem.objects.create(cart=cart, product=product)
+                #         cart_item.photo_set = photos
+                #         cart_item.quantity = qty
+                #         cart_item.line_total = product.price
+                #         cart_item.save()
 
                 # return HttpResponseRedirect(reverse("cart"))
 
@@ -126,7 +152,6 @@ class UploadPhotosWizard(SessionWizardView):
 
     def get_context_data(self, form, **kwargs):
         context = super(UploadPhotosWizard, self).get_context_data(form=form, **kwargs)
-
         product = Product.objects.get(slug=self.kwargs.get('slug', None))
         context.update({'product': product})
 
@@ -134,10 +159,15 @@ class UploadPhotosWizard(SessionWizardView):
 
             try:
                 prev_data = self.storage.get_step_data('0')
+                cart_item_id = self.kwargs.get('cart_item_id', None)
                 if prev_data:
                     temp_hash = prev_data.get('0-temp_hash', '')
                     photo_list = self.get_images_data(temp_hash)
                     context.update({'photo_list': photo_list})
+                elif cart_item_id:
+                    photo_list = CartItem.objects.get(id=cart_item_id).photo_set.all()
+                    context.update({'photo_list': photo_list})
+
             except Exception as e:
                 print(e)
                 pass
@@ -147,14 +177,38 @@ class UploadPhotosWizard(SessionWizardView):
             temp_hash = prev_data.get('0-temp_hash', '')
             photo_list = self.get_images_data(temp_hash)
 
-            context.update({'photo_list': photo_list, })
+            if product.slug == 'pdstrips':
+                product_template = "products/pdstrips_templates/pdstrip_template.html"
+                grouped_photo_list = grouped(photo_list, 4)
+            elif product.slug == 'pdposters':
+                product_template = "products/pdposters_templates/pdposters_template.html"
+                grouped_photo_list = grouped(photo_list, 6)
+            elif product.slug == 'pdframes':
+                product_template = "products/pdgrams_template/pdgrams_template.html"
+            else:
+                product_template = None
+
+            context.update({'photo_list': photo_list, 'product_template': product_template,
+                            'grouped_photo_list': grouped_photo_list, })
 
         if self.steps.current == '2':
             prev_data = self.storage.get_step_data('0')
             temp_hash = prev_data.get('0-temp_hash', '')
             photo_list = self.get_images_data(temp_hash)
 
-            context.update({'photo_list': photo_list, })
+            if product.slug == 'pdstrips':
+                product_template = "products/pdstrips_templates/pdstrip_template.html"
+                grouped_photo_list = grouped(photo_list, 4)
+            elif product.slug == 'pdposters':
+                product_template = "products/pdposters_templates/pdposters_template.html"
+                grouped_photo_list = grouped(photo_list, 6)
+            elif product.slug == 'pdframes':
+                product_template = "products/pdgrams_template/pdgrams_template.html"
+            else:
+                product_template = None
+
+            context.update({'photo_list': photo_list, 'product_template': product_template,
+                            'grouped_photo_list': grouped_photo_list, })
         return context
 
     # this runs for the step it's on as well as for the step before
@@ -165,7 +219,7 @@ class UploadPhotosWizard(SessionWizardView):
 
         if step == '0':
             return self.initial_dict.get(
-                step, {'step_title': 'Paso 1', 'step_description': 'Carga tus fotos y editalas'}
+                step, {'temp_hash': uuid.uuid1(), 'step_description': 'Carga tus fotos y editalas'}
             )
         # get the data for step 1 on step 3
         if step == '1':
@@ -218,6 +272,8 @@ class UploadPhotosWizard(SessionWizardView):
             temp_hash = form_list[0].cleaned_data['temp_hash']
             photo_list = Photo.objects.filter(temp_hash=temp_hash)
 
+            cart_item_id = self.kwargs.get('cart_item_id', None)
+
             if photo_list.count() != product.image_total:
 
                 qty = form_list[2].cleaned_data['quantity']
@@ -225,7 +281,11 @@ class UploadPhotosWizard(SessionWizardView):
 
                 cart = Cart.objects.get(id=cart_id)
 
-                cart_item = CartItem.objects.create(cart=cart, product=product)
+                if cart_item_id:
+                    cart_item = CartItem.objects.get(id=cart_item_id)
+                else:
+                    cart_item = CartItem.objects.create(cart=cart, product=product)
+
                 cart_item.photo_set = photo_list
                 cart_item.quantity = qty
                 cart_item.line_total = product.price
@@ -234,16 +294,63 @@ class UploadPhotosWizard(SessionWizardView):
                 return HttpResponseRedirect(reverse("cart"))
 
             else:
-                messages.error(self.request, "Ocurrio un error! Solo cargaste %s fotos de %s" % (photo_list.count(), product.image_total))
+                messages.error(self.request, "Ocurrio un error! Solo cargaste %s fotos de %s" % (
+                    photo_list.count(), product.image_total))
                 return HttpResponseRedirect("/")
 
         except Exception as e:
             print(e)
             return HttpResponseForbidden(self.request)
 
-        # return render_to_response('photos/done.html', {
-        #     'form_data': [form.cleaned_data for form in form_list], 'request': self.request,
-        # })
+            # return render_to_response('photos/done.html', {
+            #     'form_data': [form.cleaned_data for form in form_list], 'request': self.request,
+            # })
+
+
+def edit_wizard(request, cart_item_id=None):
+    """
+
+    :param request:
+    :param id:
+    :return: :raise HttpResponseForbidden:
+    """
+    cart_item = CartItem.objects.get(id=cart_item_id)
+    # cart = cart_item.cart
+    # order_list = cart.order_set
+    # order = cart.order_set.first()
+    # user = order.user
+    # print(order_list)
+    photo_list = cart_item.photo_set.order_by('sequence')
+    sorted_photo_list = photo_list.values('id')
+
+    # photo_list = Photo.objects.filter(temp_hash=temp_hash).order_by('sequence')
+    temp_hash = photo_list.first().temp_hash
+    product = cart_item.product
+
+    try:
+        cart = cart_item.cart
+    except Exception as e:
+        print(e)
+        new_cart = Cart()
+        new_cart.save()
+        request.session['cart_id'] = new_cart.id
+        cart_id = new_cart.id
+
+    # cart = Cart.objects.get(id=cart_id)
+
+    if 1 != 1:
+        raise HttpResponseForbidden
+    else:
+        # get the initial data to include in the form
+        initial = {'0': {'photo_list': photo_list, 'temp_hash': temp_hash,
+                         },
+                   '1': {'photo_list': photo_list, 'temp_hash': temp_hash, 'photo_sort_list': sorted_photo_list,
+                         },
+                   '2': {'cart': cart,
+                         },
+                   }
+        form = UploadPhotosWizard.as_view([PhotoUploadForm, PhotoSortForm, CartItemForm], initial_dict=initial)
+        return form(context=RequestContext(request), request=request, slug=product.slug, cart_item_id=cart_item_id)
 
 
 def grouped(l, n):
@@ -498,7 +605,6 @@ def make(request, slug=None):
 @require_POST
 @csrf_exempt
 def delete_uploaded_image(request):
-
     if request.POST:
         photo_id = request.POST.get('photo_id')
         photo = get_object_or_404(Photo, id=photo_id)
@@ -521,7 +627,6 @@ def crop_image(request):
 
             filter_data = json.loads(request.POST.get('image_filter_data', None))
             if filter_data:
-                from photos.utils import apply_filters_to_image
                 from django.core.files.storage import default_storage as storage  # TODO: allow set storage via settings
                 from pdpostdata.settings import EDITED_PREVIEWS_ROOT
                 shortname, extension = os.path.splitext(photo.image.name)
@@ -558,7 +663,6 @@ def crop_image(request):
 
 @login_required(login_url='/login/instagram')
 def upload_instagram_images(request, product_slug=None):
-
     product = get_object_or_404(Product, slug=product_slug)
     if request.POST:
         print(json.loads(request.POST.get('selected_images[]')))
@@ -579,17 +683,31 @@ def upload_instagram_images(request, product_slug=None):
     access_token = social.extra_data['access_token']
     client_secret = "a7d35a06a9984f2483b5448d178f8a83"
     api = InstagramAPI(access_token=access_token, client_secret=client_secret)
-    recent_media, next_ = api.user_recent_media(user_id=request.user.social_auth.last().uid, count=10)
+    recent_media, next_ = api.user_recent_media(user_id=request.user.social_auth.last().uid, count=30)
     images = []
     for media in recent_media:
-        print("AQUI1", media.images['standard_resolution'])
-        images.append(media.images['standard_resolution'])
+        print("AQUI1", media.images['standard_resolution'].url)
 
-    form = PhotoUploadForm()
+        try:
+            instagram_image_url = media.images['standard_resolution'].url
+            instagram_image_caption = media.caption.text
+        except:
+            instagram_image_caption = 'No caption'
 
-    context = RequestContext(request, {'request': request, 'user': request.user, 'images': images, 'product': product, 'upload_form': form, })
+        instagram_image = {
+            'url': instagram_image_url,
+            'caption': instagram_image_caption
+        }
 
-    return render_to_response('photos/upload2.html', context_instance=context)
+        images.append(instagram_image)
+
+    return JsonResponse({'images': images, })
+
+    # form = PhotoUploadForm()
+
+    # context = RequestContext(request, {'request': request, 'user': request.user, 'images': images, 'product': product, 'upload_form': form, })
+
+    # return render_to_response('photos/wizard-upload.html', context_instance=context)
 
 
 def get_instagram_images(user=None):
@@ -611,4 +729,3 @@ def get_instagram_images(user=None):
     except Exception as e:
         print('Error de social_auth:', e)
         pass
-

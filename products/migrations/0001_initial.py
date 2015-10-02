@@ -50,7 +50,7 @@ class Migration(migrations.Migration):
                 ('thumbnail', models.BooleanField(default=False)),
                 ('active', models.BooleanField(default=True)),
                 ('updated', models.DateTimeField(auto_now=True)),
-                ('product', models.ForeignKey(to='products.Product')),
+                ('product', models.ForeignKey(related_name='product_images', to='products.Product')),
             ],
         ),
         migrations.CreateModel(

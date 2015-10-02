@@ -17,8 +17,15 @@ class ProductAdmin(admin.ModelAdmin):
         model = Product
 
 
+class CategoryAdmin(admin.ModelAdmin):
+    prepopulated_fields = {"slug": ("title",)}
+
+    class Meta:
+        model = Category
+
+
 admin.site.register(Product, ProductAdmin)
 
 admin.site.register(ProductImage)
 admin.site.register(Variation)
-admin.site.register(Category)
+admin.site.register(Category, CategoryAdmin)

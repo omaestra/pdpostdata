@@ -1,202 +1,453 @@
 {% extends "base.html" %}
 
-<script>
-{% block jquery %}
-$(".radio-label").click(function(){
-  $("label").removeClass('radio-label-selected');
-  $(this).addClass('radio-label-selected');
-});
-$(".billing-label").click(function(){
-  $("label").removeClass('billing-label-selected');
-  $(this).addClass('billing-label-selected');
-});
-
-/*jQuery(function($) {
-  $('#payment-form').submit(function(event) {
-    var $form = $(this);
-    // Disable the submit button to prevent repeated clicks
-    $form.find('button').prop('disabled', true);
-    // Prevent the form from submitting with the default action
-    return false;
-  });
-});*/
-function stripeResponseHandler(status, response) {
-  var $form = $('#payment-form');
-  if (response.error) {
-    // Show the errors on the form
-    $("#card_errors_div").removeClass("hidden");
-    $form.find('.payment-errors').text(response.error.message);
-    $form.find('button').prop('disabled', false);
-  } else {
-    $("#card_errors_div").addClass("hidden");
-    // response contains id and card, which contains additional card details
-    var token = response.id;
-    // Insert the token into the form so it gets submitted to the server
-    // and submit
-    //$form.get(0).submit();
-  }
-}
-    $("#addShippingAddress").click(function(e){
-  e.preventDefault();
-  $("#shippingAddressForm").fadeToggle();
-});
-{% if not current_addresses  %}
-  $("#shippingAddressForm").fadeToggle();
-{% endif %}
-{% endblock %}
-</script>
-
 <style>
-{% block checkout-styles %}
-.radio-label {
-  font-size: 22px;
-  font-weight: normal;
-  padding: 4px 30px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-}
-.radio-label input[type=radio] {
-  display: none;
-}
-.radio-label:hover {
-  font-size: 22px;
-  font-weight: normal;
-  background-color: #428bca;
-  color: white;
-  cursor: pointer;
-}
-.radio-label-selected {
-  font-size: 22px;
-  font-weight: normal;
-  background-color: #428bca;
-  color: white;
-  cursor: pointer;
-}
-.billing-label {
-  font-size: 22px;
-  font-weight: normal;
-  padding: 4px 30px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-}
-.billing-label input[type=radio] {
-  display: none;
-}
-.billing-label:hover {
-  font-size: 22px;
-  font-weight: normal;
-  background-color: #428bca;
-  color: white;
-  cursor: pointer;
-}
-.billing-label-selected {
-  font-size: 22px;
-  font-weight: normal;
-  background-color: #428bca;
-  color: white;
-  cursor: pointer;
-}
-@media(min-width: 1200px) {
-  .total {
-    position: fixed;
-  }
-}
-{% endblock %}
+    {% block checkout-styles %}
+        .radio-label span:before {
+            font-family: "FontAwesome", serif;
+            font-style: normal;
+            width: 1em;
+            height: 1em;
+            font-size: 2em;
+            content: '\f096';
+            margin-left: .3em;
+        }
+        .radio-label.radio-label-selected span:before {
+            content: '\f046';
+            color: #34aa3a;
+        }
+        .radio-label {
+            font-size: 16px;
+            font-weight: normal;
+            padding: 4px 30px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            opacity: 0.5;
+        }
+        .radio-label input[type=radio] {
+            display: none;
+        }
+        .radio-label:hover {
+            font-size: 16px;
+            font-weight: normal;
+            border-color: #34aa3a;
+            color: #000000;
+            cursor: pointer;
+            opacity: 1;
+        }
+        .radio-label-selected {
+            font-size: 16px;
+            font-weight: normal;
+            border-color: #34aa3a;
+            color: #000000;
+            cursor: pointer;
+            opacity: 1;
+        }
+        .billing-label {
+            font-size: 16px;
+            font-weight: normal;
+            padding: 4px 30px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+        .billing-label input[type=radio] {
+            display: none;
+        }
+        .billing-label:hover {
+            font-size: 16px;
+            font-weight: normal;
+            background-color: #428bca;
+            color: white;
+            cursor: pointer;
+        }
+        .billing-label-selected {
+            font-size: 16px;
+            font-weight: normal;
+            background-color: #428bca;
+            color: white;
+            cursor: pointer;
+        }
+        @media(min-width: 1200px) {
+            .total {
+                position: fixed;
+            }
+        }
+    {% endblock %}
 </style>
 
 
+
+    {#        <div class='col-sm-3 pull-right'>#}
+{##}
+{#            <div class='total'>#}
+{#                <h1>Current total: {{ order.get_final_amount }}</h1>#}
+{#                <a href='#'>Finalize Checkout</a>#}
+{#            </div>#}
+{#        </div>#}
+
 {% block content %}
+    <div class="modal fade" id='addShippingAddressModal'>
+        <form id="shippingAddressForm" method='POST' action='{% url "ajax_add_user_address" %}'>{% csrf_token %}
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                        <h4 class="modal-title">Agregar una nueva direccion de envio</h4>
+                        {% if address_form.errors %}
+                            {% for field in address_form %}
+                                {% for error in field.errors %}
+                                    <div class="alert alert-error">
+                                        <strong>{{ error|escape }}</strong>
+                                    </div>
+                                {% endfor %}
+                            {% endfor %}
+                            {% for error in address_form.non_field_errors %}
+                                <div class="alert alert-error">
+                                    <strong>{{ error|escape }}</strong>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                    <div class="modal-body">
+                        <div class="container">
+                            <div class="row">
+                                <div class='col-sm-6 pull-left'>
+                                    <fieldset>
+                                        <legend>Informacion personal</legend>
+                                        <div class="form-group form-inline">
+                                            {{ address_form.first_name }}
+                                            {{ address_form.last_name }}
+                                        </div>
+                                        <div class="form-group form-inline">
+                                            {{ address_form.personal_dni }}
+                                            {{ address_form.personal_dni.help_text }}
+                                        </div>
+                                    </fieldset>
+                                    <fieldset>
+                                        <legend>Informacion de contacto</legend>
+                                        <div class="form-group">
+                                            {{ address_form.address }}
+                                            {{ address_form.address.help_text }}
+                                        </div>
+                                        <div class="form-group">
+                                            {{ address_form.address2 }}
+                                        </div>
+                                        <div class="form-group form-inline">
+                                            {{ address_form.country }}
+                                        </div>
+                                        <div class="form-group form-inline">
+                                            {{ address_form.city }}
+                                            {{ address_form.state }}
+                                            {{ address_form.zipcode }}
+                                        </div>
+                                        <div class="form-group form-inline">
+                                            {{ address_form.phone_number }}
+                                            {{ address_form.phone_number.help_text }}
+                                        </div>
+                                    </fieldset>
+                                    <div class="form-group">
+                                        {{ address_form.default }}
+                                        {{ address_form.default.label_tag }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <input type='submit' class='btn btn-primary btn-fill' value='Agregar nueva direccion'/>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </form>
+    </div><!-- /.modal -->
+
     <div class="container">
-        <div class='col-sm-3 pull-right'>
-            <div class='total'>
-                <h1>Current total: {{ order.get_final_amount }}</h1>
-                <a href='#'>Finalize Checkout</a>
-            </div>
-        </div>
-
-        <div class='col-sm-9 pull-left'>
-            <div class='col-sm-6 pull-right' id='shippingAddressForm' style='display:none;'>
-                <h3>Add new Shipping Address</h3>
-                <form method="POST" action='{% url "ajax_add_user_address" %}?next=checkout'>{% csrf_token %}
-                    {{ address_form.as_p }}
-
-                    <input type='submit' class='btn btn-default' value='Add Shipping Address'/>
-                </form>
-            </div>
-
+        <p class="text-center">Información de envío y pago</p>
+        <div class="row">
             <form method='POST' action="{% url 'checkout' %}" id="payment-form"> {% csrf_token %}
-                {% if current_addresses  %}
-                    <div class='col-sm-12'>
-                        <h3>Shipping Addresses</h3>
-
-                        {% for address in current_addresses %}
-                            {% if request.user.userdefaultaddress.shipping.id == address.id %}
+                <div class='col-md-6'>
+                    <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Selecciona tu dirección de envío</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <h4>Recoger en las oficinas de Postdata</h4>
+                            <div class="pull-left address-box">
                                 <label class='radio-label radio-label-selected'>
-                                <input type='radio' name='shipping_address' value='{{ address.id }}' checked='checked'/> {{ address.get_address }}
-                            {% else %}
-                                <label class='radio-label'>
-                                <input type='radio' name='shipping_address' value='{{ address.id }}' /> {{ address.get_address }}
-                            {% endif %}
-                            </label><br/>
-                        {% endfor %}
-
-                        <a href='{% url "add_user_address" %}' id='addShippingAddress'>Add New Address</a>
-                    </div>
-                {% endif %}
-
-                {% if billing_addresses  %}
-                    <div class='col-sm-12'>
-                        <h3>Billing Addresses</h3>
-
-                        {% for address in billing_addresses %}
-                            {% if request.user.userdefaultaddress.billing.id == address.id %}
-                                <label class='billing-label billing-label-selected'>
-                                <input type='radio' name='billing_address' value='{{ address.id }}' checked='checked'/> {{ address.get_address }} <br/>
-                            {% else %}
-                                <label class='billing-label'>
-                                <input type='radio' name='billing_address' value='{{ address.id }}' /> {{ address.get_address }} <br/>
-                            {% endif %}
-                        </label>
-                        {% endfor %}
-                    </div>
-                {% endif %}
-
-                <div class='col-sm-6'>
-                    <h3>Credit Info</h3>
-                    <div id='card_errors_div' class="alert alert-danger hidden payment-errors" role="alert"></div>
-
-                    <div class="form-row">
-                        <div class='row'>
-                            <div class='col-xs-6' style='padding-right:0px;'>
-                                <b>Card Number</b>
-                                <input class='form-control' type="text" size="20" data-stripe="number"/>
+                                    <input type='radio' name='default_address' value='{{ default_address.id }}' />
+                                    <strong>{{ default_address.first_name }} {{ default_address.last_name }}</strong><span></span><br>
+                                    {{ default_address.address }}<br>
+                                    {{ default_address.address2 }}<br>
+                                    {{ default_address.city }}<br>
+                                    {{ addrdefault_addressess.country }}<br>
+                                    {{ default_address.phone_number }}<br>
+                                    <strong>{{ default_address.zipcode }}</strong><br>
+                                </label><br/>
                             </div>
-                            <div class='col-xs-2'>
-                                <b>CVC</b>
-                                <input class='form-control' type="text" size="4" data-stripe="cvc"/>
+                        </div>
+                        <div class="row">
+                            <h4>Selecciona una dirección de envío</h4>
+                            {% if not current_addresses %}
+                                <div class="pull-left address-box">
+                                    <p>Aún no tienes ninguna dirección de envío, deseas agregar una?</p>
+                                </div>
+
+                            {% else %}
+                                {% for address in current_addresses %}
+                                    <div class="pull-left address-box">
+                                        <label class='radio-label'>
+                                            <input type='radio' name='shipping_address' value='{{ address.id }}' />
+                                            <strong>{{ address.first_name }} {{ address.last_name }}</strong><span></span><br>
+                                            {{ address.address }}<br>
+                                            {{ address.address2 }}<br>
+                                            {{ address.city }}<br>
+                                            {{ address.country }}<br>
+                                            {{ address.phone_number }}<br>
+                                            <strong>{{ address.zipcode }}</strong><br>
+                                        </label><br/>
+                                        <a class="pull-left text-primary" href='#'>Editar
+                                            <span class="glyphicon glyphicon-edit"></span>
+                                        </a>
+                                        <a class="pull-right text-danger" href='{% url "delete_user_address" address.id %}?next=checkout'>Eliminar
+                                            <span class="glyphicon glyphicon-remove"></span>
+                                        </a>
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                        <div class="row">
+                            <a href="" data-toggle="modal" data-target="#addShippingAddressModal">Agregar una nueva dirección de envío</a>
+                        </div>
+{#                        {% if current_addresses  %}#}
+{#                                <h3>Dirección de envío</h3>#}
+{##}
+{#                                {% for address in current_addresses %}#}
+{#                                    {% if request.user.userdefaultaddress.shipping.id == address.id %}#}
+{#                                        <label class='radio-label'>#}
+{#                                        <input type='radio' name='shipping_address' value='{{ address.id }}' checked='checked'/> {{ address.get_address }}#}
+{#                                    {% else %}#}
+{#                                        <label class='radio-label'>#}
+{#                                        <input type='radio' name='shipping_address' value='{{ address.id }}' /> {{ address.get_address }}#}
+{#                                    {% endif %}#}
+{#                                    </label><br/>#}
+{#                                {% endfor %}#}
+{##}
+{#                                <a href='{% url "add_user_address" %}' id='addShippingAddress'>Agregar una nueva dirección</a>#}
+{##}
+{#                        {% endif %}#}
+{##}
+{#                        {% if billing_addresses  %}#}
+{#                            <div class='col-sm-12'>#}
+{#                                <h3>Dirección de facturación</h3>#}
+{##}
+{#                                {% for address in billing_addresses %}#}
+{#                                    {% if request.user.userdefaultaddress.billing.id == address.id %}#}
+{#                                        <label class='billing-label billing-label-selected'>#}
+{#                                        <input type='radio' name='billing_address' value='{{ address.id }}' checked='checked'/> {{ address.get_address }} <br/>#}
+{#                                    {% else %}#}
+{#                                        <label class='billing-label'>#}
+{#                                        <input type='radio' name='billing_address' value='{{ address.id }}' /> {{ address.get_address }} <br/>#}
+{#                                    {% endif %}#}
+{#                                </label>#}
+{#                                {% endfor %}#}
+{#                            </div>#}
+{#                        {% endif %}#}
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Detalles del pago</h3>
+                        </div>
+                        <div class="panel-body">
+                            <div id='card_errors_div' class="alert alert-danger hidden payment-errors" role="alert"></div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label for="cardNumber">
+                                        NUMERO DE TARJETA</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" id="cardNumber" placeholder="Numero de tarjeta de credito" required autofocus />
+                                        <span class="input-group-addon"><span class="glyphicon glyphicon-lock"></span></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-xs-6 col-md-8">
+                                    <div class="form-group">
+                                        <p>
+                                            FECHA DE EXPIRACION</p>
+                                        <div class="col-xs-6 col-lg-6 pl-ziro">
+                                            <input type="text" class="form-control" id="expityMonth" placeholder="MM" required />
+                                        </div>
+                                        <div class="col-xs-6 col-lg-6 pl-ziro">
+                                            <input type="text" class="form-control" id="expityYear" placeholder="YY" required /></div>
+                                    </div>
+                                </div>
+                                <div class="col-xs-5 col-md-4 pull-right">
+                                    <div class="form-group">
+                                        <p>CODIGO CV</p>
+                                        <input type="password" class="form-control" id="cvCode" placeholder="CV" required />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="secure-proof row">
+                                <div class="col-xs-7">
+                                    <div class="lock-text pull-left">
+                                        <i class="fa fa-lock fa-2x pull-left"></i>
+                                        <span>Pago de tarjeta de credito seguro</span>
+                                        <span>Encriptación 256-bit SSL</span>
+                                    </div>
+                                </div>
+                                <div class="col-xs-5 pull-right text-right">Powered By
+                                </div>
                             </div>
                         </div>
                     </div>
+                    <ul class="nav nav-pills nav-stacked">
+                        <li class="active"><a href="#"><span class="badge pull-right"><span> Bs.F</span>{{ order.sub_total }}</span> Sub Total</a>
+                        </li>
+                        <li class="active"><a href="#"><span class="badge pull-right"><span> Bs.F </span>{{ order.get_final_amount }}</span> Monto total a pagar</a>
+                        </li>
+                    </ul>
                     <br/>
-
-                    <div class="form-row">
-                        <b>Expiration (MM/YYYY)</b>
-                        <div class='row'>
-                            <div class='col-xs-2' style='padding-right:0px;'>
-                                <input class='form-control'  type="text" size="2" data-stripe="exp-month" placeholder='2'/>
-                            </div>
-                            <div class='col-xs-3'>
-                                <input class='form-control' type="text" size="4" data-stripe="exp-year" placeholder='2017'/>
-                            </div>
-                        </div>
+                    <button class='btn btn-success btn-lg btn-block btn-fill' type="submit">Pagar</button>
                     </div>
-                    <br/>
-                    <br/>
-                    <button class='btn btn-default btn-lg' type="submit">Submit Payment</button>
-                    <input class="btn btn-default btn-lg" type="submit"/>
-
                 </div>
             </form>
         </div>
     </div>
 {% endblock %}
+
+
+{#                    <div class='col-sm-6'>#}
+    {#                        <h3>Credit Info</h3>#}
+    {#                        <div id='card_errors_div' class="alert alert-danger hidden payment-errors" role="alert"></div>#}
+    {##}
+    {#                        <div class="form-row">#}
+    {#                            <div class='row'>#}
+    {#                                <div class='col-xs-6' style='padding-right:0px;'>#}
+    {#                                    <b>Card Number</b>#}
+    {#                                    <input class='form-control' type="text" size="20" data-stripe="number"/>#}
+    {#                                </div>#}
+    {#                                <div class='col-xs-2'>#}
+    {#                                    <b>CVC</b>#}
+    {#                                    <input class='form-control' type="text" size="4" data-stripe="cvc"/>#}
+    {#                                </div>#}
+    {#                            </div>#}
+    {#                        </div>#}
+    {#                        <br/>#}
+    {##}
+    {#                        <div class="form-row">#}
+    {#                            <b>Expiration (MM/YYYY)</b>#}
+    {#                            <div class='row'>#}
+    {#                                <div class='col-xs-2' style='padding-right:0px;'>#}
+    {#                                    <input class='form-control'  type="text" size="2" data-stripe="exp-month" placeholder='2'/>#}
+    {#                                </div>#}
+    {#                                <div class='col-xs-3'>#}
+    {#                                    <input class='form-control' type="text" size="4" data-stripe="exp-year" placeholder='2017'/>#}
+    {#                                </div>#}
+    {#                            </div>#}
+    {#                        </div>#}
+    {#                        <br/>#}
+    {#                        <br/>#}
+    {#                        <button class='btn btn-default btn-lg' type="submit">Submit Payment</button>#}
+    {#                        <input class="btn btn-default btn-lg" type="submit"/>#}
+    {##}
+    {#                    </div>#}
+
+
+<script>
+    {% block jquery %}
+        $(".radio-label").click(function(){
+            $("label").removeClass('radio-label-selected');
+            $(this).addClass('radio-label-selected');
+        });
+
+        $(".billing-label").click(function(){
+            $("label").removeClass('billing-label-selected');
+            $(this).addClass('billing-label-selected');
+        });
+{#        jQuery(function($) {#}
+{#            $('#payment-form').submit(function(event) {#}
+{#                var $form = $(this);#}
+{#                // Disable the submit button to prevent repeated clicks#}
+{#                $form.find('button').prop('disabled', true);#}
+{#                // Prevent the form from submitting with the default action#}
+{#                return false;#}
+{#            });#}
+{#        });#}
+
+        jQuery(function($) {
+            $('#shippingAddressForm').submit(function(event) {
+                event.preventDefault();
+                var $form = $(this);
+                // Disable the submit button to prevent repeated clicks
+                $form.find('button').prop('disabled', true);
+
+                $.ajax({
+                    type: "POST",
+                    url: "{% url 'ajax_add_user_address' %}",
+                    data: $form.serialize(),
+                    success: function(data) {
+                        if (data.status == 'error') {
+
+                            $(".alert").remove();
+                            $(".errorField").remove();
+                            $("#addShippingAddressModal").find("input").each(function () {
+                                $(this).css('border', '1px solid #ccc');
+                            });
+                            $("#addShippingAddressModal").find(".modal-header").append("<div class='alert alert-danger alert-dismissible' role='alert'>Oops! Encontramos un error en el formulario, revisa los campos en rojo!<button type='button' class='close' data-dismiss='alert'><span aria-hidden='true'>&times;</span><span class='sr-only'>Close</span></button> </div>");
+
+                            for (var key in data.form_errors) {
+                                var field = $("#shippingAddressForm").find("#id_" + key);
+                                if (data.form_errors[key][0]) {
+                                    var error = data.form_errors[key][0];
+                                    field.before('<p class="errorField"><em></em>' + error + '</p>');
+                                }
+                                // Find related field
+                                // Attach error message before it
+                                field.css('border', '2px solid #a94442');
+                            }
+                        } else if (data.status == 'success') {
+                            console.log("success");
+                            location.reload(true);
+                        }
+                    },
+                    error: function(data) {
+                        alert("Oops! Ocurrió un error al agregar la dirección de envío");
+                        console.log(data)
+                    }
+                });
+                // Prevent the form from submitting with the default action
+                return false;
+            });
+        });
+
+        function stripeResponseHandler(status, response) {
+            var $form = $('#payment-form');
+            if (response.error) {
+                // Show the errors on the form
+                $("#card_errors_div").removeClass("hidden");
+                $form.find('.payment-errors').text(response.error.message);
+                $form.find('button').prop('disabled', false);
+            } else {
+                $("#card_errors_div").addClass("hidden");
+                // response contains id and card, which contains additional card details
+                var token = response.id;
+                // Insert the token into the form so it gets submitted to the server
+                // and submit
+                //$form.get(0).submit();
+            }
+        }
+
+        $("#addShippingAddress").click(function(e){
+            e.preventDefault();
+            $("#shippingAddressForm").fadeToggle();
+        });
+        {% if not current_addresses  %}
+            //$("#shippingAddressForm").fadeToggle();
+        {% endif %}
+    {% endblock %}
+</script>

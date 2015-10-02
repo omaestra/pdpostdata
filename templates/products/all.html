@@ -20,13 +20,13 @@
                     <div class="box">
                         <div class="boxInner">
                             <div class="text">
-                                <h3 class="styled">{{ product.title }}</h3>
+                                <h2 class="styled">{{ product.title }}</h2>
                                 <p></p>
                             </div>
                             <div class="titleBox">
                                 <p>
                                     <a href="{{ product.get_absolute_url }}" class="btn btn-product-fill" role="button">Ver</a>
-                                    <a href="{% url 'make' product.slug %}" class="btn btn-product" role="button">
+                                    <a href="{% url 'wizard' product.slug %}" class="btn btn-product" role="button">
                                         <span class="glyphicon glyphicon-shopping-cart"></span> Agregar al carrito
                                     </a>
                                 </p>
@@ -35,13 +35,15 @@
                     </div>
                     <div class="box">
                         <div class="boxInner">
-                            {% if product.productimage_set.all %}
+                            {% if product.product_images.all %}
                                 <div id="description-carousel" class="carousel fade" data-ride="carousel" data-interval="3000">
                                     <div class="carousel-inner">
-                                        {% for item in product.productimage_set.all %}
+                                        {% for item in product.product_images.all %}
                                             <div class="item {% if item.featured %}active{% endif %}">
                                                 <div class="img-product">
-                                                    <img class='img-responsive' src="/media/{{ item.image }}" />
+                                                    <a href="{% url 'wizard' product.slug %}">
+                                                        <img class='img-responsive' src="/media/{{ item.image }}" />
+                                                    </a>
                                                 </div>
                                             </div>
                                             <div class="titleBox">{{ product.description }}</div>
